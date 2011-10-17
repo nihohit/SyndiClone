@@ -35,10 +35,16 @@
   </PropertyGroup>
   <ItemGroup>
     <Folder Include="audio manager\" />
-    <Folder Include="city generator\" />
     <Folder Include="graphic manager\" />
     <Folder Include="logic\" />
     <Folder Include="screen manager\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="city generator\City.cs" />
+    <Compile Include="city generator\Block.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
