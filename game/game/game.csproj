@@ -42,8 +42,18 @@
   <ItemGroup>
     <Compile Include="city generator\City.cs" />
     <Compile Include="city generator\Block.cs" />
+    <Compile Include="city generator\CityImageGenerator.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="sfmlnet-audio">
+      <HintPath>..\..\SFML-1.6-dotnet-dev-windows\SFML-1.6\dotnet\lib\sfmlnet-audio.dll</HintPath>
+    </Reference>
+    <Reference Include="sfmlnet-graphics">
+      <HintPath>..\..\SFML-1.6-dotnet-dev-windows\SFML-1.6\dotnet\lib\sfmlnet-graphics.dll</HintPath>
+    </Reference>
+    <Reference Include="sfmlnet-window">
+      <HintPath>..\..\SFML-1.6-dotnet-dev-windows\SFML-1.6\dotnet\lib\sfmlnet-window.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

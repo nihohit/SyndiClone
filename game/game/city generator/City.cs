@@ -7,5 +7,11 @@ namespace game.city_generator
 {
     class City
     {
+        char[][] grid;
+
+        public char[][] get_grid()
+        {
+            return this.grid;
+        }
     }
 }
