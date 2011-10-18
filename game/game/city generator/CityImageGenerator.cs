@@ -1,10 +1,13 @@
 ﻿using System.Drawing;
 using System.Collections.Generic;
 
+
+
 namespace game.city_generator
 {
     class CityImageGenerator
     {
+        static int tileSize = 32;
         
         public static Image convert_to_image(City city){
             short[][] grid = city.get_grid();
@@ -32,7 +35,10 @@ namespace game.city_generator
 
         public static Image test_convert_to_image(short[][] grid)
         {
-            Image img = new Bitmap(32 * grid.GetLength(0), 32 * grid.GetLength(1));
+            int width = tileSize * grid.GetLength(0);
+            int height = tileSize * grid[0].GetLength(0);
+            Image img = new Bitmap(width,height);
+            
             List<Image> images = new List<Image>();
             foreach (short[] list in grid)
             {
@@ -48,8 +54,13 @@ namespace game.city_generator
             foreach (Image image in images)
             {
                 graphic.DrawImage(image, new Rectangle(widthOffset, heightOffset, image.Width, image.Height));
-                widthOffset += 32;
-                heightOffset += 32;
+                widthOffset += tileSize;
+                if (widthOffset == width)
+                {
+                    heightOffset += tileSize;
+                    widthOffset = 0;
+                }
+                
             }
 
             return img;
