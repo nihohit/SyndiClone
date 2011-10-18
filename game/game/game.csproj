@@ -35,6 +35,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Folder Include="audio manager\" />
+    <Folder Include="city generator\images\" />
     <Folder Include="graphic manager\" />
     <Folder Include="logic\" />
     <Folder Include="screen manager\" />
@@ -43,6 +44,12 @@
     <Compile Include="city generator\City.cs" />
     <Compile Include="city generator\Block.cs" />
     <Compile Include="city generator\CityImageGenerator.cs" />
+    <Compile Include="city generator\city_images.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>city_images.resx</DependentUpon>
+    </Compile>
+    <Compile Include="TestMain.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="sfmlnet-audio">
@@ -55,6 +62,13 @@
       <HintPath>..\..\SFML-1.6-dotnet-dev-windows\SFML-1.6\dotnet\lib\sfmlnet-window.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Drawing" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="city generator\city_images.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>city_images.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

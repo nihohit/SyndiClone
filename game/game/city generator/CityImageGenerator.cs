@@ -1,16 +1,81 @@
-﻿using SFML.Graphics;
+﻿using System.Drawing;
+using System.Collections.Generic;
 
 namespace game.city_generator
 {
     class CityImageGenerator
     {
-
+        
         public static Image convert_to_image(City city){
-            char[][] grid = city.get_grid();
-            Image img;
-
+            short[][] grid = city.get_grid();
+            Image img = new Bitmap(32*grid.GetLength(0),32*grid.GetLength(1));
+            List<Image> images = new List<Image>();
+            foreach (short[] list in grid)
+            {
+                foreach (short num in list)
+                {
+                    images.Add(get_image(num));
+                }
+            }
+            Graphics graphic = Graphics.FromImage(img);
+            graphic.Clear(Color.Gray);
+            int widthOffset = 0;
+            int heightOffset = 0;
+            foreach (Image image in images){
+                graphic.DrawImage(image, new Rectangle(widthOffset,heightOffset,image.Width, image.Height));
+                widthOffset +=32;
+                heightOffset +=32;
+            }
 
             return img; 
+        }
+
+        public static Image test_convert_to_image(short[][] grid)
+        {
+            Image img = new Bitmap(32 * grid.GetLength(0), 32 * grid.GetLength(1));
+            List<Image> images = new List<Image>();
+            foreach (short[] list in grid)
+            {
+                foreach (short num in list)
+                {
+                    images.Add(get_image(num));
+                }
+            }
+            Graphics graphic = Graphics.FromImage(img);
+            graphic.Clear(Color.Gray);
+            int widthOffset = 0;
+            int heightOffset = 0;
+            foreach (Image image in images)
+            {
+                graphic.DrawImage(image, new Rectangle(widthOffset, heightOffset, image.Width, image.Height));
+                widthOffset += 32;
+                heightOffset += 32;
+            }
+
+            return img;
+        }
+
+        private static Image get_image(short id)
+        {
+            Image img = null;
+            switch (id)
+            {
+                case 1:
+                    img = new Bitmap(city_images.road1);
+                    break;
+                case 2:
+                    img = new Bitmap(city_images.road1);
+                    img.RotateFlip(RotateFlipType.Rotate90FlipNone);
+                    break;
+                case 3:
+                    img = new Bitmap(city_images.road1mid);
+                    break;
+                default:
+                    img = new Bitmap(city_images.empty);
+                    break;
+            }
+
+            return img;
         }
 
     }
