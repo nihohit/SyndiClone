@@ -34,10 +34,7 @@ namespace Game.Maps
         public static void run (){
             Point p1 = new Point(4, 7);
             Point p2 = new Point(5, 10, 1, 6);
-            System.Console.WriteLine("BOO");
-            System.Console.WriteLine(p1.ToString());
-            System.Windows.Forms.MessageBox.Show(p2.ToString(),"p2");
-            
+           
 
         }
     }

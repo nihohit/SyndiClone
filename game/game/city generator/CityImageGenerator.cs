@@ -1,5 +1,6 @@
 ﻿using System.Drawing;
 using System.Collections.Generic;
+using System;
 
 
 
@@ -35,8 +36,8 @@ namespace game.city_generator
 
         public static Image test_convert_to_image(short[][] grid)
         {
-            int width = tileSize * grid.GetLength(0);
-            int height = tileSize * grid[0].GetLength(0);
+            int width = tileSize * grid[0].GetLength(0);
+            int height = tileSize * grid.GetLength(0);
             Image img = new Bitmap(width,height);
             
             List<Image> images = new List<Image>();
@@ -69,20 +70,66 @@ namespace game.city_generator
         private static Image get_image(short id)
         {
             Image img = null;
-            switch (id)
+            //TODO - enter all types of tiles here. should we tile in buildings, and change the whole picture when they get destryed?
+            /*code:
+             * WXYZ - 
+             * W - type?
+             * X - which pictures (1-8)
+             * Y - needs flip? 0 - no, 1 - X, 2 - Y, 3 - XY
+             * Z - needs Rotate? 0 - no, 1 - 90, 2 - 180, 3 - 270
+             * */
+            switch (id/100)
             {
-                case 1:
-                    img = new Bitmap(city_images.road1);
+                case 11:
+                    img = new Bitmap(city_images._1_road1);
                     break;
-                case 2:
-                    img = new Bitmap(city_images.road1);
-                    img.RotateFlip(RotateFlipType.Rotate90FlipNone);
+                case 12:
+                    img = new Bitmap(city_images._2_road1intersect);
                     break;
-                case 3:
-                    img = new Bitmap(city_images.road1mid);
+                case 13:
+                    img = new Bitmap(city_images._3_road1mid);
+                    break;
+                case 14: 
+                    img = new Bitmap(city_images._4_road2intersect);
+                    break;
+                case 15:
+                    img = new Bitmap(city_images._5_road2side);
+                    break;
+                case 16:
+                    img = new Bitmap(city_images._6_road3intersect);
+                    break;
+                case 17:
+                    img = new Bitmap(city_images._7_road3middle);
+                    break;
+                case 18:
+                    img = new Bitmap(city_images._8_road3side);
                     break;
                 default:
-                    img = new Bitmap(city_images.empty);
+                    img = new Bitmap(city_images._0_empty);
+                    break;
+            }
+            switch (id % 10)
+            {
+                case 1:
+                    img.RotateFlip(RotateFlipType.Rotate90FlipNone);
+                    break;
+                case 2:
+                    img.RotateFlip(RotateFlipType.Rotate180FlipNone);
+                    break;
+                case 3:
+                    img.RotateFlip(RotateFlipType.Rotate270FlipNone);
+                    break;
+            }
+            switch ((id % 100) / 10)
+            {
+                case 1:
+                    img.RotateFlip(RotateFlipType.RotateNoneFlipX);
+                    break;
+                case 2:
+                    img.RotateFlip(RotateFlipType.RotateNoneFlipY);
+                    break;
+                case 3:
+                    img.RotateFlip(RotateFlipType.RotateNoneFlipXY);
                     break;
             }
 

@@ -60,65 +60,65 @@ namespace game.city_generator {
             }
         }
         
-        internal static System.Drawing.Bitmap empty {
+        internal static System.Drawing.Bitmap _0_empty {
             get {
-                object obj = ResourceManager.GetObject("empty", resourceCulture);
+                object obj = ResourceManager.GetObject("_0_empty", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
         
-        internal static System.Drawing.Bitmap road1 {
+        internal static System.Drawing.Bitmap _1_road1 {
             get {
-                object obj = ResourceManager.GetObject("road1", resourceCulture);
+                object obj = ResourceManager.GetObject("_1_road1", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
         
-        internal static System.Drawing.Bitmap road1intersect {
+        internal static System.Drawing.Bitmap _2_road1intersect {
             get {
-                object obj = ResourceManager.GetObject("road1intersect", resourceCulture);
+                object obj = ResourceManager.GetObject("_2_road1intersect", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
         
-        internal static System.Drawing.Bitmap road1mid {
+        internal static System.Drawing.Bitmap _3_road1mid {
             get {
-                object obj = ResourceManager.GetObject("road1mid", resourceCulture);
+                object obj = ResourceManager.GetObject("_3_road1mid", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
         
-        internal static System.Drawing.Bitmap road2intersect {
+        internal static System.Drawing.Bitmap _4_road2intersect {
             get {
-                object obj = ResourceManager.GetObject("road2intersect", resourceCulture);
+                object obj = ResourceManager.GetObject("_4_road2intersect", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
         
-        internal static System.Drawing.Bitmap road2side {
+        internal static System.Drawing.Bitmap _5_road2side {
             get {
-                object obj = ResourceManager.GetObject("road2side", resourceCulture);
+                object obj = ResourceManager.GetObject("_5_road2side", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
         
-        internal static System.Drawing.Bitmap road3intersect {
+        internal static System.Drawing.Bitmap _6_road3intersect {
             get {
-                object obj = ResourceManager.GetObject("road3intersect", resourceCulture);
+                object obj = ResourceManager.GetObject("_6_road3intersect", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
         
-        internal static System.Drawing.Bitmap road3middle {
+        internal static System.Drawing.Bitmap _7_road3middle {
             get {
-                object obj = ResourceManager.GetObject("road3middle", resourceCulture);
+                object obj = ResourceManager.GetObject("_7_road3middle", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
         
-        internal static System.Drawing.Bitmap road3side {
+        internal static System.Drawing.Bitmap _8_road3side {
             get {
-                object obj = ResourceManager.GetObject("road3side", resourceCulture);
+                object obj = ResourceManager.GetObject("_8_road3side", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
