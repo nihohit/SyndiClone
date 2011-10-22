@@ -2,7 +2,7 @@
 
 namespace game.logic
 {
-    class Entity
+    abstract class Entity
     {
         private int health;
 
@@ -11,6 +11,8 @@ namespace game.logic
             this.health -= damage;
             return (this.health <= 0);
         }
+
+        public abstract bool blocksVision();
 
     }
 }
