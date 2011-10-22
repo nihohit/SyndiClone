@@ -1,5 +1,5 @@
 ﻿
-namespace game.logic
+namespace Game.Logic
 {
     class BlastEffect
     {

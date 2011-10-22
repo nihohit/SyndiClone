@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Game.Maps
+namespace Game.City_Generator
 {
     class Point
     {

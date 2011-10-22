@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace game.logic
+namespace Game.Logic
 {
     class FirstGrid : Grid
     {
@@ -9,7 +9,7 @@ namespace game.logic
 
         public FirstGrid(int x, int y)
         {
-            locations = new Dictionary<Entity, Point>();
+            locations = new Dictionary<Entity, Point>(); //TODO question: just "entity" is enough? not, maybe, "background+entity" ? 
             gameGrid = new Entity[x,y];
             for (int i = 0 ; i < x; i++){
                 for (int j =0 ; j < y ; j++){
@@ -32,15 +32,21 @@ namespace game.logic
 
         //This function checks if any entity in the radius around the point answers the conditions in checker
         //TODO - ensure that LoS is blocked by relevant entities. After that, copy the function for area of effect. 
-        public Entity checkFor(Entity ent, int radius, LogicInfo.EntityChecker checker)
+        public List<Entity> whatSees(Entity ent)
         {
             //Get all the relevant variables
-            Entity ans = null;
-            Entity temp = null;
+            List<Entity> ans = new List<Entity>();
             Point location = this.locations[ent];
+            Sight sight = ent.getSight();
+            int radius = sight.getRange();
             int x = location.getX();
             int y = location.getY();
-
+            /*TODO - redo. what needs to be done is open a scan in each direction, 
+             * and as long as not blocked in that direction, continue scan. possible method - 
+             * plot the outermost ring of points, and plot the way towards each point, 
+             * adding what entities you see on the way.
+             * 
+             * 
             //the main loop - checks for each length
             for (int i = 1; i < radius; i++)
             {
@@ -95,7 +101,7 @@ namespace game.logic
                 if (ans!=null){
                     break;
                 }
-            }
+            }*/
 
             return ans;
         }
@@ -111,7 +117,7 @@ namespace game.logic
         }
 
         //This function simulates a single shot
-        public void affectTarget(Entity shooter, Entity target, LogicInfo.HitFunction func, ShotType shot)
+        public void solveShot(Entity shooter, Entity target, LogicInfo.HitFunction func, ShotType shot)
         {
             //get all relevant variables
             Point currentTarget = func(this.locations[target]);

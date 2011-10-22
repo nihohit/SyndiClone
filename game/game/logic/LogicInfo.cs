@@ -1,5 +1,7 @@
-﻿
-namespace game.logic
+﻿using System.Collections.Generic;
+
+
+namespace Game.Logic
 {
     class LogicInfo
     {
@@ -7,6 +9,7 @@ namespace game.logic
         public delegate Point HitFunction(Point target);
         public delegate void Effect(Entity ent);
         public delegate bool wasBlocked(Entity ent);
+        public delegate Entity targetChooser(List<Entity> targets);
 
     }
 }

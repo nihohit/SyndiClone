@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Game.Maps;
+using Game.City_Generator;
 
 namespace Game
 {

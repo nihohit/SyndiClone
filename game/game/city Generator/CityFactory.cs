@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Game.Maps
+namespace Game.City_Generator
 {
     
     class CityFactory
@@ -22,6 +22,7 @@ namespace Game.Maps
         public static City createMap(int length=DEF_LEN,int width=DEF_WID){
             City retVal = new City(length,width);
             retVal.addRoads(length, width);
+            retVal.translateMap();
 
 
 

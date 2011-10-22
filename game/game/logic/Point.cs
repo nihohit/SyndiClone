@@ -1,7 +1,7 @@
 ﻿
-namespace game.logic
+namespace Game.Logic
 {
-    class Point
+    class Point //TODO: question - we have two "Point" classes. any reason for this duplicity? 
     {
 
         private int _xLoc, _yLoc;

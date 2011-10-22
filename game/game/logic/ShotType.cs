@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace game.logic
+namespace Game.Logic
 {
     class ShotType
     {
+        //TODO question - I think we need to talk about the shooting mechanism, also, we should do that later - after we'll have people running on our map.
         private readonly BlastEffect _blast;
         private readonly LogicInfo.Effect _effect;
         private readonly LogicInfo.wasBlocked _blocked;
