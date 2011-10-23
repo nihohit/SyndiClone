@@ -1,18 +1,18 @@
 ﻿
-namespace Game.Logic
+namespace Game.Logic.Entities
 {
     abstract class Weapon
     {
         private readonly int _range;
 
-        internal int rng
+        internal int Range
         {
           get { return _range; }  
         } 
 
         readonly ShotType _shot;
 
-        internal ShotType shot
+        internal ShotType Shot
         {
           get { return _shot; }  
         } 

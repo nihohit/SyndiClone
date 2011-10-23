@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Game.Logic
+namespace Game.Logic.Entities
 {
     abstract class Shooter : Entity
     {
         private readonly Weapon weapon;
 
-        protected Weapon Weapon
+        internal Weapon Weapon
         {
             get { return weapon; }
         }
@@ -17,7 +17,7 @@ namespace Game.Logic
 
         private readonly HitFunction hitFunc;
 
-        protected HitFunction HitFunc
+        internal HitFunction HitFunc
         {
             get { return hitFunc; }
         } 

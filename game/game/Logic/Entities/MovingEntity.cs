@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-namespace Game.Logic
+namespace Game.Logic.Entities
 {
     class MovingEntity
     {

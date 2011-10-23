@@ -1,6 +1,6 @@
 ﻿
 
-namespace Game.Logic
+namespace Game.Logic.Entities
 {
     internal abstract class Entity
         //TODO: question - "Entity" is civilians, soldiers and buildings? anything else?

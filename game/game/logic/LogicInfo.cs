@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Game.Logic.Entities;
 
 
 namespace Game.Logic
