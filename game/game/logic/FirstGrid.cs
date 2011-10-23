@@ -2,10 +2,12 @@
 
 namespace Game.Logic
 {
+
+
     class FirstGrid : Grid
     {
-        Dictionary<Entity, Point> locations;
-        Entity[,] gameGrid;
+        private readonly Dictionary<Entity, Point> locations;
+        private readonly Entity[,] gameGrid;
 
         public FirstGrid(int x, int y)
         {
@@ -117,13 +119,14 @@ namespace Game.Logic
         }
 
         //This function simulates a single shot
-        public void solveShot(Entity shooter, Entity target, LogicInfo.HitFunction func, ShotType shot)
+        public void solveShot(Shooter shooter, Entity target)
         {
             //get all relevant variables
-            Point currentTarget = func(this.locations[target]);
+
+            Point currentTarget = shooter.func(this.locations[target]);
             Point exit = this.locations[shooter];
-            LogicInfo.wasBlocked blocked = shot.getBlocked();
-            LogicInfo.Effect effect = shot.getEffect();
+            wasBlocked blocked = shot.getBlocked();
+            Effect effect = shot.getEffect();
 
             Entity temp = null;
 

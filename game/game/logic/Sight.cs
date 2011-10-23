@@ -1,16 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace game.logic
+﻿
+namespace Game.Logic
 {
     class Sight
     {
         private readonly int _range;
-        private readonly LogicInfo.wasBlocked _blocked;
+        private readonly wasBlocked _blocked;
 
-        public Sight(int range, LogicInfo.wasBlocked blocked)
+        public Sight(int range, wasBlocked blocked)
         {
             this._blocked = blocked;
             this._range = range;
@@ -21,7 +17,7 @@ namespace game.logic
             return this._range;
         }
 
-        public LogicInfo.wasBlocked getBlocked()
+        public wasBlocked getBlocked()
         {
             return this._blocked;
         }

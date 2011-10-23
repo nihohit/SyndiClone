@@ -4,10 +4,10 @@ namespace Game.Logic
     class BlastEffect
     {
         private readonly int _radius;
-        private readonly LogicInfo.Effect _effect;
+        private readonly Effect _effect;
         private readonly bool _blocked;
 
-        public BlastEffect(int radius, LogicInfo.Effect effect, bool blocked)
+        public BlastEffect(int radius, Effect effect, bool blocked)
         {
             this._blocked = blocked;
             this._effect = effect;
@@ -19,7 +19,7 @@ namespace Game.Logic
             return this._radius;
         }
 
-        public LogicInfo.Effect getEffect()
+        public Effect getEffect()
         {
             return this._effect;
         }

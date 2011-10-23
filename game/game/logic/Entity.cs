@@ -2,7 +2,7 @@
 
 namespace Game.Logic
 {
-    abstract class Entity
+    internal abstract class Entity
         //TODO: question - "Entity" is civilians, soldiers and buildings? anything else?
     {
         private int _health;

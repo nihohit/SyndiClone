@@ -9,10 +9,10 @@ namespace Game.Logic
     {
         //TODO question - I think we need to talk about the shooting mechanism, also, we should do that later - after we'll have people running on our map.
         private readonly BlastEffect _blast;
-        private readonly LogicInfo.Effect _effect;
-        private readonly LogicInfo.wasBlocked _blocked;
+        private readonly Effect _effect;
+        private readonly wasBlocked _blocked;
 
-        public ShotType(BlastEffect blast, LogicInfo.Effect effect, LogicInfo.wasBlocked blocked)
+        public ShotType(BlastEffect blast, Effect effect, wasBlocked blocked)
         {
             this._blast = blast;
             this._blocked = blocked;
@@ -24,12 +24,12 @@ namespace Game.Logic
             return this._blast;
         }
 
-        public LogicInfo.Effect getEffect()
+        public Effect getEffect()
         {
             return this._effect;
         }
 
-        public LogicInfo.wasBlocked getBlocked()
+        public wasBlocked getBlocked()
         {
             return this._blocked;
         }

@@ -3,13 +3,10 @@
 
 namespace Game.Logic
 {
-    class LogicInfo
-    {
-        public delegate bool EntityChecker(Entity ent);
-        public delegate Point HitFunction(Point target);
-        public delegate void Effect(Entity ent);
-        public delegate bool wasBlocked(Entity ent);
-        public delegate Entity targetChooser(List<Entity> targets);
+        internal delegate bool EntityChecker(Entity ent);
+        internal delegate Point HitFunction(Point target);
+        internal delegate void Effect(Entity ent);
+        internal delegate bool wasBlocked(Entity ent);
+        internal delegate Entity targetChooser(List<Entity> targets);
 
-    }
 }
