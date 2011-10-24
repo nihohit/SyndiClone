@@ -7,10 +7,30 @@ namespace Game.Logic.Entities
 {
     class ShotType
     {
-        //TODO question - I think we need to talk about the shooting mechanism, also, we should do that later - after we'll have people running on our map.
+        /*HACK (amit) 
+         * question - I think we need to talk about the shooting mechanism, also, we should do that later - after we'll have people running on our map.
+         */
         private readonly BlastEffect _blast;
+
+        internal BlastEffect Blast
+        {
+            get { return _blast; }
+        }
+
         private readonly Effect _effect;
+
+        internal Effect Effect
+        {
+            get { return _effect; }
+        }
+
         private readonly wasBlocked _blocked;
+
+        internal wasBlocked Blocked
+        {
+            get { return _blocked; }
+        } 
+
 
         public ShotType(BlastEffect blast, Effect effect, wasBlocked blocked)
         {
@@ -19,20 +39,6 @@ namespace Game.Logic.Entities
             this._effect = effect;
         }
 
-        public BlastEffect getBlast()
-        {
-            return this._blast;
-        }
-
-        public Effect getEffect()
-        {
-            return this._effect;
-        }
-
-        public wasBlocked getBlocked()
-        {
-            return this._blocked;
-        }
 
     }
 }

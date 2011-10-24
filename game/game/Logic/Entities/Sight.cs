@@ -4,7 +4,19 @@ namespace Game.Logic.Entities
     class Sight
     {
         private readonly int _range;
+
+        public int Range
+        {
+            get { return _range; }
+        }
+
         private readonly wasBlocked _blocked;
+
+        internal wasBlocked Blocked
+        {
+            get { return _blocked; }
+        } 
+
 
         public Sight(int range, wasBlocked blocked)
         {
@@ -12,14 +24,6 @@ namespace Game.Logic.Entities
             this._range = range;
         }
 
-        public int getRange()
-        {
-            return this._range;
-        }
 
-        public wasBlocked getBlocked()
-        {
-            return this._blocked;
-        }
     }
 }

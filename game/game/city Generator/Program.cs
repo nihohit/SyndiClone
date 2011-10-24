@@ -13,10 +13,11 @@ namespace Game
         [STAThread]
         static void Main()
         {
+            Random rand = new Random();
             //Application.EnableVisualStyles();
            // Application.SetCompatibleTextRenderingDefault(false);
            // Application.Run(new Form1());
-            //Console.Out.WriteLine("ho");
+            
             City city = CityFactory.createMap(100,100);
             char[,] grid = city.getGrid();
             //Console.Out.WriteLine("hey!!");
@@ -31,7 +32,7 @@ namespace Game
                 file.Write("\r\n");
             }
             file.Close();
-
+            
             
            System.Console.ReadKey();
         }

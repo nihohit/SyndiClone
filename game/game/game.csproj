@@ -34,34 +34,42 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Folder Include="audio manager\" />
-    <Folder Include="graphic manager\" />
-    <Folder Include="screen manager\" />
+    <Folder Include="Audio Manager\" />
+    <Folder Include="Screen Manager\" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="city generator\Block.cs" />
-    <Compile Include="city generator\Building.cs" />
-    <Compile Include="city generator\CityImageGenerator.cs" />
-    <Compile Include="city generator\city_images.Designer.cs">
+    <Compile Include="City Generator\Block.cs" />
+    <Compile Include="City Generator\Building.cs" />
+    <Compile Include="City Generator\CityImageGenerator.cs" />
+    <Compile Include="City Generator\city_images.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>city_images.resx</DependentUpon>
     </Compile>
-    <Compile Include="city generator\City.cs" />
-    <Compile Include="city generator\CityFactory.cs" />
-    <Compile Include="logic\BlastEffect.cs" />
-    <Compile Include="logic\Civilian.cs" />
-    <Compile Include="logic\FirstGrid.cs" />
-    <Compile Include="logic\LogicInfo.cs" />
-    <Compile Include="logic\MovingEntity.cs" />
-    <Compile Include="logic\Entity.cs" />
-    <Compile Include="logic\GameLogic.cs" />
-    <Compile Include="logic\Grid.cs" />
-    <Compile Include="logic\Point.cs" />
-    <Compile Include="city generator\Point.cs" />
-    <Compile Include="city generator\Program.cs" />
-    <Compile Include="logic\ShotType.cs" />
+    <Compile Include="City Generator\City.cs" />
+    <Compile Include="City Generator\CityFactory.cs" />
+    <Compile Include="City Generator\RoadTile.cs" />
+    <Compile Include="City Generator\Tile.cs" />
+    <Compile Include="Graphic Manager\DisplayManager.cs" />
+    <Compile Include="Graphic Manager\GraphicInfo.cs" />
+    <Compile Include="Logic\Entities\Agent.cs" />
+    <Compile Include="Logic\Entities\BlastEffect.cs" />
+    <Compile Include="Logic\Entities\Civilian.cs" />
+    <Compile Include="Logic\Entities\EntityInfo.cs" />
+    <Compile Include="Logic\Entities\Person.cs" />
+    <Compile Include="Logic\Grid.cs" />
+    <Compile Include="Logic\LogicInfo.cs" />
+    <Compile Include="Logic\Entities\MovingEntity.cs" />
+    <Compile Include="Logic\Entities\Entity.cs" />
+    <Compile Include="Logic\GameLogic.cs" />
+    <Compile Include="City Generator\Program.cs" />
+    <Compile Include="Logic\Entities\Shooter.cs" />
+    <Compile Include="Logic\Entities\ShotType.cs" />
+    <Compile Include="Logic\Entities\Sight.cs" />
+    <Compile Include="Logic\Entities\Weapon.cs" />
+    <Compile Include="Point.cs" />
     <Compile Include="TestMain.cs" />
+    <Compile Include="Vector.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="sfmlnet-audio">
@@ -77,116 +85,116 @@
     <Reference Include="System.Drawing" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="city generator\city_images.resx">
+    <EmbeddedResource Include="City Generator\city_images.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>city_images.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <None Include="city generator\images\road2intersect2.jpg" />
-    <None Include="ClassDiagram1.cd" />
+    <None Include="City Generator\images\road2intersect2.jpg" />
     <None Include="ClassDiagram2.cd" />
-    <None Include="ClassDiagram3.cd" />
-    <None Include="logic\Logic.cd" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="city generator\images\road2intersect3.jpg" />
+    <None Include="City Generator\images\road2intersect3.jpg" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="city generator\images\road2side.jpg" />
+    <None Include="City Generator\images\road2side.jpg" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="city generator\images\road3intersect1.jpg" />
+    <None Include="City Generator\images\road3intersect1.jpg" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="city generator\images\road3intersect2.jpg" />
+    <None Include="City Generator\images\road3intersect2.jpg" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="city generator\images\road3intersect3.jpg" />
+    <None Include="City Generator\images\road3intersect3.jpg" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="city generator\images\road3middle.jpg" />
+    <None Include="City Generator\images\road3middle.jpg" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="city generator\images\road3side.jpg" />
+    <None Include="City Generator\images\road3side.jpg" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="city generator\images\empty.jpg" />
+    <None Include="City Generator\images\empty.jpg" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="city generator\images\road1.jpg" />
+    <None Include="City Generator\images\road1.jpg" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="city generator\images\road1intersect1.jpg" />
+    <None Include="City Generator\images\road1intersect1.jpg" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="city generator\images\road1intersect2.jpg" />
+    <None Include="City Generator\images\road1intersect2.jpg" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="city generator\images\road1intersect3.jpg" />
+    <None Include="City Generator\images\road1intersect3.jpg" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="city generator\images\road1mid.jpg" />
+    <None Include="City Generator\images\road1mid.jpg" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="city generator\images\road2intersect1.jpg" />
+    <None Include="City Generator\images\road2intersect1.jpg" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="city generator\images\road1mid222.jpg" />
+    <None Include="City Generator\images\road1mid222.jpg" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="city generator\images\road1mid11.jpg" />
+    <None Include="City Generator\images\road1mid11.jpg" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="city generator\images\road1mid12.jpg" />
+    <None Include="City Generator\images\road1mid12.jpg" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="city generator\images\road1mid13.jpg" />
+    <None Include="City Generator\images\road1mid13.jpg" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="city generator\images\road1mid23.jpg" />
+    <None Include="City Generator\images\road1mid23.jpg" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="city generator\images\road1mid33.jpg" />
+    <None Include="City Generator\images\road1mid33.jpg" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="city generator\images\road1mid221.jpg" />
+    <None Include="City Generator\images\road1mid221.jpg" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="city generator\images\road2intersect.jpg" />
+    <None Include="City Generator\images\road2intersect.jpg" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="city generator\images\road3intersect.jpg" />
+    <None Include="City Generator\images\road3intersect.jpg" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="city generator\images\road1intersect.jpg" />
+    <None Include="City Generator\images\road1intersect.jpg" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="city generator\images\2_road1intersect.jpg" />
+    <None Include="City Generator\images\2_road1intersect.jpg" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="city generator\images\3_road1mid.jpg" />
+    <None Include="City Generator\images\3_road1mid.jpg" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="city generator\images\4_road2intersect.jpg" />
+    <None Include="City Generator\images\4_road2intersect.jpg" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="city generator\images\5_road2side.jpg" />
+    <None Include="City Generator\images\5_road2side.jpg" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="city generator\images\6_road3intersect.jpg" />
+    <None Include="City Generator\images\6_road3intersect.jpg" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="city generator\images\7_road3middle.jpg" />
+    <None Include="City Generator\images\7_road3middle.jpg" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="city generator\images\8_road3side.jpg" />
+    <None Include="City Generator\images\8_road3side.jpg" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="city generator\images\0_empty.jpg" />
+    <None Include="City Generator\images\0_empty.jpg" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="city generator\images\1_road1.jpg" />
+    <None Include="City Generator\images\1_road1.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

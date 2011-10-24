@@ -5,22 +5,12 @@ using System.Text;
 
 namespace Game.Logic.Entities
 {
-    abstract class Shooter : Entity
+    interface Shooter
     {
-        private readonly Weapon weapon;
 
-        internal Weapon Weapon
-        {
-            get { return weapon; }
-        }
+        Weapon weapon();
 
-
-        private readonly HitFunction hitFunc;
-
-        internal HitFunction HitFunc
-        {
-            get { return hitFunc; }
-        } 
+        HitFunction hitFunc();
 
     }
 }

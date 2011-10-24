@@ -3,20 +3,26 @@
 namespace Game.Logic.Entities
 {
     internal abstract class Entity
-        //TODO: question - "Entity" is civilians, soldiers and buildings? anything else?
+
     {
-        private int _health;
-        private readonly Sight _sight;
+        protected int _health;
+        protected Sight _sight;
+        protected Vector _size;
+
+        internal Sight Sight
+        {
+            get { return _sight; }
+        } 
+
+        internal Vector Size
+        {
+            get { return _size; }
+        }
 
         public bool hit(int damage)
         {
             this._health -= damage;
             return (this._health <= 0);
-        }
-
-        public Sight getSight()
-        {
-            return this._sight;
         }
 
         public abstract bool blocksVision();

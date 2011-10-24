@@ -1,11 +1,23 @@
 ﻿using System.Collections.Generic;
 namespace Game.Logic.Entities
 {
-    class MovingEntity
+    abstract class MovingEntity : Entity
     {
-        int speed;
+        protected readonly int speed;
+
+        public int Speed
+        {
+            get { return speed; }
+        } 
+
         static int update = 100;
-        LinkedList<Point> path;
+        protected LinkedList<Point> path;
+
+        internal LinkedList<Point> Path
+        {
+            get { return path; }
+            set { path = value; }
+        }
         
 
     }
