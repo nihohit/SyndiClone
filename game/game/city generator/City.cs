@@ -186,10 +186,10 @@ namespace Game.City_Generator
             while (cond > 0) {
                 temp = blocks[0];
               //  Console.Out.WriteLine("Block size: " + temp.getWid() * temp.getLen());
-                if (temp.getWid() * temp.getLen() > MIN_BLOCK_SIZE)
+                if (temp.Width * temp.Length > MIN_BLOCK_SIZE)
                 {
-                    addMainRoads(temp.getX(), temp.getY(), temp.getLen(), temp.getWid(), ref blocks);
-                   // printBlock(temp.getX(), temp.getY(), temp.getLen(), temp.getWid());
+                    addMainRoads(temp.StartX, temp.StartY, temp.Length, temp.Width, ref blocks);
+                   // printBlock(temp.getX, temp.getY, temp.getLen(), temp.getWid());
                 }
                 blocks.RemoveAt(0);
                 cond = blocks.Count;

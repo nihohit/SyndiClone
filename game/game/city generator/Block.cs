@@ -8,7 +8,29 @@ namespace Game.City_Generator
     class Block
     {
        // Point _corner;
-        int _len, _wid,startX,startY;
+        readonly int _len, _wid,startX,startY;
+
+        public int Length
+        {
+          get { return _len; }  
+        } 
+
+
+        public int Width
+        {
+          get { return _wid; }  
+        } 
+
+
+        public int StartY
+        {
+          get { return startY; }
+        }
+
+        public int StartX
+        {
+          get { return startX; }
+        }
 
         internal Block(int x, int y, int len, int wid) {
           //  _corner = new Point(x,y);
@@ -18,10 +40,5 @@ namespace Game.City_Generator
             _wid = wid;
         }
 
-      //  internal Point getCorner() { return _corner; }
-        internal int getLen() { return _len; }
-        internal int getWid() { return _wid; }
-        internal int getX() { return startX; }
-        internal int getY() { return startY; }
     }
 }

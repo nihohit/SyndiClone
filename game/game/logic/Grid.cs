@@ -49,7 +49,7 @@ namespace Game.Logic
         public void addEntity(Entity ent, Entity from, Vector displacement)
         {
             Point[,] loc = new Point[ent.Size.X, ent.Size.Y];
-            //TODO - if (gameGrid[loc.getX(), loc.Y] != null) throw new LocationFullException(loc.ToString() + " " + gameGrid[loc.getX(), loc.getY()].ToString());
+            //TODO - if (gameGrid[loc.getX, loc.Y] != null) throw new LocationFullException(loc.ToString() + " " + gameGrid[loc.getX, loc.getY].ToString());
             //else
             {
                 
@@ -65,7 +65,7 @@ namespace Game.Logic
 
         private Entity getEntityInPoint(Point point)
         {
-            return this.gameGrid[point.getX(), point.getY()];
+            return this.gameGrid[point.X, point.Y];
         }
 
         //This function checks if any entity in the radius around the point answers the conditions in checker
@@ -103,8 +103,8 @@ namespace Game.Logic
             int radius = blast.Radius;
             wasBlocked blocked = blast.Blocked;
             Effect effect = blast.Effect;
-            int x = location.getX();
-            int y = location.getY();
+            int x = location.X;
+            int y = location.Y;
             int newX, newY;
             //checks in each of the four cardinal directions;
             for (int i = 0; i < radius; i++)
@@ -147,10 +147,10 @@ namespace Game.Logic
 
         private Point processPath(Point exit, Point target, wasBlocked blocked, Effect effect)
         {
-            int x0 = exit.getX();
-            int y0 = exit.getY();
-            int x1 = target.getX();
-            int y1 = target.getY();
+            int x0 = exit.X;
+            int y0 = exit.Y;
+            int x1 = target.X;
+            int y1 = target.Y;
             int dx = abs(x1-x0);
             int dy = abs(y1-y0);
             int sx, sy, e2;
