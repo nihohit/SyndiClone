@@ -14,7 +14,7 @@ namespace Game.Graphic_Manager
 
         public void display()
         {
-            this.mainWindow.Display();
+            mainWindow.Display();
         }
 
 

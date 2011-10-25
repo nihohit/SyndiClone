@@ -9,6 +9,18 @@ namespace Game
     {
         private readonly int _xLoc, _yLoc;
 
+        public int Y
+        {
+            get { return _yLoc; }
+        } 
+
+
+        public int X
+        {
+            get { return _xLoc; }
+        } 
+
+
         /** 
          * This constructor creates a point with x,y parameters
          */
@@ -16,6 +28,13 @@ namespace Game
         {
             _xLoc = x;
             _yLoc = y;
+        }
+
+        internal Point(Point origin, Vector transfer)
+        {
+            this._xLoc = origin.X + transfer.X;
+            this._yLoc = origin.Y + transfer.Y;
+
         }
 
         /** 
@@ -33,17 +52,6 @@ namespace Game
             return "(" + _xLoc + "," + _yLoc + ")";
         }
 
-
-
-        public static void run()
-        {
-            Point p1 = new Point(4, 7);
-            Point p2 = new Point(5, 10, 1, 6);
-
-        }
-
-        public int getX() { return _xLoc; }
-        public int getY() { return _yLoc; }
 
     }
 }

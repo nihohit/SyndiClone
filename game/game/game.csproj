@@ -92,7 +92,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="City Generator\images\road2intersect2.jpg" />
-    <None Include="ClassDiagram2.cd" />
   </ItemGroup>
   <ItemGroup>
     <None Include="City Generator\images\road2intersect3.jpg" />
