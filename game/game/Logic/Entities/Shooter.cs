@@ -12,5 +12,7 @@ namespace Game.Logic.Entities
 
         HitFunction hitFunc();
 
+        Sight sight();
+
     }
 }

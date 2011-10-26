@@ -1,23 +1,21 @@
 ﻿
 namespace Game.Logic.Entities
 {
-    abstract class Weapon
+    class Weapon
     {
         private readonly int _range;
+        private readonly ShotType _shot;
+        private readonly int _rateOfFire;
 
         internal int Range
         {
           get { return _range; }  
         } 
 
-        readonly ShotType _shot;
-
         internal ShotType Shot
         {
           get { return _shot; }  
         } 
-
-        readonly int _rateOfFire;
 
         public int RateOfFire
         {
@@ -31,8 +29,7 @@ namespace Game.Logic.Entities
           get { return _accuracy; }  
         }
 
-
-        public Weapon(int range, int ROF, float acc, ShotType shot)
+        internal Weapon(int range, int ROF, float acc, ShotType shot)
         {
             this._accuracy = acc;
             this._range = range;
@@ -40,6 +37,4 @@ namespace Game.Logic.Entities
             this._shot = shot;
         }
     }
-
-
 }

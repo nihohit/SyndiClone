@@ -5,11 +5,12 @@ using System.Text;
 
 namespace Game.Logic.Entities
 {
-    /*TODO -class Agent  :  Person, Shooter
+    /* TODO - class Cop : Person, Shooter
     {
-
-        Weapon weapon;
-        HitFunction hitFunc;
+        internal override bool blocksVision()
+        {
+            throw new NotImplementedException();
+        }
 
         Weapon Shooter.weapon()
         {
@@ -26,5 +27,5 @@ namespace Game.Logic.Entities
             throw new NotImplementedException();
         }
     }
-     * */
+     */
 }

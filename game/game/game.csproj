@@ -55,7 +55,7 @@
     <Compile Include="Logic\Entities\Agent.cs" />
     <Compile Include="Logic\Entities\BlastEffect.cs" />
     <Compile Include="Logic\Entities\Civilian.cs" />
-    <Compile Include="Logic\Entities\EntityInfo.cs" />
+    <Compile Include="Logic\Entities\Cop.cs" />
     <Compile Include="Logic\Entities\Person.cs" />
     <Compile Include="Logic\Grid.cs" />
     <Compile Include="Logic\LogicInfo.cs" />

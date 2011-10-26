@@ -1,4 +1,7 @@
-﻿
+﻿using System.Collections.Generic;
+using Game.Logic;
+
+
 namespace Game.Logic.Entities
 {
     class Civilian : Person
@@ -6,14 +9,33 @@ namespace Game.Logic.Entities
 
         const int CIV_HEALTH = 3;
         const int CIV_SPEED = 10;
-        const int CIV_SIGHT_RANGE = 20;
+        private bool newPathFlag;
 
-        public bool CIV_SIGHT(Entity ent)
+        internal Civilian() : 
+            base(CIV_HEALTH, Affiliation.INDEPENDENT, Sight.instance(SightType.CIV_SIGHT), CIV_SPEED, new LinkedList<Point>())
         {
-            if (ent == null) return false;
-            else return true;
+            newPathFlag = true;
+        }
+
+        internal bool needNewPath()
+        {
+            return this.newPathFlag;
         }
 
 
+        internal void getNewPath(LinkedList<Point> path)
+        {
+            this.Path = path;
+            newPathFlag = false;
+        }
+
+        internal override Point move()
+        {
+            if (this.Path.Count < 2)
+            {
+                newPathFlag = true;
+            }
+            return base.move();
+        }
     }
 }

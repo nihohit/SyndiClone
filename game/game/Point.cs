@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+
 
 namespace Game
 {
-    class Point
+    struct Point
     {
         private readonly int _xLoc, _yLoc;
 
@@ -13,7 +11,6 @@ namespace Game
         {
             get { return _yLoc; }
         } 
-
 
         public int X
         {

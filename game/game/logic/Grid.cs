@@ -161,7 +161,7 @@ namespace Game.Logic
             {
                 Entity ent = gameGrid[x0, y0];
                 effect(ent);
-                if (blocked(ent)) break;
+                if (blocked(ent.Visible)) break;
                 e2 = 2 * err;
                 if (e2 > -dy)
                 {
