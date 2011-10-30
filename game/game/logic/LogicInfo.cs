@@ -10,14 +10,17 @@ namespace Game.Logic
     internal delegate bool wasBlocked(Visibility ent);
     internal delegate Entity targetChooser(List<Entity> targets);
     internal delegate Reaction reactionFunction(List<Entity> ent);
+
     internal enum Action { FIRE_AT, IGNORE, RUN_AWAY_FROM, MOVE_TOWARDS, MOVE_WHILE_SHOOT }
     internal enum entityType { PERSON, VEHICLE, BUILDING}
     internal enum Visibility { CLOAKED, MASKED, REVEALED, SOLID }
     internal enum Affiliation { INDEPENDENT, CORP1, CORP2, CORP3, CORP4 }
     internal enum SightType { CIV_SIGHT }
     internal enum WeaponType { PISTOL, ASSAULT, BAZOOKA, SNIPER, RAILGUN }
+    internal enum BufferType { MOVE, SHOT }
+    internal enum TypesOfShot { SIGHT } 
 
-    internal class Reaction{
+    internal struct Reaction{
 
         private readonly Entity _focus;
         private readonly Action _actionChosen;
@@ -139,6 +142,101 @@ namespace Game.Logic
 
             return target;
         }
+    }
+
+    class UniqueList<T> : List<T>
+    {
+        public UniqueList()
+            : base()
+        {
+        }
+
+        public void uniqueAdd(T obj)
+        {
+            if (!base.Contains(obj)) base.Add(obj);
+        }
+
+        public void listAdd(UniqueList<T> list)
+        {
+            foreach (T t in list)
+            {
+                this.uniqueAdd(t);
+            }
+        }
+    }
+
+    internal interface BufferAction
+    {
+    }
+
+    internal struct ShotAction : BufferAction
+    {
+        private readonly Weapon _weapon;
+        private readonly Point _exit;
+        private readonly Point _target;
+
+        internal ShotAction(Weapon weapon, Point exit, Point entry)
+        {
+            this._exit = exit;
+            this._target = entry;
+            this._weapon = weapon;
+        }
+
+        internal Weapon Weapon
+        {
+            get { return _weapon; }
+        }
+
+        internal Point Target
+        {
+            get { return _target; }
+        }
+
+        internal Point Exit
+        {
+            get { return _exit; }
+        }
+
+    }
+
+    internal struct MoveAction : BufferAction
+    {
+        private readonly Point[,] _exit;
+        private readonly Point[,] _entry;
+        private readonly MovingEntity _mover;
+
+        internal MoveAction(Point[,] exit, Point[,] entry, MovingEntity mover)
+        {
+            this._entry = entry;
+            this._exit = exit;
+            this._mover = mover;
+        }
+
+        internal MovingEntity Mover
+        {
+            get { return _mover; }
+        }
+
+        internal Point[,] Entry
+        {
+            get { return _entry; }
+        }
+
+        public Point[,] Exit
+        {
+            get { return _exit; }
+        }
+    }
+
+    internal class LocationFullException : System.ApplicationException
+    {
+        internal LocationFullException() { }
+        internal LocationFullException(string message) { }
+
+        // Constructor needed for serialization 
+        // when exception propagates from a remoting server to the client.
+        protected LocationFullException(System.Runtime.Serialization.SerializationInfo info,
+            System.Runtime.Serialization.StreamingContext context) { }
     }
 
 }

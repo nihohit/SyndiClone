@@ -5,94 +5,15 @@ using System;
 
 namespace Game.Logic
 {
-    public struct ShotAction
-    {
-        private readonly Weapon _weapon;
-        private readonly Point _exit;
-        private readonly Point _target;
-
-        public ShotAction(Weapon weapon, Point exit, Point entry)
-        {
-            this._exit = exit;
-            this._target = entry;
-            this._weapon = weapon;
-        }
-
-        internal Weapon Weapon
-        {
-            get { return _weapon; }
-        }
-
-        internal Point Target
-        {
-            get { return _target; }
-        }
-
-        internal Point Exit
-        {
-            get { return _exit; }
-        } 
-
-    }
-
-    public struct MoveAction
-    {
-        private readonly Point[,] _exit;
-        private readonly Point[,] _entry;
-        private readonly MovingEntity _mover;
-
-        public MoveAction(Point[,] exit, Point[,] entry, MovingEntity mover)
-        {
-            this._entry = entry;
-            this._exit = exit;
-            this._mover = mover;
-        }
-
-        internal MovingEntity Mover
-        {
-            get { return _mover; }
-        }
-
-        internal MovingEntity Mover
-        {
-            get { return _mover; }
-        }
-
-        internal Point[,] Entry
-        {
-            get { return _entry; }
-        } 
-    }
-
-
-    public class LocationFullException : System.ApplicationException
-    {
-        public LocationFullException() { }
-        public LocationFullException(string message) { }
-
-        // Constructor needed for serialization 
-        // when exception propagates from a remoting server to the client.
-        protected LocationFullException(System.Runtime.Serialization.SerializationInfo info,
-            System.Runtime.Serialization.StreamingContext context) { }
-    }
-
 
     class Grid
     {
         private readonly Dictionary<Entity, Point[,]> locations;
         private readonly Entity[,] gameGrid;
         delegate Effect CurriedListAdd(List<Entity> list);
+        private readonly List<BufferAction> actionsDone;
 
-        private Point convertToCentralPoint(Entity ent, Point[,] grid)
-        {
-            int x,y;
-            if (grid.GetLength(0) % 2 == 0) x = grid.GetLength(0) / 2; else x = (grid.GetLength(0) + 1) / 2;
-            if (grid.GetLength(1) % 2 == 0) y = grid.GetLength(1) / 2; else y = (grid.GetLength(1) + 1) / 2;
-            Point ans = grid[x, y];
-            return ans;
-        } 
-
-        public Grid(int x, int y)
+        internal Grid(int x, int y)
         {
             locations = new Dictionary<Entity, Point[,]>(); /*HACK ans 
                                                              * (amit): just "entity" is enough? not, maybe, "background+entity" ? 
@@ -104,9 +25,26 @@ namespace Game.Logic
                     gameGrid[i,j] = null;
                 }
             }
+            this.actionsDone = new List<BufferAction>();
         }
 
-        public void addEntity(Entity ent, Entity from, Vector displacement)
+        internal List<BufferAction> receiveActions()
+        {
+            List<BufferAction> ans = new List<BufferAction>(this.actionsDone);
+            this.actionsDone.Clear();
+            return ans;
+        }
+
+        private Point convertToCentralPoint(Entity ent, Point[,] grid)
+        {
+            int x, y;
+            if (grid.GetLength(0) % 2 == 0) x = grid.GetLength(0) / 2; else x = (grid.GetLength(0) + 1) / 2;
+            if (grid.GetLength(1) % 2 == 0) y = grid.GetLength(1) / 2; else y = (grid.GetLength(1) + 1) / 2;
+            Point ans = grid[x, y];
+            return ans;
+        } 
+
+        internal void addEntity(Entity ent, Entity from, Vector displacement)
         {
             Point[,] loc = new Point[ent.Size.X, ent.Size.Y];
             //TODO - if (gameGrid[loc.getX, loc.Y] != null) throw new LocationFullException(loc.ToString() + " " + gameGrid[loc.getX, loc.getY].ToString());
@@ -149,7 +87,7 @@ namespace Game.Logic
         }
 
         //This function checks if any entity in the radius around the point answers the conditions in checker
-        public UniqueList<Entity> whatSees(Entity ent)
+        internal UniqueList<Entity> whatSees(Entity ent)
         {
             
             //Get all the relevant variables
@@ -167,16 +105,15 @@ namespace Game.Logic
 
             Effect effect = listAdd(ans);
 
-            BlastEffect blast = new BlastEffect(radius, effect, blocked);
+            BlastEffect blast = new BlastEffect(radius,  effect, blocked, TypesOfShot.SIGHT);
 
             return ans;
         }
 
-        public void areaEffect(Entity ent, BlastEffect blast)
+        internal void areaEffect(Entity ent, BlastEffect blast)
         {
             this.areaEffect(this.convertToCentralPoint(ent,this.locations[ent]), blast);
         }
-
 
         private void areaEffect(Point location, BlastEffect blast)
         {
@@ -205,7 +142,7 @@ namespace Game.Logic
         }
 
         //This function simulates a single shot
-        public void solveShot(Shooter shooter, Entity target)
+        internal void solveShot(Shooter shooter, Entity target)
         {
             //get all relevant variables
             ShotType shot = shooter.weapon().Shot;
@@ -256,7 +193,6 @@ namespace Game.Logic
             }
             return new Point(x0, y0);
         }
-
 
         private int abs(int a){
             if (a > 0) return a; else return -a;

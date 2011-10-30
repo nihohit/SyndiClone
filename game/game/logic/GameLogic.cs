@@ -3,26 +3,6 @@ using System.Collections.Generic;
 
 namespace Game.Logic
 {
-    class UniqueList<T> : List<T>
-    {
-        public UniqueList() : base()
-        {
-        }
-
-        public void uniqueAdd(T obj)
-        {
-            if (!base.Contains(obj)) base.Add(obj);
-        }
-
-        public void listAdd(UniqueList<T> list)
-        {
-            foreach (T t in list)
-            {
-                this.uniqueAdd(t);
-            }
-        }
-
-    }
 
     class GameLogic
     {
@@ -31,17 +11,24 @@ namespace Game.Logic
         private readonly UniqueList<Entity> playerUnits;
         private readonly UniqueList<Shooter> shooters;
         private readonly UniqueList<Entity> alwaysActive;
-        private readonly Grid grid;
-        private readonly DisplayBuffer dips;
-        private readonly InputBuffer input;
-        private readonly SoundBuffer sound;
 
-        public GameLogic()
+        private readonly Grid grid;
+        private readonly DisplayBuffer _disp;
+        private readonly InputBuffer _input;
+        private readonly SoundBuffer _sound;
+
+        public GameLogic(DisplayBuffer disp, InputBuffer input, SoundBuffer sound)
         {
-            activeEntities = new UniqueList<Entity>(); 
-            movers = new UniqueList<MovingEntity>();
-            alwaysActive = new UniqueList<Entity>(); 
-            playerUnits = new UniqueList<Entity>(); 
+            this.activeEntities = new UniqueList<Entity>(); 
+            this.movers = new UniqueList<MovingEntity>();
+            this.alwaysActive = new UniqueList<Entity>(); 
+            this.playerUnits = new UniqueList<Entity>();
+            this.shooters = new UniqueList<Shooter>();
+            this._disp = disp;
+            this._input = input;
+            this._sound = sound;
+
+            //TODO - create the grid;
         }
 
         public void loop()
@@ -54,12 +41,19 @@ namespace Game.Logic
             this.handleShooting();
 
             this.updateOutput();
-            movers.Clear();
-            activeEntities.Clear();
+            this.clearData();
+        }
+
+        private void clearData()
+        {
+            this.shooters.Clear();
+            this.movers.Clear();
+            this.activeEntities.Clear();
         }
 
         private void updateOutput()
         {
+            List<BufferAction> actions = grid.receiveActions();
             //TODO
         }
 

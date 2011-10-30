@@ -30,7 +30,7 @@ namespace Game.Logic.Entities
             this._reaction = new Reaction (null, Action.IGNORE);
             this._visible = visibility;
             this._howReact = reaction;
-            this._reactionTime = _reactionTime;
+            this._reactionTime = reactionTime;
         }
 
         ///METHODS///

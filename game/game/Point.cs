@@ -3,7 +3,7 @@
 
 namespace Game
 {
-    struct Point
+    public struct Point
     {
         private readonly int _xLoc, _yLoc;
 

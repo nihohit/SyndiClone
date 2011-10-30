@@ -1,34 +1,23 @@
 ﻿
 namespace Game.Logic.Entities
 {
-    class BlastEffect
+    class BlastEffect : ShotType
     {
         private readonly int _radius;
 
-        public int Radius
+        internal int Radius
         {
             get { return _radius; }
         }
 
-        private readonly Effect _effect;
-
-        internal Effect Effect
+        internal BlastEffect(int radius, Effect effect, wasBlocked blocked, TypesOfShot type) : base(null, effect, blocked, type)
         {
-            get { return _effect; }
+            this._radius = radius;
         }
 
-        private readonly wasBlocked _blocked;
-
-        public wasBlocked Blocked
+        internal BlastEffect(BlastEffect blast,int radius, Effect effect, wasBlocked blocked, TypesOfShot type)
+            : base(blast, effect, blocked, type)
         {
-            get { return _blocked; }
-        } 
-
-
-        public BlastEffect(int radius, Effect effect, wasBlocked blocked)
-        {
-            this._blocked = blocked;
-            this._effect = effect;
             this._radius = radius;
         }
 
