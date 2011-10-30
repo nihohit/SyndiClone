@@ -5,8 +5,8 @@ namespace Game.Logic.Entities
     abstract class Person : MovingEntity
     {
 
-        protected Person(int health, Affiliation loyalty, Sight sight, int speed, LinkedList<Point> path) : 
-            base(health, entityType.PERSON, new Vector(1,1), loyalty, Visibility.REVEALED, sight ,speed, path)
+        protected Person(reactionFunction react, int health, Affiliation loyalty, Sight sight, int speed, LinkedList<Point> path) :
+            base(react, health, entityType.PERSON, new Vector(1, 1), loyalty, Visibility.REVEALED, sight, speed, path)
         {
         }
 

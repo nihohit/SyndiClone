@@ -32,6 +32,8 @@ namespace Game.Logic
             return ans;
         }
 
+        
+
         public Grid(int x, int y)
         {
             locations = new Dictionary<Entity, Point[,]>(); /*HACK ans 
@@ -68,12 +70,32 @@ namespace Game.Logic
             return this.gameGrid[point.X, point.Y];
         }
 
+        private bool canMove(Entity ent, Point point)
+        {
+            Entity ans = this.getEntityInPoint(point);
+            return (ans == null || ans == ent);
+        }
+
+        internal void resolveMove(MovingEntity ent)
+        {
+            Action action = ent.Reaction.ActionChosen;
+            //TODO
+        }
+
+        internal void resolveShoot(Shooter shooter, Entity target)
+        {
+            if (shooter.readyToShoot())
+            {
+                solveShot(shooter, target);
+            }
+        }
+
         //This function checks if any entity in the radius around the point answers the conditions in checker
-        public List<Entity> whatSees(Entity ent)
+        public UniqueList<Entity> whatSees(Entity ent)
         {
             
             //Get all the relevant variables
-            List<Entity> ans = new List<Entity>();
+            UniqueList<Entity> ans = new UniqueList<Entity>();
             Point location = this.convertToCentralPoint(ent,this.locations[ent]);
             Sight sight = ent.Sight;
             int radius = sight.Range;
@@ -129,14 +151,14 @@ namespace Game.Logic
         {
             //get all relevant variables
             ShotType shot = shooter.weapon().Shot;
-            Point currentTarget = shooter.hitFunc()(this.convertToCentralPoint(target,this.locations[target]));
+            Point currentTargetLocation = shooter.hitFunc()(this.convertToCentralPoint(target,this.locations[target]));
             //TODO - If there's a target that I see only parts of it, how do I aim at the visible parts?
             Point exit = this.convertToCentralPoint((Entity)shooter,this.locations[(Entity)shooter]);
             wasBlocked blocked = shot.Blocked;
             Effect effect = shot.Effect;
 
             //get the path the bullet is going through, and affect targets
-            Point endPoint = this.processPath(exit, currentTarget, blocked, effect);
+            Point endPoint = this.processPath(exit, currentTargetLocation, blocked, effect);
 
             if (shot.Blast != null){
 

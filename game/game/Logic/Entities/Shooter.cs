@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace Game.Logic.Entities
 {
@@ -12,7 +9,13 @@ namespace Game.Logic.Entities
 
         HitFunction hitFunc();
 
-        Sight sight();
+        bool readyToShoot();
+
+        Entity target();
+
+        targetChooser targeter();
 
     }
+
+
 }

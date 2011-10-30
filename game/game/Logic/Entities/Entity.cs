@@ -1,17 +1,47 @@
 ﻿
-
 namespace Game.Logic.Entities
 {
     internal abstract class Entity
 
     {
         private int _health;
+
+        public int Health
+        {
+            get { return _health; }
+        }
         private readonly Vector _size;
         private readonly entityType _type;
         private Reaction _reaction;
         private Affiliation _loyalty;
         private readonly Sight _sight;
         private Visibility _visible;
+        private readonly reactionFunction _howReact;
+        private UniqueList<Entity> _whatSees;
+        private int _threat = 0;
+
+        public int Threat
+        {
+            get { return _threat; }
+            set { _threat = value; }
+        }
+
+        internal reactionFunction HowReact
+        {
+            get { return _howReact; }
+        }
+
+        internal UniqueList<Entity> WhatSees
+        {
+            get { return _whatSees; }
+            set { _whatSees = value; }
+        }
+
+        internal Affiliation Loyalty
+        {
+            get { return _loyalty; }
+            set { _loyalty = value; }
+        }
 
         internal Visibility Visible
         {
@@ -19,7 +49,13 @@ namespace Game.Logic.Entities
             set { _visible = value; }
         }
 
-        protected Entity(int health,entityType type, Vector size, Affiliation loyalty, Sight sight, Visibility visibility)
+        virtual internal Reaction resolveOrders()
+        {
+            this.Reaction = this.HowReact(this.WhatSees);
+            return this.Reaction;
+        }
+
+        protected Entity(reactionFunction reaction, int health,entityType type, Vector size, Affiliation loyalty, Sight sight, Visibility visibility)
         {
             this._health = health;
             this._size = size;
@@ -28,6 +64,7 @@ namespace Game.Logic.Entities
             this._sight = sight;
             this._reaction = new Reaction (null, Action.IGNORE);
             this._visible = visibility;
+            this._howReact = reaction;
         }
 
         internal Reaction Reaction
@@ -51,7 +88,7 @@ namespace Game.Logic.Entities
             get { return _size; }
         }
 
-        internal bool hit(int damage)
+        internal virtual bool hit(int damage)
         {
             this._health -= damage;
             return (this._health <= 0);
