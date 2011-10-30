@@ -30,9 +30,7 @@ namespace Game.Logic
             if (grid.GetLength(1) % 2 == 0) y = grid.GetLength(1) / 2; else y = (grid.GetLength(1) + 1) / 2;
             Point ans = grid[x, y];
             return ans;
-        }
-
-        
+        } 
 
         public Grid(int x, int y)
         {

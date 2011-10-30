@@ -8,8 +8,8 @@ namespace Game.Logic.Entities
         private int _steps = 0;
         private LinkedList<Point> _path;
 
-        protected MovingEntity(reactionFunction reaction, int health, entityType type, Vector size, Affiliation loyalty, Visibility visibility, Sight sight, int speed, LinkedList<Point> path)
-            : base(reaction, health, type, size, loyalty, sight, visibility)
+        protected MovingEntity(int reactionTime, reactionFunction reaction, int health, entityType type, Vector size, Affiliation loyalty, Visibility visibility, Sight sight, int speed, LinkedList<Point> path)
+            : base(reactionTime, reaction, health, type, size, loyalty, sight, visibility)
         {
             this._speed = speed;
             this._path = path;
@@ -28,9 +28,9 @@ namespace Game.Logic.Entities
 
         internal virtual Point tryMove()
         {
-            _steps += _speed;
+            bool check = reachAffect(AMOUNT_OF_MOVES_FOR_STEP, _steps, _speed);
             Point ans;
-            if (_steps > AMOUNT_OF_MOVES_FOR_STEP)
+            if (check)
             {
                 ans = Path.First.Next.Value;
             }

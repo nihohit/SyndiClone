@@ -53,7 +53,6 @@ namespace Game.Logic
             this.handleMovement();
             this.handleShooting();
 
-
             this.updateOutput();
             movers.Clear();
             activeEntities.Clear();
@@ -73,7 +72,11 @@ namespace Game.Logic
         {
             foreach (Entity ent in activeEntities)
             {
-                Reaction react = ent.resolveOrders();
+                if (ent.doesReact())
+                {
+                    ent.resolveOrders();
+                }
+                Reaction react = ent.Reaction;
                 Action action = react.ActionChosen;
                 if (action == Action.FIRE_AT || action == Action.MOVE_WHILE_SHOOT)
                 {

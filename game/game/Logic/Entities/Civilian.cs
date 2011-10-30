@@ -9,11 +9,12 @@ namespace Game.Logic.Entities
 
         const int CIV_HEALTH = 3;
         const int CIV_SPEED = 10;
+        const int CIV_REACTION = 10;
         private bool newPathFlag;
         private int _tryToMove = 0;
 
         internal Civilian() : 
-            base(civReact, CIV_HEALTH, Affiliation.INDEPENDENT, Sight.instance(SightType.CIV_SIGHT), CIV_SPEED, new LinkedList<Point>())
+            base(CIV_REACTION, civReact, CIV_HEALTH, Affiliation.INDEPENDENT, Sight.instance(SightType.CIV_SIGHT), CIV_SPEED, new LinkedList<Point>())
         {
             newPathFlag = true;
         }
