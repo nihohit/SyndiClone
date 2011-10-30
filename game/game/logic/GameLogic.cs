@@ -53,7 +53,7 @@ namespace Game.Logic
 
         private void updateOutput()
         {
-            List<BufferAction> actions = grid.receiveActions();
+            List<BufferEvent> actions = grid.receiveActions();
             //TODO
         }
 
