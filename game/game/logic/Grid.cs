@@ -5,6 +5,66 @@ using System;
 
 namespace Game.Logic
 {
+    public struct ShotAction
+    {
+        private readonly Weapon _weapon;
+        private readonly Point _exit;
+        private readonly Point _target;
+
+        public ShotAction(Weapon weapon, Point exit, Point entry)
+        {
+            this._exit = exit;
+            this._target = entry;
+            this._weapon = weapon;
+        }
+
+        internal Weapon Weapon
+        {
+            get { return _weapon; }
+        }
+
+        internal Point Target
+        {
+            get { return _target; }
+        }
+
+        internal Point Exit
+        {
+            get { return _exit; }
+        } 
+
+    }
+
+    public struct MoveAction
+    {
+        private readonly Point[,] _exit;
+        private readonly Point[,] _entry;
+        private readonly MovingEntity _mover;
+
+        public MoveAction(Point[,] exit, Point[,] entry, MovingEntity mover)
+        {
+            this._entry = entry;
+            this._exit = exit;
+            this._mover = mover;
+        }
+
+        internal MovingEntity Mover
+        {
+            get { return _mover; }
+        }
+
+        internal MovingEntity Mover
+        {
+            get { return _mover; }
+        }
+
+        internal Point[,] Entry
+        {
+            get { return _entry; }
+        } 
+    }
+
+
     public class LocationFullException : System.ApplicationException
     {
         public LocationFullException() { }
