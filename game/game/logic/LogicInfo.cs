@@ -165,26 +165,27 @@ namespace Game.Logic
         }
     }
 
-    internal interface BufferAction
+    internal interface BufferEvent
     {
+        BufferType type();
     }
 
-    internal struct ShotAction : BufferAction
+    internal struct ShotEvent : BufferEvent
     {
-        private readonly Weapon _weapon;
+        private readonly TypesOfShot _shot;
         private readonly Point _exit;
         private readonly Point _target;
 
-        internal ShotAction(Weapon weapon, Point exit, Point entry)
+        internal ShotEvent(TypesOfShot shot, Point exit, Point entry)
         {
             this._exit = exit;
             this._target = entry;
-            this._weapon = weapon;
+            this._shot = shot;
         }
 
-        internal Weapon Weapon
+        internal TypesOfShot Shot
         {
-            get { return _weapon; }
+            get { return _shot; }
         }
 
         internal Point Target
@@ -197,15 +198,20 @@ namespace Game.Logic
             get { return _exit; }
         }
 
+        public BufferType type()
+        {
+            return BufferType.SHOT;
+        }
+
     }
 
-    internal struct MoveAction : BufferAction
+    internal struct MoveEvent : BufferEvent
     {
         private readonly Point[,] _exit;
         private readonly Point[,] _entry;
         private readonly MovingEntity _mover;
 
-        internal MoveAction(Point[,] exit, Point[,] entry, MovingEntity mover)
+        internal MoveEvent(Point[,] exit, Point[,] entry, MovingEntity mover)
         {
             this._entry = entry;
             this._exit = exit;
@@ -225,6 +231,11 @@ namespace Game.Logic
         public Point[,] Exit
         {
             get { return _exit; }
+        }
+
+        public BufferType type()
+        {
+            return BufferType.MOVE;
         }
     }
 

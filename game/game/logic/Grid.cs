@@ -11,7 +11,7 @@ namespace Game.Logic
         private readonly Dictionary<Entity, Point[,]> locations;
         private readonly Entity[,] gameGrid;
         delegate Effect CurriedListAdd(List<Entity> list);
-        private readonly List<BufferAction> actionsDone;
+        private readonly List<BufferEvent> actionsDone;
 
         internal Grid(int x, int y)
         {
@@ -25,12 +25,12 @@ namespace Game.Logic
                     gameGrid[i,j] = null;
                 }
             }
-            this.actionsDone = new List<BufferAction>();
+            this.actionsDone = new List<BufferEvent>();
         }
 
-        internal List<BufferAction> receiveActions()
+        internal List<BufferEvent> receiveActions()
         {
-            List<BufferAction> ans = new List<BufferAction>(this.actionsDone);
+            List<BufferEvent> ans = new List<BufferEvent>(this.actionsDone);
             this.actionsDone.Clear();
             return ans;
         }
@@ -118,8 +118,6 @@ namespace Game.Logic
         private void areaEffect(Point location, BlastEffect blast)
         {
             int radius = blast.Radius;
-            wasBlocked blocked = blast.Blocked;
-            Effect effect = blast.Effect;
             int x = location.X;
             int y = location.Y;
             int newX, newY;
@@ -128,16 +126,16 @@ namespace Game.Logic
             {
                 newX = Math.Min(x+i, gameGrid.GetLength(0));
                 newY = Math.Min(y+radius-i,gameGrid.GetLength(1));
-                processPath(location, new Point(newX,newY), blocked, effect);
+                processPath(location, new Point(newX,newY), blast);
 
                 newY = newY = Math.Max(y-radius+i,0);
-                processPath(location, new Point(newX,newY), blocked, effect);
+                processPath(location, new Point(newX,newY), blast);
 
                 newX = Math.Max(x-i, 0);
-                processPath(location, new Point(newX,newY), blocked, effect);
+                processPath(location, new Point(newX,newY), blast);
 
                 newY = Math.Min(y+radius-i,gameGrid.GetLength(1));
-                processPath(location, new Point(newX,newY), blocked, effect);
+                processPath(location, new Point(newX,newY), blast);
             }
         }
 
@@ -149,11 +147,10 @@ namespace Game.Logic
             Point currentTargetLocation = shooter.hitFunc()(this.convertToCentralPoint(target,this.locations[target]));
             //TODO - If there's a target that I see only parts of it, how do I aim at the visible parts?
             Point exit = this.convertToCentralPoint((Entity)shooter,this.locations[(Entity)shooter]);
-            wasBlocked blocked = shot.Blocked;
-            Effect effect = shot.Effect;
+
 
             //get the path the bullet is going through, and affect targets
-            Point endPoint = this.processPath(exit, currentTargetLocation, blocked, effect);
+            Point endPoint = this.processPath(exit, currentTargetLocation, shot);
 
             if (shot.Blast != null){
 
@@ -162,8 +159,10 @@ namespace Game.Logic
             }
         }
 
-        private Point processPath(Point exit, Point target, wasBlocked blocked, Effect effect)
+        private Point processPath(Point exit, Point target, ShotType shot)
         {
+            Effect effect = shot.Effect;
+            wasBlocked blocked = shot.Blocked;
             int x0 = exit.X;
             int y0 = exit.Y;
             int x1 = target.X;
@@ -191,7 +190,14 @@ namespace Game.Logic
                     y0 = y0 + sy;
                 }
             }
-            return new Point(x0, y0);
+            Point res = new Point(x0, y0);
+
+            if (!(shot.Type == TypesOfShot.SIGHT))
+            {
+                this.actionsDone.Add(new ShotEvent(shot.Type, exit, res));
+            }
+
+            return res;
         }
 
         private int abs(int a){
