@@ -8,7 +8,7 @@ namespace Game.City_Generator
     class Block
     {
        // Point _corner;
-        readonly int _len, _wid,startX,startY;
+        public readonly int _len, _wid,startX,startY;
 
         public int Length
         {

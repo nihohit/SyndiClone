@@ -22,7 +22,9 @@ namespace Game.City_Generator
         public static City createMap(int length=DEF_LEN,int width=DEF_WID){
             City retVal = new City(length,width);
             retVal.addRoads(length, width);
-           // retVal.translateMap();
+            retVal.translateRoads();
+            retVal.addBuildings();
+
 
 
 
