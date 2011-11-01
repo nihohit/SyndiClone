@@ -12,7 +12,7 @@ namespace Game.Logic
 
         public City (Game.City_Generator.City city)
         {
-            //TODO
+            //TODO - missing function
         }
 
         public Point[,] Grid

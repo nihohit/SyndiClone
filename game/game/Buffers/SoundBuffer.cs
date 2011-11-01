@@ -9,24 +9,24 @@ namespace Game.Buffers
     {
         void Buffer.receiveInput(Input input)
         {
-            //TODO
+            //TODO - missing function
         }
 
-        bool Buffer.readyToRead()
+        bool Buffer.readyForInput()
         {
-            //TODO
+            //TODO - missing function
             return false;
         }
 
-        bool Buffer.readyToWrite()
+        bool Buffer.readyToOutput()
         {
-            //TODO
+            //TODO - missing function
             return false;
         }
 
         LinkedList<Output> Buffer.returnOutput()
         {
-            //TODO
+            //TODO - missing function
             return null;
         }
     }

@@ -25,7 +25,7 @@ namespace Game.City_Generator
         public Block getFlip()
         {
             //uses block to hold two points to form a flip-line.
-            //TODO
+            //TODO - missing function
             return null;
         }
         public int getRotate() {

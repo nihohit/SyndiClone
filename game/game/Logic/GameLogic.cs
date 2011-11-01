@@ -13,7 +13,7 @@ namespace Game.Logic
         private readonly UniqueList<Shooter> shooters;
         private readonly UniqueList<Entity> alwaysActive;
 
-        private readonly Grid grid;
+        private readonly Grid _grid;
         private readonly DisplayBuffer _disp;
         private readonly InputBuffer _input;
         private readonly SoundBuffer _sound;
@@ -36,13 +36,17 @@ namespace Game.Logic
         {
             this.handleInput();
             this.listAdd();
-            //TODO - how do I actually resolve each entitiy's orders?
             this.resolveOrders();
             this.handleMovement();
             this.handleShooting();
-
+            this.handleBuilding();
             this.updateOutput();
             this.clearData();
+        }
+
+        private void handleBuilding()
+        {
+            //TODO - missing function
         }
 
         private void clearData()
@@ -54,13 +58,13 @@ namespace Game.Logic
 
         private void updateOutput()
         {
-            List<BufferEvent> actions = grid.receiveActions();
-            //TODO
+            List<BufferEvent> actions = _grid.returnActions();
+            //TODO - missing function
         }
 
         private void handleInput()
         {
-            //TODO
+            //TODO - missing function
         }
 
         private void resolveOrders()
@@ -87,7 +91,7 @@ namespace Game.Logic
 
                 if (action == Action.CREATE_ENTITY)
                 {
-                    //TODO
+                    //TODO - missing function
                 }
             }
         }
@@ -96,7 +100,7 @@ namespace Game.Logic
         {
             foreach (MovingEntity ent in movers)
             {
-                grid.resolveMove(ent);
+                _grid.resolveMove(ent);
             }
         }
 
@@ -104,7 +108,7 @@ namespace Game.Logic
         {
             foreach (Shooter ent in shooters)
             {
-                grid.resolveShoot(ent, ent.target());
+                _grid.resolveShoot(ent, ent.target());
             }
         }
 
@@ -114,7 +118,7 @@ namespace Game.Logic
             foreach (Entity t in playerUnits)
             {
                 activeEntities.uniqueAdd(t);
-                t.WhatSees = grid.whatSees(t);
+                t.WhatSees = _grid.whatSees(t);
                 foreach (Entity temp in t.WhatSees)
                 {
                     activeEntities.uniqueAdd(temp);

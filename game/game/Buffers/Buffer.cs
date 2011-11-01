@@ -8,8 +8,8 @@ namespace Game.Buffers
     interface Buffer
     {
         void receiveInput(Input input);
-        bool readyToRead();
-        bool readyToWrite();
+        bool readyForInput();
+        bool readyToOutput();
         LinkedList<Output> returnOutput();
 
     }

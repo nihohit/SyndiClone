@@ -28,7 +28,7 @@ namespace Game.Logic
             this.actionsDone = new List<BufferEvent>();
         }
 
-        internal List<BufferEvent> receiveActions()
+        internal List<BufferEvent> returnActions()
         {
             List<BufferEvent> ans = new List<BufferEvent>(this.actionsDone);
             this.actionsDone.Clear();
@@ -57,7 +57,7 @@ namespace Game.Logic
         private LinkedList<Point> getSimplePath(Point entry, Point target)
         {
             LinkedList<Point> ans = new LinkedList<Point>();
-            //TODO
+            //TODO - missing function
             return ans;
         }
 
@@ -75,7 +75,7 @@ namespace Game.Logic
         internal void resolveMove(MovingEntity ent)
         {
             Action action = ent.Reaction.ActionChosen;
-            //TODO
+            //TODO - missing function
         }
 
         internal void resolveShoot(Shooter shooter, Entity target)

@@ -39,8 +39,9 @@ namespace Game.City_Generator
                 int i;
                 int middle = ARR_SIZE/2;
                 double quota = LOWER_HALF_PROB/(middle-1); //lower half initial probability.
-                
-                for (i = 2; i <= middle; ++i) { //TODO
+
+                for (i = 2; i <= middle; ++i)
+                { //TODO - missing function
                         _hPlaces[i] = _vPlaces[i] = (i-1)*quota;
                     }
                 quota = (1-LOWER_HALF_PROB)/(middle-1+(ARR_SIZE%2)); //the modulo is to deal with both even and odd sized arrays.
