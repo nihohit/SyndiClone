@@ -1,0 +1,14 @@
+*.user
+*.aps
+*pch
+*.vspscc
+*.suo
+*.bak
+*,cache
+*.log
+*.mf
+*.exe
+*.pdb
+bin/
+debug/
+obj/
