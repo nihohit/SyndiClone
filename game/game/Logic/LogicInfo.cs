@@ -11,7 +11,7 @@ namespace Game.Logic
     internal delegate Entity targetChooser(List<Entity> targets);
     internal delegate Reaction reactionFunction(List<Entity> ent);
 
-    internal enum Action { FIRE_AT, IGNORE, RUN_AWAY_FROM, MOVE_TOWARDS, MOVE_WHILE_SHOOT }
+    internal enum Action { FIRE_AT, IGNORE, RUN_AWAY_FROM, MOVE_TOWARDS, MOVE_WHILE_SHOOT, CREATE_ENTITY }
     internal enum entityType { PERSON, VEHICLE, BUILDING}
     internal enum Visibility { CLOAKED, MASKED, REVEALED, SOLID }
     internal enum Affiliation { INDEPENDENT, CORP1, CORP2, CORP3, CORP4 }

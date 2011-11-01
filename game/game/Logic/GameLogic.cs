@@ -1,4 +1,5 @@
 ﻿using Game.Logic.Entities;
+using Game.Buffers;
 using System.Collections.Generic;
 
 namespace Game.Logic
@@ -17,7 +18,7 @@ namespace Game.Logic
         private readonly InputBuffer _input;
         private readonly SoundBuffer _sound;
 
-        public GameLogic(DisplayBuffer disp, InputBuffer input, SoundBuffer sound)
+        public GameLogic(DisplayBuffer disp, InputBuffer input, SoundBuffer sound, Game.City_Generator.City city)
         {
             this.activeEntities = new UniqueList<Entity>(); 
             this.movers = new UniqueList<MovingEntity>();
@@ -27,7 +28,7 @@ namespace Game.Logic
             this._disp = disp;
             this._input = input;
             this._sound = sound;
-
+            City _city = new City(city);
             //TODO - create the grid;
         }
 
@@ -72,13 +73,21 @@ namespace Game.Logic
                 }
                 Reaction react = ent.Reaction;
                 Action action = react.ActionChosen;
+
                 if (action == Action.FIRE_AT || action == Action.MOVE_WHILE_SHOOT)
                 {
                     this.shooters.Add((Shooter)ent);
                 }
-                if (action != Action.FIRE_AT && ent.Type != entityType.BUILDING)
+
+                if ( action == Action.MOVE_TOWARDS || action == Action.MOVE_WHILE_SHOOT || action == Action.RUN_AWAY_FROM || 
+                    (action == Action.IGNORE && ent.Type != entityType.BUILDING))
                 {
                     this.movers.Add((MovingEntity)ent);
+                }
+
+                if (action == Action.CREATE_ENTITY)
+                {
+                    //TODO
                 }
             }
         }
@@ -113,7 +122,7 @@ namespace Game.Logic
             }
         }
 
-
+        //TODO - add blocks, add the whole palyer logic, add research
 
 
     }

@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Game
+namespace Game.Buffers
 {
-    class DisplayBuffer
+    interface Output
     {
     }
 }

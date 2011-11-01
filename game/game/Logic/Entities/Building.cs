@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Game
+namespace Game.Logic.Entities
 {
-    class SoundBuffer
+    /*TODO - class Building : Entity
     {
-    }
+
+
+    }*/
 }

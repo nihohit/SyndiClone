@@ -10,9 +10,5 @@ namespace Game.Logic.Entities
         {
         }
 
-        internal override bool blocksVision()
-        {
-            return false;
-        }
     }
 }

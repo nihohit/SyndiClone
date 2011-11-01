@@ -11,7 +11,6 @@ namespace Game.City_Generator
 {
     class City
     {
-        
         private const int GAP_RATIO = 6;
         private const char EMPTY = ' ';
         private const char ROAD_GENERIC = '*'; // a generic char for a road, not knowing direction or it's adjacent squares.

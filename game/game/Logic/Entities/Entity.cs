@@ -67,9 +67,6 @@ namespace Game.Logic.Entities
             return (currentAcc + increaseBy >= topLevel); 
         }
 
-        internal abstract bool blocksVision();
-
-
         ///GETTERS & SETTERS////
         internal Reaction Reaction
         {
