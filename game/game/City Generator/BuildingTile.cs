@@ -14,5 +14,10 @@ namespace Game.City_Generator
             _type = ContentType.BUILDING;
             _building = b;
         }
+
+        internal Building Building {
+            get { return _building; }
+            set { _building = value; }
+        }
     }
 }

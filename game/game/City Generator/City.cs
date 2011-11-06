@@ -9,26 +9,22 @@ using System.Windows.Forms; //TODO: remove using - it's here so I can use Messag
  */
 namespace Game.City_Generator
 {
-    class City
+    class City : GameBoard
     {
         private const int GAP_RATIO = 6;
         private const char EMPTY = ' ';
         private const char ROAD_GENERIC = '*'; // a generic char for a road, not knowing direction or it's adjacent squares.
         private const int MIN_BLOCK_SIZE = 0; // the smaller block that will have sub-roads is of size 7X6
         private static readonly Random _rand = new Random();
-        private static char c = 'A';
+        private static char c = 'A';//TODO: remove after debug phase
 
         
         private char[,] _grid;
-        private Tile[,] _grid2;
-        private List<Building> _buildings;
-        private List<Point> _intersections;
-        private int _len, _wid;
         private BuildingPlacer _bp;
 
 
         public class BuildingPlacer {
-            private const double DECREASE_FACTOR = 0.01,LOWER_HALF_PROB = 0.75;
+            private const double DECREASE_FACTOR = 0.01,LOWER_HALF_PROB = 0.25;
             private const int ARR_SIZE=12;
             private double[] _hPlaces,_vPlaces;
             
@@ -143,22 +139,11 @@ namespace Game.City_Generator
                 for (int j = 0; j < _wid; ++j)
                     _grid2[i, j] = new Tile();
  
-
             _buildings = new List<Building>();
-            _intersections = new List<Point>();
+            _corps = new List<Corporate>();
         }
 
-        /**
-         * Constructor.
-         */
-        public City(int gridL, int gridW, List<Building> building)
-        {
-            _len = gridL;
-            _wid = gridW;
-            _grid = new char[_len, _wid];
-            _buildings = building;
-            _intersections = null;
-        }
+        
 
         /*********************************************************************
          * Map Creation: roads, buildings etc.
@@ -446,7 +431,6 @@ namespace Game.City_Generator
                 {
                     
                     _grid[i, j] = c;
-                    
                     _grid2[i, j] = new BuildingTile(b);
                 }
             _buildings.Add(b);
@@ -455,10 +439,12 @@ namespace Game.City_Generator
                 c = 'A';
             
         }
+
+        
         private void connectBuildings2Roads()
         {
-           bool cond=true;
-           while (cond)
+           bool cond=true; 
+           while (cond) //this while allows me to wreak havoc to the _buildings list without ruining my iterator.
            {
                cond = false;
                foreach (Building b in _buildings)
@@ -497,6 +483,9 @@ namespace Game.City_Generator
                            continue;
                        }
                    }
+                   if (canConnect(b))
+                       continue;
+
                    for (int i = 0; i < b.Length; ++i)
                        for (int j = 0; j < b.Width; ++j)
                        {
@@ -510,6 +499,89 @@ namespace Game.City_Generator
            }
         }
 
+        private bool canConnect(Building b) {
+            if (b.StartX + b.Width + 1 < _wid)
+                if ((_grid2[b.StartY, b.StartX+b.Width].Type == ContentType.EMPTY) && (_grid2[b.StartY, b.StartX + b.Width + 1].Type == ContentType.ROAD))
+                {
+                    for (int i = b.StartY; i < b.StartY + b.Length; ++i)
+                    {
+                        if (_grid2[i, b.StartX + b.Width].Type != ContentType.EMPTY)
+                            Console.Out.WriteLine("trying to override (" + (b.StartY - 1) + "," + i + ")");
+                        else
+                        {
+                            _grid2[i, b.StartX + b.Width] = new BuildingTile(b);
+                            _grid[i, b.StartX + b.Width] = '#';//_grid[b.StartY, b.StartX];
+                        }
+                    }
+                    b.Width++;
+                    return true;
+                }
+
+            if (b.StartY>1)
+                if ((_grid2[b.StartY - 1, b.StartX].Type == ContentType.EMPTY) && (_grid2[b.StartY - 2, b.StartX].Type == ContentType.ROAD))
+                {
+                    for (int i = b.StartX; i < b.StartX + b.Width; ++i)
+                    {
+                        if (_grid2[b.StartY - 1, i].Type != ContentType.EMPTY)
+                            Console.Out.WriteLine("trying to override (" + (b.StartY - 1) + "," + i + ")");
+                        else
+                        {
+                            _grid2[b.StartY - 1, i] = new BuildingTile(b);
+                            _grid[b.StartY - 1, i] = '#';//_grid[b.StartY, i];
+                        }
+                    }
+                    b.Length++;
+                    b.StartY--;
+                    return true;
+                }
+
+            if (b.StartX > 1)
+                if ((_grid2[b.StartY, b.StartX -1].Type == ContentType.EMPTY) && (_grid2[b.StartY, b.StartX-2].Type == ContentType.ROAD))
+                {
+                    for (int i = b.StartY; i < b.StartY + b.Length; ++i)
+                    {
+                        if (_grid2[i, b.StartX-1].Type != ContentType.EMPTY)
+                            Console.Out.WriteLine("trying to override (" + (b.StartY - 1) + "," + i + ")");
+                        else
+                        {
+                            _grid2[i, b.StartX - 1] = new BuildingTile(b);
+                            _grid[i, b.StartX - 1] = '#';// _grid[b.StartY, b.StartX];
+                        }
+                    }
+                    b.Width++;
+                    b.StartX--;
+                    return true;
+                }
+
+            
+
+            if (b.StartY + b.Length + 1 < _len)
+                if ((_grid2[b.StartY+b.Length, b.StartX].Type == ContentType.EMPTY) && (_grid2[b.StartY+b.Length+1, b.StartX].Type == ContentType.ROAD))
+                {
+                    for (int i = b.StartX; i < b.StartX + b.Width; ++i)
+                    {
+                        if (_grid2[b.StartY+b.Length, i].Type != ContentType.EMPTY)
+                            Console.Out.WriteLine("trying to override (" + (b.StartY - 1) + "," + i + ")");
+                        else
+                        {
+                            _grid2[b.StartY + b.Length, i] = new BuildingTile(b);
+                            _grid[b.StartY + b.Length, i] = '#';//_grid[b.StartY, b.StartX];
+                        }
+                    }
+                    b.Length++;
+                    return true;
+                }
+
+
+
+
+            return false;
+        }
+        internal void addCorporates() {
+ 
+
+
+        }
 
         /****************************************************************************
          * Getters, Setters, simple functions
@@ -519,7 +591,7 @@ namespace Game.City_Generator
         public int getLen() { return _len; }
         public int getWid() { return _wid; }
         public char[,] getGrid() { return _grid; }
-        public Tile[,] getGrid2() { return _grid2; }
+        public Tile[,] getGrid2() { return _grid2; } //HACK(amit): I've added our standard getters\setters, tell me whan I can delete those.
 
 
         public short[][] getShortGrid() { 

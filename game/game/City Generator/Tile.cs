@@ -11,7 +11,7 @@ namespace Game.City_Generator
         protected ContentType _type;
         protected int _rotate;
 
-        protected ContentType Type
+        internal ContentType Type
         {
             get { return _type; }
             set { _type = value; }

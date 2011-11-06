@@ -19,11 +19,12 @@ namespace Game.City_Generator
         /**
          * returns a city with some roads in it. in future, may also contain buildings
          */
-        public static City createMap(int length=DEF_LEN,int width=DEF_WID){
+        public static GameBoard createMap(int length=DEF_LEN,int width=DEF_WID){
             City retVal = new City(length,width);
             retVal.addRoads(length, width);
             retVal.translateRoads();
             retVal.addBuildings();
+            retVal.addCorporates();
 
 
 

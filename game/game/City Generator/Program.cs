@@ -18,7 +18,7 @@ namespace Game
            // Application.SetCompatibleTextRenderingDefault(false);
            // Application.Run(new Form1());
             
-            City city = CityFactory.createMap(100,100);
+            GameBoard city = CityFactory.createMap(100,100);
             //City.BuildingPlacer bp = new City.BuildingPlacer();
             //bp.print();
 
@@ -29,14 +29,14 @@ namespace Game
             //}
             //// Console.Out.WriteLine("\nGetting a random H num: "+bp.getHDimension(8));
             //bp.print();
-         
 
-            char[,] grid = city.getGrid();
+
+            char[,] grid = ((City)city).getGrid();
            
             System.IO.StreamWriter file = new System.IO.StreamWriter("city.mf");
-            for (int i = 0; i < city.getLen(); ++i)
+            for (int i = 0; i < city.Length; ++i)
             {
-                for (int j = 0; j < city.getWid(); ++j)
+                for (int j = 0; j < city.Width; ++j)
                 {
                     Console.Out.Write(grid[i, j]);
                     file.Write(grid[i, j]);
