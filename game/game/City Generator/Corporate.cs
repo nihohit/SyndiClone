@@ -23,7 +23,7 @@ namespace Game.City_Generator
             _buildings.Remove(b);
         }
 
-        /*HACK (amit)ans
+        /*hack (amit)ans
          * (amit):
          * I thought that in order to make the corporates significant, we can decide that no building is usable unless you hold the whole corporate.
          *      this also means that it's relatively easy to harass the other player (which makes defence harder than offence)

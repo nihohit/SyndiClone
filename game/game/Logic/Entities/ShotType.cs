@@ -3,9 +3,6 @@ namespace Game.Logic.Entities
 {
     class ShotType
     {
-        /*HACK (amit) 
-         * question - I think we need to talk about the shooting mechanism, also, we should do that later - after we'll have people running on our map.
-         * */
          
         private readonly BlastEffect _blast;
         private readonly Effect _effect;

@@ -24,10 +24,7 @@ namespace Game.Logic
         {
             this.gameGrid = grid;
             this.actionsDone = new List<BufferEvent>();
-            this.locations = new Dictionary<Entity, Area>(); /*HACK (amit)ans 
-                                                             * (amit): just "entity" is enough? not, maybe, "background+entity" ? 
-                                                             * why?
-                                                             * */
+            this.locations = new Dictionary<Entity, Area>(); 
         }
 
         //////////COMMUNICATION LOGIC////////

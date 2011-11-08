@@ -8,7 +8,7 @@ namespace Game.City_Generator
 
     class BuildingTile:Tile
     {
-        Building _building;
+        //Building _building;
         
         internal BuildingTile(Building b): base(){
             _type = ContentType.BUILDING;

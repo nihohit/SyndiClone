@@ -70,11 +70,7 @@ namespace Game.City_Generator
         private static Image get_image(short id)
         {
             Image img = null;
-            /*HACK (amit)ans
-             * (amit): I think it's not the best style nither for coding nor for reading. best set some ENUM or stuff like that.
-            maybe even create a tile object that can answer all of those questions.
-             * shachar: however you feel is fine by me.
-            */
+            
             //TODO - enter all types of tiles here. should we tile in buildings, and change the whole picture when they get destryed?
             /*code:
              * WXYZ - 

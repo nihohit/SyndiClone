@@ -9,8 +9,9 @@ namespace Game.City_Generator
     {
        // Point _corner;
         private  int _len, _wid,_startX,_startY;
-        /*HACK (shachar)
+        /*HACK (shachar) (with ans)
          * you can use here (and I guess in similar areas) Vector & Point.
+         * (amit): I know, but it's not helping me. just adding more to write (and another call to to "point" object)
          * */
 
         public int Length

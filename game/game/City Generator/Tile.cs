@@ -10,6 +10,7 @@ namespace Game.City_Generator
     {
         protected ContentType _type;
         protected int _rotate;
+        protected Building _building;
 
         internal ContentType Type
         {
@@ -21,6 +22,7 @@ namespace Game.City_Generator
         {
             _type = ContentType.EMPTY;
             _rotate = 0;
+            _building = null;
         }
         public Block getFlip()
         {
@@ -38,6 +40,11 @@ namespace Game.City_Generator
         }
         public ContentType getType() {
             return _type;
+        }
+
+        internal Building Building
+        {
+            get { return _building; }
         }
 
     }
