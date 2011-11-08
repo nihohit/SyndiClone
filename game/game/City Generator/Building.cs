@@ -51,5 +51,16 @@ namespace Game.City_Generator
             set { _corp = value;}
             get { return _corp; }
         }
+
+        internal bool hasCorp() { return _corp != null; }
+
+        internal void joinCorp(Corporate c)
+        {
+            if (_corp != null)
+                _corp.removeBuilding(this);
+            _corp = c;
+            if (_corp != null)
+                _corp.addBuilding(this);
+        }
     }
 }

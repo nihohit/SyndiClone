@@ -25,6 +25,7 @@ namespace Game.City_Generator
             retVal.translateRoads();
             retVal.addBuildings();
             retVal.addCorporates();
+            Corporate.print();
 
 
 
