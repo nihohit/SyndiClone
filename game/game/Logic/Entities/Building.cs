@@ -5,9 +5,13 @@ using System.Text;
 
 namespace Game.Logic.Entities
 {
-    /*TODO - class Building : Entity
+    class Building : Entity
     {
+        public Building(int reactionTime, reactionFunction reaction, int health,  
+            Vector size, Affiliation loyalty, Sight sight)
+            : base(reactionTime, reaction, health, entityType.BUILDING, size, loyalty, sight, Visibility.SOLID)
+        {
+        }
 
-
-    }*/
+    }
 }

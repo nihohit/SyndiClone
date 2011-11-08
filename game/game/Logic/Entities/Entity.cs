@@ -6,7 +6,7 @@ namespace Game.Logic.Entities
     {
         const int timeToReact = 100;
         private int _health;
-        private readonly Vector _size;
+        protected Vector _size;
         private readonly entityType _type;
         private Reaction _reaction;
         private Affiliation _loyalty;
@@ -18,7 +18,10 @@ namespace Game.Logic.Entities
         private readonly int _reactionTime;
         private int _timeAcc = 0;
 
-        
+        internal bool destroyed()
+        {
+            return this._health <= 0;
+        }
 
         protected Entity(int reactionTime, reactionFunction reaction, int health,entityType type, Vector size, Affiliation loyalty, Sight sight, Visibility visibility)
         {

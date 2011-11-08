@@ -50,6 +50,8 @@
     </Compile>
     <Compile Include="City Generator\City.cs" />
     <Compile Include="City Generator\CityFactory.cs" />
+    <Compile Include="City Generator\Corporate.cs" />
+    <Compile Include="City Generator\GameBoard.cs" />
     <Compile Include="City Generator\RoadTile.cs" />
     <Compile Include="City Generator\Tile.cs" />
     <Compile Include="Buffers\DisplayBuffer.cs" />
@@ -64,6 +66,8 @@
     <Compile Include="Logic\Entities\Civilian.cs" />
     <Compile Include="Logic\Entities\Cop.cs" />
     <Compile Include="Logic\Entities\Person.cs" />
+    <Compile Include="Logic\Entities\Vehicle.cs" />
+    <Compile Include="Logic\GameBoardToGameGridConverter.cs" />
     <Compile Include="Logic\Grid.cs" />
     <Compile Include="Logic\LogicInfo.cs" />
     <Compile Include="Logic\Entities\MovingEntity.cs" />
@@ -204,6 +208,11 @@
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Graphic Manager\images\PersonBlue.jpg" />
+    <Content Include="Graphic Manager\images\PersonRed.jpg" />
+    <Content Include="Graphic Manager\images\PersonYellow.jpg" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

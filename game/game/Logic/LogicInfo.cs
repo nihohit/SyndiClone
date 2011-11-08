@@ -17,8 +17,60 @@ namespace Game.Logic
     internal enum Affiliation { INDEPENDENT, CORP1, CORP2, CORP3, CORP4 }
     internal enum SightType { CIV_SIGHT }
     internal enum WeaponType { PISTOL, ASSAULT, BAZOOKA, SNIPER, RAILGUN }
-    internal enum BufferType { MOVE, SHOT }
-    internal enum TypesOfShot { SIGHT } 
+    internal enum BufferType { MOVE, SHOT, DESTROY, CREATE }
+    internal enum TypesOfShot { SIGHT }
+    internal enum Direction { LEFT, RIGHT, UP, DOWN }
+
+    internal struct Area
+    {
+        private readonly Point _entry; //the top left of the shape
+        private readonly Vector _size;
+
+        internal void flip()
+        {
+            this._size.flip();
+        }
+
+
+
+        internal Vector Size
+        {
+            get { return _size; }
+        }
+
+        public Point Entry
+        {
+            get { return _entry; }
+        }
+
+        internal Area(Point entry, Vector size)
+        {
+            this._entry = entry;
+            this._size = size;
+        }
+
+        internal Area(Area location, Vector vector)
+        {
+            this._entry = new Point(location.Entry, vector);
+            this._size = location.Size.addVector(vector);
+        }
+
+        internal Point[,] getPointArea()
+        {
+            Point[,] area = new Point[this._size.X, this._size.Y];
+
+            for (int i = 0; i < this._size.X; i++)
+            {
+                for (int j = 0; j < this._size.Y; j++)
+                {
+                    area[i, j] = new Point(this._entry, new Vector(i, j));
+                }
+            }
+
+            return area;
+        }
+
+    }
 
     internal struct Reaction{
 
@@ -205,13 +257,40 @@ namespace Game.Logic
 
     }
 
+    internal struct DestroyEvent : BufferEvent
+    {
+        private readonly Area _area;
+        private readonly Entity _ent;
+
+        internal DestroyEvent(Area area, Entity ent)
+        {
+            this._area = area;
+            this._ent = ent;
+        }
+
+        internal Entity Ent
+        {
+            get { return _ent; }
+        }
+
+        internal Area Area
+        {
+            get { return _area; }
+        }
+
+        BufferType BufferEvent.type()
+        {
+            return BufferType.DESTROY;
+        }
+    }
+
     internal struct MoveEvent : BufferEvent
     {
-        private readonly Point[,] _exit;
-        private readonly Point[,] _entry;
+        private readonly Area _exit;
+        private readonly Area _entry;
         private readonly MovingEntity _mover;
 
-        internal MoveEvent(Point[,] exit, Point[,] entry, MovingEntity mover)
+        internal MoveEvent(Area exit, Area entry, MovingEntity mover)
         {
             this._entry = entry;
             this._exit = exit;
@@ -223,12 +302,12 @@ namespace Game.Logic
             get { return _mover; }
         }
 
-        internal Point[,] Entry
+        internal Area Entry
         {
             get { return _entry; }
         }
 
-        public Point[,] Exit
+        public Area Exit
         {
             get { return _exit; }
         }

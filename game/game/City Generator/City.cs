@@ -591,7 +591,11 @@ namespace Game.City_Generator
         public int getLen() { return _len; }
         public int getWid() { return _wid; }
         public char[,] getGrid() { return _grid; }
-        public Tile[,] getGrid2() { return _grid2; } //HACK(amit): I've added our standard getters\setters, tell me whan I can delete those.
+        public Tile[,] getGrid2() { return _grid2; } /*HACK(amit)ans
+        *: I've added our standard getters\setters, tell me whan I can delete those.
+        * (shachar): didn't understand the question. I need the basic getters & setters for the game board, and that's all. 
+        * BTW, why aren't you using properties to ease getting/setting?
+        */
 
 
         public short[][] getShortGrid() { 

@@ -6,39 +6,57 @@ namespace Game.Logic.Entities
         const int AMOUNT_OF_MOVES_FOR_STEP = 100;
         private readonly int _speed;
         private int _steps = 0;
-        private LinkedList<Point> _path;
+        private LinkedList<Direction> _path;
+        private Direction _headed;
 
-        protected MovingEntity(int reactionTime, reactionFunction reaction, int health, entityType type, Vector size, Affiliation loyalty, Visibility visibility, Sight sight, int speed, LinkedList<Point> path)
+        protected MovingEntity(int reactionTime, reactionFunction reaction, int health, entityType type, Vector size, Affiliation loyalty, Visibility visibility, Sight sight, int speed, LinkedList<Direction> path)
             : base(reactionTime, reaction, health, type, size, loyalty, sight, visibility)
         {
             this._speed = speed;
             this._path = path;
+            this._headed = path.First.Value;
+        }
+
+        internal bool needFlip()
+        {
+            switch (this._headed)
+            {
+                case Direction.DOWN:
+                    return ((this.getDirection() == Direction.LEFT) || (this.getDirection() == Direction.RIGHT));
+                case Direction.UP:
+                    return ((this.getDirection() == Direction.LEFT) || (this.getDirection() == Direction.RIGHT));
+                case Direction.RIGHT:
+                    return ((this.getDirection() == Direction.UP) || (this.getDirection() == Direction.DOWN));
+                case Direction.LEFT:
+                    return ((this.getDirection() == Direction.UP) || (this.getDirection() == Direction.DOWN));
+            }
+            return false;
+        }
+
+        internal void flip()
+        {
+            this._size = new Vector(this._size.Y, this._size.X);
         }
 
         internal int Speed
         {
             get { return _speed; }
-        } 
+        }
 
-        internal LinkedList<Point> Path
+        internal LinkedList<Direction> Path
         {
             get { return _path; }
             set { _path = value; }
         }
 
-        internal virtual Point tryMove()
+        internal bool needToMove(int speed)
         {
-            bool check = reachAffect(AMOUNT_OF_MOVES_FOR_STEP, _steps, _speed);
-            Point ans;
-            if (check)
-            {
-                ans = Path.First.Next.Value;
-            }
-            else
-            {
-                ans = Path.First.Value;
-            }
-            return ans;
+            return reachAffect(AMOUNT_OF_MOVES_FOR_STEP, _steps, speed);
+        }
+
+        internal virtual Direction getDirection()
+        {
+            return Path.First.Value;
         }
 
         internal virtual void moveResult(bool result)
@@ -46,7 +64,9 @@ namespace Game.Logic.Entities
             if (result)
             {
                 _steps -= AMOUNT_OF_MOVES_FOR_STEP;
+                this._headed = this.getDirection();
                 Path.RemoveFirst();
+                
             }
             else
             {

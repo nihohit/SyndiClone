@@ -11,7 +11,9 @@ namespace Game.City_Generator
         Corporate _corp;
         int _owner; //TODO: decide how will "player" be represented. can be either a number or an object.
         /*
-         * HACK(amit) Q: see above - do you want player to be just a number?
+         * HACK (amit)ans
+         * (amit) Q: see above - do you want player to be just a number?
+         * (Shachar) 
          */
        
         internal Building(Block dim) {

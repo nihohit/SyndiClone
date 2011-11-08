@@ -13,8 +13,8 @@ namespace Game.Logic.Entities
         private bool newPathFlag;
         private int _tryToMove = 0;
 
-        internal Civilian() : 
-            base(CIV_REACTION, civReact, CIV_HEALTH, Affiliation.INDEPENDENT, Sight.instance(SightType.CIV_SIGHT), CIV_SPEED, new LinkedList<Point>())
+        internal Civilian() :
+            base(CIV_REACTION, civReact, CIV_HEALTH, Affiliation.INDEPENDENT, Sight.instance(SightType.CIV_SIGHT), CIV_SPEED, new LinkedList<Direction>())
         {
             newPathFlag = true;
         }
@@ -42,7 +42,7 @@ namespace Game.Logic.Entities
             return this.newPathFlag;
         }
 
-        internal void getNewPath(LinkedList<Point> path)
+        internal void getNewPath(LinkedList<Direction> path)
         {
             this.Path = path;
             newPathFlag = false;
