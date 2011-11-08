@@ -11,7 +11,9 @@ namespace Game.City_Generator
         Corporate _corp;
         int _owner; //TODO: decide how will "player" be represented. can be either a number or an object.
         /*
-         * HACK(amit) Q: see above - do you want player to be just a number?
+         * HACK (amit)ans
+         * (amit) Q: see above - do you want player to be just a number?
+         * (Shachar) 
          */
        
         internal Building(Block dim) {
@@ -48,6 +50,17 @@ namespace Game.City_Generator
         public Corporate Corp{
             set { _corp = value;}
             get { return _corp; }
+        }
+
+        internal bool hasCorp() { return _corp != null; }
+
+        internal void joinCorp(Corporate c)
+        {
+            if (_corp != null)
+                _corp.removeBuilding(this);
+            _corp = c;
+            if (_corp != null)
+                _corp.addBuilding(this);
         }
     }
 }

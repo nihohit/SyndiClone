@@ -7,5 +7,6 @@ namespace Game.Buffers
 {
     interface Input
     {
+
     }
 }

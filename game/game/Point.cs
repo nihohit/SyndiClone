@@ -49,6 +49,11 @@ namespace Game
             return "(" + _xLoc + "," + _yLoc + ")";
         }
 
+        internal Vector getDiffVector(Point point)
+        {
+            return new Vector(this.X - point.X, this.Y - point.Y);
+        }
+
 
     }
 }

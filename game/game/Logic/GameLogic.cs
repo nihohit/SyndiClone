@@ -14,9 +14,9 @@ namespace Game.Logic
         private readonly UniqueList<Entity> alwaysActive;
 
         private readonly Grid _grid;
-        private readonly DisplayBuffer _disp;
-        private readonly InputBuffer _input;
-        private readonly SoundBuffer _sound;
+        private readonly DisplayBuffer displayBuffer;
+        private readonly InputBuffer inputBuffer;
+        private readonly SoundBuffer soundBuffer;
 
         public GameLogic(DisplayBuffer disp, InputBuffer input, SoundBuffer sound, Game.City_Generator.City city)
         {
@@ -25,9 +25,9 @@ namespace Game.Logic
             this.alwaysActive = new UniqueList<Entity>(); 
             this.playerUnits = new UniqueList<Entity>();
             this.shooters = new UniqueList<Shooter>();
-            this._disp = disp;
-            this._input = input;
-            this._sound = sound;
+            this.displayBuffer = disp;
+            this.inputBuffer = input;
+            this.soundBuffer = sound;
             City _city = new City(city);
             //TODO - create the grid;
         }
@@ -59,6 +59,14 @@ namespace Game.Logic
         private void updateOutput()
         {
             List<BufferEvent> actions = _grid.returnActions();
+            foreach (BufferEvent action in actions)
+            {
+                if (action.type() == BufferType.DESTROY)
+                {
+                    this.alwaysActive.Remove(((DestroyEvent)action).Ent);
+                    this.playerUnits.Remove(((DestroyEvent)action).Ent);
+                }
+            }
             //TODO - missing function
         }
 

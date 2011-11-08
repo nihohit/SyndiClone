@@ -577,10 +577,54 @@ namespace Game.City_Generator
 
             return false;
         }
+
         internal void addCorporates() {
- 
+
+            for (int i = 0; i < _len; ++i)
+            {
+                for (int j = 0; j < _wid; ++j)
+                {
+                    if ((_grid2[i, j].Type == ContentType.BUILDING) && (!((BuildingTile)_grid2[i, j]).Building.hasCorp()))
+                        ((BuildingTile)_grid2[i, j]).Building.joinCorp(getSquareCorp(i, j));
+                }
+            }
+
+        }
+
+        private Corporate getSquareCorp(int iLoc, int jLoc) {
+            int i=iLoc,j=jLoc;
+            for (; i >= 0 && _grid2[i, j].Type != ContentType.ROAD; --i) {
+                if (_grid2[i, j].Type == ContentType.BUILDING)
+                    if (((BuildingTile)_grid2[i, j]).Building.hasCorp())
+                        return ((BuildingTile)_grid2[i, j]).Building.Corp;
+            }
+
+           // if (_grid2[i, j].Type == ContentType.ROAD)
+                ++i;
+            for (; j >= 0 && _grid2[i, j].Type != ContentType.ROAD; --j)
+            {
+                if (_grid2[i, j].Type == ContentType.BUILDING)
+                    if (((BuildingTile)_grid2[i, j]).Building.hasCorp())
+                        return ((BuildingTile)_grid2[i, j]).Building.Corp;
+            }
+            //if (_grid2[i, j].Type == ContentType.ROAD)
+                ++j;
+            //now we are either in 0,0 or in the 
+            for (; (i < _len) && _grid2[i, jLoc].Type != ContentType.ROAD; ++i)
+                for (; (j < _wid) && _grid2[i, j].Type != ContentType.ROAD; ++j)
+                {
+                    if (_grid2[i, j].Type == ContentType.BUILDING)
+                        if (((BuildingTile)_grid2[i, j]).Building.hasCorp())
+                            return ((BuildingTile)_grid2[i, j]).Building.Corp;
+                }
 
 
+                    return new Corporate();
+        }
+
+        private int corporateSquare(int startY, int startX)
+        {
+            return startX+1;
         }
 
         /****************************************************************************
@@ -591,7 +635,11 @@ namespace Game.City_Generator
         public int getLen() { return _len; }
         public int getWid() { return _wid; }
         public char[,] getGrid() { return _grid; }
-        public Tile[,] getGrid2() { return _grid2; } //HACK(amit): I've added our standard getters\setters, tell me whan I can delete those.
+        public Tile[,] getGrid2() { return _grid2; } /*HACK(amit)ans
+        *: I've added our standard getters\setters, tell me whan I can delete those.
+        * (shachar): didn't understand the question. I need the basic getters & setters for the game board, and that's all. 
+        * BTW, why aren't you using properties to ease getting/setting?
+        */
 
 
         public short[][] getShortGrid() { 

@@ -9,6 +9,9 @@ namespace Game.City_Generator
     {
        // Point _corner;
         private  int _len, _wid,_startX,_startY;
+        /*HACK (shachar)
+         * you can use here (and I guess in similar areas) Vector & Point.
+         * */
 
         public int Length
         {
