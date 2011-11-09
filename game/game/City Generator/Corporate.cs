@@ -7,14 +7,14 @@ namespace Game.City_Generator
 {
     class Corporate
     {
-        static int counter = 0;
+     //   static int counter = 0;
         private List<Building> _buildings;
         
         internal Corporate() {
-            counter++;
+           // counter++;
             _buildings = new List<Building>();
         }
-
+        
         internal void addBuilding (Building b){
             _buildings.Add(b);
         }
@@ -38,14 +38,18 @@ namespace Game.City_Generator
                     return false;
             return true;
         }
-        internal static void print() {
+      /*  internal static void print() {
             Console.Out.WriteLine("count: " + counter);
-        }
+        }*/
         internal List<Building> Buildings{
             get { return _buildings; }
         }
 
         internal void merge(Corporate other) {
+            if (other == this)
+                return;
+         //   Console.Out.WriteLine("merging!");
+          //  counter--;
             while (other.Buildings.Count>0)
                 other.Buildings.First().joinCorp(this);
         }

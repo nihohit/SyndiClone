@@ -25,10 +25,7 @@ namespace Game.City_Generator
             retVal.translateRoads();
             retVal.addBuildings();
             retVal.addCorporates();
-            Corporate.print();
-
-
-
+           // Corporate.print();
 
             return retVal;
         }

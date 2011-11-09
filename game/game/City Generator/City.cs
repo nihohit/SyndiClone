@@ -12,15 +12,20 @@ namespace Game.City_Generator
     class City : GameBoard
     {
         private const int GAP_RATIO = 6;
+        private const double TAKEOVER_CHANCE = 0.2;
+        private const int BIG_CORPS = 10; //TODO: maybe later we will want to change this to something related to boardsize.
         private const char EMPTY = ' ';
         private const char ROAD_GENERIC = '*'; // a generic char for a road, not knowing direction or it's adjacent squares.
         private const int MIN_BLOCK_SIZE = 0; // the smaller block that will have sub-roads is of size 7X6
+        private const int CORP_DIM = 20; //see "add corporates()" for use, signifies the size of each initial corporate
         private static readonly Random _rand = new Random();
         private static char c = 'A';//TODO: remove after debug phase
 
         
+        
         private char[,] _grid;
         private BuildingPlacer _bp;
+        
 
 
         public class BuildingPlacer {
@@ -138,9 +143,13 @@ namespace Game.City_Generator
             for (int i = 0; i < _len; ++i)
                 for (int j = 0; j < _wid; ++j)
                     _grid2[i, j] = new Tile();
+            _corpList = new Corporate[(_len / CORP_DIM), (_wid / CORP_DIM)];
+            for (int i = 0; i < (_len / CORP_DIM) ; ++i)
+                for (int j = 0; j < (_wid / CORP_DIM) ; ++j)
+                    _corpList[i, j] = new Corporate();
  
             _buildings = new List<Building>();
-            _corps = new List<Corporate>();
+            
         }
 
         
@@ -579,53 +588,36 @@ namespace Game.City_Generator
         }
 
         internal void addCorporates() {
+            Building b;
+            foreach (Tile t in _grid2)
+                if (t.Type == ContentType.BUILDING) {
+                    b = ((BuildingTile)t).Building;
+                    if (!b.hasCorp()) {
+                        b.joinCorp(_corpList[(b.StartY + (b.Length / 2)) / CORP_DIM, (b.StartX + (b.Width / 2)) / CORP_DIM]);
+                    }
+                }
+            for (int i = 0; i < BIG_CORPS; ++i)
+                takeover(_rand.Next(_len / CORP_DIM), _rand.Next(_wid / CORP_DIM));
+        }
 
-            for (int i = 0; i < _len; ++i)
-            {
-                for (int j = 0; j < _wid; ++j)
-                {
-                    if ((_grid2[i, j].Type == ContentType.BUILDING) && (!((BuildingTile)_grid2[i, j]).Building.hasCorp()))
-                        ((BuildingTile)_grid2[i, j]).Building.joinCorp(getSquareCorp(i, j));
+        private void takeover(int iLoc, int jLoc) {
+
+            for (int i = iLoc - 1; i <= iLoc + 1; ++i) {
+                if (i < 0) continue;
+                if (i>= _corpList.GetLength(0)) break;
+                for (int j = jLoc - 1; j <= jLoc + 1; ++j) {
+                    if (j < 0) continue;
+                    if (j >= _corpList.GetLength(1)) break;
+                    if (_rand.NextDouble() <TAKEOVER_CHANCE)
+                    {
+                        _corpList[iLoc, jLoc].merge(_corpList[i, j]);
+                        _corpList[i, j] = _corpList[iLoc, jLoc];
+                    }
                 }
             }
-
         }
 
-        private Corporate getSquareCorp(int iLoc, int jLoc) {
-            int i=iLoc,j=jLoc;
-            for (; i >= 0 && _grid2[i, j].Type != ContentType.ROAD; --i) {
-                if (_grid2[i, j].Type == ContentType.BUILDING)
-                    if (((BuildingTile)_grid2[i, j]).Building.hasCorp())
-                        return ((BuildingTile)_grid2[i, j]).Building.Corp;
-            }
 
-           // if (_grid2[i, j].Type == ContentType.ROAD)
-                ++i;
-            for (; j >= 0 && _grid2[i, j].Type != ContentType.ROAD; --j)
-            {
-                if (_grid2[i, j].Type == ContentType.BUILDING)
-                    if (((BuildingTile)_grid2[i, j]).Building.hasCorp())
-                        return ((BuildingTile)_grid2[i, j]).Building.Corp;
-            }
-            //if (_grid2[i, j].Type == ContentType.ROAD)
-                ++j;
-            //now we are either in 0,0 or in the 
-            for (; (i < _len) && _grid2[i, jLoc].Type != ContentType.ROAD; ++i)
-                for (; (j < _wid) && _grid2[i, j].Type != ContentType.ROAD; ++j)
-                {
-                    if (_grid2[i, j].Type == ContentType.BUILDING)
-                        if (((BuildingTile)_grid2[i, j]).Building.hasCorp())
-                            return ((BuildingTile)_grid2[i, j]).Building.Corp;
-                }
-
-
-                    return new Corporate();
-        }
-
-        private int corporateSquare(int startY, int startX)
-        {
-            return startX+1;
-        }
 
         /****************************************************************************
          * Getters, Setters, simple functions

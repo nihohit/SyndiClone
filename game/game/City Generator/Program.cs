@@ -18,7 +18,7 @@ namespace Game
            // Application.SetCompatibleTextRenderingDefault(false);
            // Application.Run(new Form1());
             
-            GameBoard city = CityFactory.createMap(100,100);
+            GameBoard city = CityFactory.createMap(200,200);
             //City.BuildingPlacer bp = new City.BuildingPlacer();
             //bp.print();
 
