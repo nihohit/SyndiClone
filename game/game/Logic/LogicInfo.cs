@@ -4,21 +4,22 @@ using Game.Logic.Entities;
 
 namespace Game.Logic
 {
-    internal delegate bool EntityChecker(Entity ent);
-    internal delegate Point HitFunction(Point target);
-    internal delegate void Effect(Entity ent);
-    internal delegate bool wasBlocked(Visibility ent);
-    internal delegate Entity targetChooser(List<Entity> targets);
-    internal delegate Reaction reactionFunction(List<Entity> ent);
+    internal delegate bool EntityChecker(Entity ent); //These functions check basic questions about entities and return a bool
+    internal delegate Point HitFunction(Point target); //These functions calculate the actual point of impact of a bullet, relative to the target
+    internal delegate void Effect(Entity ent); //These functions simulate effects on entities. mostly will be damage
+    internal delegate bool wasBlocked(Visibility ent); //These functions check whether an entitiy blocks a certain effect
+    internal delegate Entity targetChooser(List<Entity> targets); //These functions choose which entity, out of the list of possible entities, to target
+    internal delegate Reaction reactionFunction(List<Entity> ent); //These functions set the reaction of entities
 
-    internal enum Action { FIRE_AT, IGNORE, RUN_AWAY_FROM, MOVE_TOWARDS, MOVE_WHILE_SHOOT, CREATE_ENTITY }
-    internal enum entityType { PERSON, VEHICLE, BUILDING}
-    internal enum Visibility { CLOAKED, MASKED, REVEALED, SOLID }
-    internal enum Affiliation { INDEPENDENT, CORP1, CORP2, CORP3, CORP4 }
-    internal enum SightType { CIV_SIGHT }
-    internal enum WeaponType { PISTOL, ASSAULT, BAZOOKA, SNIPER, RAILGUN }
-    internal enum BufferType { MOVE, SHOT, DESTROY, CREATE }
-    internal enum TypesOfShot { SIGHT }
+    internal enum Action { FIRE_AT, IGNORE, RUN_AWAY_FROM, MOVE_TOWARDS, MOVE_WHILE_SHOOT, CREATE_ENTITY } //This enum checks the possible actions entities can take
+    internal enum entityType { PERSON, VEHICLE, BUILDING} //the different types of entities
+    internal enum Visibility { CLOAKED, MASKED, REVEALED, SOLID } //the visibility of an entity
+    internal enum Affiliation { INDEPENDENT, CORP1, CORP2, CORP3, CORP4 } //to which player each entity belongs
+    internal enum SightType { CIV_SIGHT } //different sights
+    internal enum WeaponType { PISTOL, ASSAULT, BAZOOKA, SNIPER, RAILGUN } //different weapons
+    internal enum BufferType { MOVE, SHOT, DESTROY, CREATE } //different buffers for the actions that the grid returns after each loop
+    internal enum BlastType { } //different blast effect
+    internal enum ShotType { SIGHT }
     internal enum Direction { LEFT, RIGHT, UP, DOWN }
 
     internal struct Area
@@ -224,18 +225,18 @@ namespace Game.Logic
 
     internal struct ShotEvent : BufferEvent
     {
-        private readonly TypesOfShot _shot;
+        private readonly ShotType _shot;
         private readonly Point _exit;
         private readonly Point _target;
 
-        internal ShotEvent(TypesOfShot shot, Point exit, Point entry)
+        internal ShotEvent(ShotType shot, Point exit, Point entry)
         {
             this._exit = exit;
             this._target = entry;
             this._shot = shot;
         }
 
-        internal TypesOfShot Shot
+        internal ShotType Shot
         {
             get { return _shot; }
         }

@@ -6,10 +6,23 @@ namespace Game.Logic
 {
     static class GameBoardToGameGridConverter
     {
+        /******************
+        class consts
+        ****************/
+        
         const int TILE_SIZE_CONVERSION = 32;
         const int BASE_BUILD_REACTION_TIME = 200;
         const int BASE_BUILD_HEALTH = 10;
 
+
+        /******************
+        Methods
+        ****************/
+
+        /*
+         * This function converts a gameBaord to a grid. It creates a new grid, and populates it according to the 
+         * building list in the original board. 
+         */
         internal static Grid convert(GameBoard board)
         {
             int x = board.Length * TILE_SIZE_CONVERSION;
@@ -26,12 +39,18 @@ namespace Game.Logic
             return grid;
         }
 
+        /*
+         * This function is just the basic reaction function for the basic civic buildings.
+         */
         public static Reaction civBuildReact(List<Entity> ent)
         {
             //TODO - missing function
             return new Reaction(null, Action.IGNORE);
         }
 
+        /*
+         * converts a generation-building to a game-building
+         */
         private static Game.Logic.Entities.Building convertBuilding(Game.City_Generator.Building build)
         {
             Vector size = new Vector (build.Length, build.Width);
@@ -40,10 +59,14 @@ namespace Game.Logic
             return new Game.Logic.Entities.Building(BASE_BUILD_REACTION_TIME / sizeModifier, civBuildReact, BASE_BUILD_HEALTH * sizeModifier, realSize, Affiliation.INDEPENDENT, Sight.instance(SightType.CIV_SIGHT));
         }
 
+        /*
+         * Finds the area of a generation bulding.
+         */
         private static Area convertToArea(Game.City_Generator.Building build)
         {
             return new Area(new Point (build.StartX * TILE_SIZE_CONVERSION, build.StartY * TILE_SIZE_CONVERSION), new Vector(build.Length * TILE_SIZE_CONVERSION, build.Width * TILE_SIZE_CONVERSION));
         }
+
 
         private static Entity[,] intiateGrid(int x, int y)
         {

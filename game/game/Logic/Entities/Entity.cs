@@ -4,7 +4,16 @@ namespace Game.Logic.Entities
     internal abstract class Entity
 
     {
+        /******************
+        class consts
+        ****************/        
+        
         const int timeToReact = 100;
+
+        /******************
+        class fields
+        ****************/        
+        
         private int _health;
         protected Vector _size;
         private readonly entityType _type;
@@ -18,10 +27,9 @@ namespace Game.Logic.Entities
         private readonly int _reactionTime;
         private int _timeAcc = 0;
 
-        internal bool destroyed()
-        {
-            return this._health <= 0;
-        }
+        /******************
+        constructors
+        ****************/
 
         protected Entity(int reactionTime, reactionFunction reaction, int health,entityType type, Vector size, Affiliation loyalty, Sight sight, Visibility visibility)
         {
@@ -36,14 +44,15 @@ namespace Game.Logic.Entities
             this._reactionTime = reactionTime;
         }
 
-        ///METHODS///
+        /******************
+        Methods
+        ****************/
 
         internal virtual bool hit(int damage)
         {
             this._health -= damage;
             return (this._health <= 0);
         }
-
 
         virtual internal Reaction resolveOrders()
         {
@@ -70,7 +79,15 @@ namespace Game.Logic.Entities
             return (currentAcc + increaseBy >= topLevel); 
         }
 
-        ///GETTERS & SETTERS////
+        internal bool destroyed()
+        {
+            return this._health <= 0;
+        }
+
+        /******************
+        Getters & setters
+        ****************/
+
         internal Reaction Reaction
         {
             get { return _reaction; }
