@@ -212,6 +212,7 @@
     <Content Include="Graphic Manager\images\PersonBlue.jpg" />
     <Content Include="Graphic Manager\images\PersonRed.jpg" />
     <Content Include="Graphic Manager\images\PersonYellow.jpg" />
+    <Content Include="Coding Conventions.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

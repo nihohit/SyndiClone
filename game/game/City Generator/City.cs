@@ -6,11 +6,19 @@ using System.Windows.Forms; //TODO: remove using - it's here so I can use Messag
 
 /**
  * It's a city. a pre-processing phase city, but a city nonetheless.
+ * here we make most of the processing needed to create a city. 
+ * the phases of creating a city are done by this order:
+ * 1) Create a city object.
+ * 2) Add roads to the city.
+ * 3) Collect data ("translate") about the roads created - direction, width etc. store it in the road-tiles
+ * 4) Add Buildings.
+ * 5) Divide building into corporates.
  */
 namespace Game.City_Generator
 {
     class City : GameBoard
     {
+        /********************************Constants***************************************/
         private const int GAP_RATIO = 6;
         private const double TAKEOVER_CHANCE = 0.2;
         private const int BIG_CORPS = 10; //TODO: maybe later we will want to change this to something related to boardsize.
@@ -21,28 +29,42 @@ namespace Game.City_Generator
         private static readonly Random _rand = new Random();
         private static char c = 'A';//TODO: remove after debug phase
 
-        
-        
+
+        /********************************Fields***************************************/
         private char[,] _grid;
         private BuildingPlacer _bp;
         
 
-
+        /****************************************************************************************************************
+         * ***************************************INNER CLASS************************************************************
+         * **************************************************************************************************************/
+        /*
+         * this class is a tool that helps me create new buildings.
+         * By theory, it was meant to keep a changing probability to decide the length and width of the building considering the past, so the more buildings there are of a certain
+         * length, the less likely this length to appear. 
+         * However, after testing it a little, I found that in the end the probabilities to get a big building reaches 100% (due to place constraints). 
+         * Maybe I will think of a different strategy later.
+         * */
         public class BuildingPlacer {
+            /********************************Constants***************************************/
             private const double DECREASE_FACTOR = 0.01,LOWER_HALF_PROB = 0.25;
             private const int ARR_SIZE=12;
+            /********************************Fields***************************************/
             private double[] _hPlaces,_vPlaces;
-            
+
+            /********************************Constructor***************************************/
             internal BuildingPlacer() {
                 _hPlaces = new double[ARR_SIZE];
-                _vPlaces = new double[ARR_SIZE];
+                _vPlaces = new double[ARR_SIZE];// these two arrays hold the probability to get an i length wall.
+
+                //initialize the arrays.
                 _vPlaces[0] = _vPlaces[1] = _hPlaces[0] = _hPlaces[1] = 0;
                 int i;
                 int middle = ARR_SIZE/2;
                 double quota = LOWER_HALF_PROB/(middle-1); //lower half initial probability.
 
                 for (i = 2; i <= middle; ++i)
-                { //TODO - missing function
+                { 
                         _hPlaces[i] = _vPlaces[i] = (i-1)*quota;
                     }
                 quota = (1-LOWER_HALF_PROB)/(middle-1+(ARR_SIZE%2)); //the modulo is to deal with both even and odd sized arrays.
@@ -70,6 +92,8 @@ namespace Game.City_Generator
                 }
                 Console.Out.WriteLine();
             }
+
+           
             internal int getVDimension(int max)
             {
                 if (max < 1) {
@@ -126,12 +150,14 @@ namespace Game.City_Generator
                 return retVal;
             }
         }
+        /*********************************************************************************************
+         * *************************************END OF INNER CLASS************************************
+         * *******************************************************************************************/
 
 
 
-        /**
-         * Constructor.
-         */
+
+        /********************************Constructor***************************************/
         public City(int gridL, int gridW)
         {
             //_rand = new Random();
@@ -143,186 +169,89 @@ namespace Game.City_Generator
             for (int i = 0; i < _len; ++i)
                 for (int j = 0; j < _wid; ++j)
                     _grid2[i, j] = new Tile();
-            _corpList = new Corporate[(_len / CORP_DIM), (_wid / CORP_DIM)];
-            for (int i = 0; i < (_len / CORP_DIM) ; ++i)
-                for (int j = 0; j < (_wid / CORP_DIM) ; ++j)
+            _corpList = new Corporate[(1+ (_len / CORP_DIM)), 1+(_wid / CORP_DIM)];
+            for (int i = 0; i < (_len / CORP_DIM)+1 ; ++i)
+                for (int j = 0; j < (_wid / CORP_DIM)+1 ; ++j)
                     _corpList[i, j] = new Corporate();
  
             _buildings = new List<Building>();
             
         }
 
-        
-
-        /*********************************************************************
-         * Map Creation: roads, buildings etc.
-         * ******************************************************************/
-       /* private void printBlock(int startX, int startY, int len, int wid) {
-            System.IO.StreamWriter file = new System.IO.StreamWriter("city" + _count + ".mf");
-            Console.Out.WriteLine("block number: " + _count);
-            for (int i = 0; i < _len; ++i) {
-                for (int j = 0; j < _wid; ++j) {
-               
-                    file.Write(_grid i,  j]);
-                   // Console.Write(_grid i, j]);
-                }
-                file.Write("\r\n");
-                //Console.Write('\n');
-             
-            }
-            file.Close();
-            _count++;
-
-        }*/
-
-        private bool isConnected(int x, int y, Directions dir,int offset) { 
-             switch (dir)
-             {
-                 case Directions.E:
-                     if (y - offset < 0) return false; //error. print?
-                     if (y - offset == 0) return false; //legit.
-                     if (_grid2[x, y -offset- 1].getType() == ContentType.ROAD)
-                         return true;
-                     return false;
-
-                 case Directions.N:
-                     if (x - offset < 0) return false; //error.
-                     if (x - offset == 0) return false; //legit.
-                     if (_grid2[x -offset - 1, y].getType() == ContentType.ROAD)
-                         return true;
-                     return false;
-                    
-                 case Directions.W:
-                     if (y + offset + 1 > _wid) return false; //error
-                     if (y + offset+1 == _wid) return false; //legit
-                     return (_grid2[x, y + offset+1].getType() == ContentType.ROAD);
-                 case Directions.S:
-                     if (x + offset + 1 > _wid) return false;//error
-                     if (x + offset + 1 == _wid) return false;//legit
-                     return (_grid2[x + offset + 1, y].getType() == ContentType.ROAD);
-                 default: return false; //error
-             }
-        }
-
-        internal void translateRoads()
+        /********************************Properties***************************************/
+        //TODO: remove.
+        //this section exists in the "GameBoard" parent class. here are just the redundant things. 
+        public char[,] getGrid() { return _grid; } //This is left here till later. TODO: remove.
+        public short[][] getShortGrid()
         {
-            RoadTile current;
+            short[][] retVal = new short[_len][];
             for (int i = 0; i < _len; ++i)
             {
+                retVal[i] = new short[_wid];
                 for (int j = 0; j < _wid; ++j)
-                {
-                    if (_grid2[i, j].getType() == ContentType.ROAD)
-                    {
-                        current = (RoadTile)_grid2[i, j];
-                        //set number of exits from the tile
-                        if (isConnected(i, j, Directions.E, current.getVOffset()))
-                            current.addExit();
-                        if (isConnected(i, j, Directions.N, current.getHOffset()))
-                            current.addExit();
-                        if (isConnected(i, j, Directions.W, current.getVWidth() - current.getVOffset() - 1)) //the "-1" part is so that the offset will lead to the edge of the road
-                            current.addExit();
-                        if (isConnected(i, j, Directions.S, current.getHWidth() - current.getHOffset() - 1))
-                            current.addExit();
-
-                        //set rotate (note that "setRotate(0)" is redundant, but it's done anyway.
-                        // rotate 4 means error.
-                        switch (current.getExits())
-                        {
-                            case 1:
-                                if (isConnected(i, j, Directions.W, current.getVOffset())) //EW begining
-                                    current.setRotate(0);
-                                else if (isConnected(i, j, Directions.S, current.getHOffset())) //NS begining
-                                    current.setRotate(1);
-                                else if (isConnected(i, j, Directions.E, current.getHOffset())) //EW end
-                                    current.setRotate(2);
-                                else if (isConnected(i, j, Directions.N, current.getHOffset())) //NS end
-                                    current.setRotate(3);
-                                else current.setRotate(4);
-                                break;
-                            case 2: //either 90 deg turn or none
-                                if (current.getDirection() == Directions.EW)
-                                    current.setRotate(1);
-                                else if (current.getDirection() == Directions.NS) current.setRotate(0);
-                                break;
-                            case 3:
-                                if (!isConnected(i, j, Directions.W, current.getVOffset()))
-                                { //3rd road to the East
-                                    current.setRotate(0);
-                                    current.setDirection(Directions.NS);
-                                }
-                                else if (!isConnected(i, j, Directions.S, current.getHOffset()))
-                                { //3rd road to the North
-                                    current.setRotate(1);
-                                    current.setDirection(Directions.EW);
-                                }
-                                else if (!isConnected(i, j, Directions.E, current.getHOffset()))
-                                { //3rd road to the West
-                                    current.setRotate(2);
-                                    current.setDirection(Directions.NS);
-                                }
-                                else if (!isConnected(i, j, Directions.N, current.getHOffset()))
-                                { //3rd road to the South
-                                    current.setRotate(3);
-                                    current.setDirection(Directions.EW);
-                                }
-                                else current.setRotate(4); break;
-                            case 4: if (current.getDirection() == Directions.FOURWAY) current.setRotate(0); else current.setRotate(4);
-                                break;
-                            default: current.setRotate(4); break;
-                        }
-                    }
-                }
+                    retVal[i][j] = (short)_grid[i, j];
             }
+            return retVal;
+
         }
 
-        internal void addRoads(int length, int width)
+        public void setGrid(char[,] grid)
+        {
+            _grid = grid;
+        }
+
+
+
+        /********************************Adding Roads To a City***************************************/
+        
+        /**
+         * This method adds roads to a city by calling to "add main roads" recursively, first time with the whole grid, and after that it adds roads block by block.
+         * */
+        internal void addRoads()
         {
             List<Block> blocks = new List<Block>();
-            addMainRoads(0, 0, length, width, ref blocks);
+            addMainRoads(0, 0, _len, _wid, ref blocks);
 
             Block temp;
             int cond = blocks.Count;
-            //printBlock(0, 0, _len, _wid);
-            while (cond > 0) {
+            while (cond > 0)
+            {
                 temp = blocks[0];
-              //  Console.Out.WriteLine("Block size: " + temp.getWid() * temp.getLen());
                 if (temp.Width * temp.Length > MIN_BLOCK_SIZE)
                 {
                     addMainRoads(temp.StartX, temp.StartY, temp.Length, temp.Width, ref blocks);
-                   // printBlock(temp.getX, temp.getY, temp.getLen(), temp.getWid());
                 }
                 blocks.RemoveAt(0);
                 cond = blocks.Count;
             }
-
         }
 
+        /**
+         * this method adds a few roads that cross an entire "block" (whose dimensions are given as parameters)
+         * */
         private void addMainRoads(int startX, int startY, int length, int width, ref List<Block> blocks)
         {
-           
+
             int lenRoadsNum = 0, widRoadsNum = 0;
             //Random rand = new Random();
 
             //this gives us the max possible road width for both vertical(length) and horizontal(width) roads
-            int maxLenRoad = (int)(Math.Log10(length)); 
+            int maxLenRoad = (int)(Math.Log10(length));
             int maxWidRoad = (int)(Math.Log10(width));
             if (maxLenRoad > 0) lenRoadsNum = (width / maxLenRoad) / GAP_RATIO;
             if (maxWidRoad > 0) widRoadsNum = (length / maxWidRoad) / GAP_RATIO;
-          //  Console.Out.WriteLine(maxLenRoad + "X" + maxWidRoad);
-
-           // Console.Out.WriteLine("lenRoadsNum=" + lenRoadsNum);
 
             List<int> lenRoads = new List<int>();
             List<int> widRoads = new List<int>();
             int gap;
 
-            gap = maxWidRoad * GAP_RATIO; 
+            gap = maxWidRoad * GAP_RATIO;
             for (int i = 0; i < widRoadsNum; ++i)
             {
                 lenRoads.Add(_rand.Next(maxWidRoad, gap - maxWidRoad) + (i * gap));
             }
 
-            gap = maxLenRoad * GAP_RATIO; 
+            gap = maxLenRoad * GAP_RATIO;
             for (int i = 0; i < lenRoadsNum; ++i)
             {
                 widRoads.Add(_rand.Next(maxLenRoad, gap - maxLenRoad) + (i * gap));
@@ -342,14 +271,14 @@ namespace Game.City_Generator
                     lenBlockEdge.Add(i + m);
                     for (int j = 0; j < m; ++j)
                         for (int k = 0; k < width; ++k)
-                            if ((startX + i + j < _len) && (startY + k) < _wid)
+                            if ((startY + i + j < _len) && (startX + k) < _wid)
                             {
-                                _grid[startX + i + j, startY + k] = ROAD_GENERIC;
-                                if (_grid2[startX + i + j, startY + k].getType() != ContentType.ROAD)
-                                    _grid2[startX + i + j, startY + k] = new RoadTile();
-                                ((RoadTile)_grid2[startX + i + j, startY + k]).addDirection(false);
-                                ((RoadTile)_grid2[startX + i + j, startY + k]).setHWidth(m);
-                                ((RoadTile)_grid2[startX + i + j, startY + k]).setHOffset(j);
+                                _grid[startY + i + j, startX + k] = ROAD_GENERIC;
+                                if (_grid2[startY + i + j, startX + k].Type != ContentType.ROAD)
+                                    _grid2[startY + i + j, startX + k] = new RoadTile();
+                                ((RoadTile)_grid2[startY + i + j, startX + k]).addDirection(false);
+                                ((RoadTile)_grid2[startY + i + j, startX + k]).HWidth = m;
+                                ((RoadTile)_grid2[startY + i + j, startX + k]).HOffset = j;
                             }
                 }
                 lenBlockEdge.Add(length);
@@ -365,14 +294,14 @@ namespace Game.City_Generator
                     for (int j = 0; j < m; ++j)
                         for (int k = 0; k < length; ++k)
                         {
-                            if ((startX + k < _len) && (startY + i + j) < _wid)
+                            if ((startY + k < _len) && (startX + i + j) < _wid)
                             {//make sure we're not out of the grid
-                                _grid[startX + k, startY + i + j] = ROAD_GENERIC;
-                                if (_grid2[startX + k, startY + i + j].getType() != ContentType.ROAD)
-                                    _grid2[startX + k, startY + i + j] = new RoadTile();
-                                ((RoadTile)_grid2[startX + k, startY + i + j]).addDirection(true);
-                                ((RoadTile)_grid2[startX + k, startY + i + j]).setVWidth(m);
-                                ((RoadTile)_grid2[startX + k, startY + i + j]).setVOffset(j);
+                                _grid[startY + k, startX + i + j] = ROAD_GENERIC;
+                                if (_grid2[startY + k, startX + i + j].Type != ContentType.ROAD)
+                                    _grid2[startY + k, startX + i + j] = new RoadTile();
+                                ((RoadTile)_grid2[startY + k, startX + i + j]).addDirection(true);
+                                ((RoadTile)_grid2[startY + k, startX + i + j]).VWidth = m;
+                                ((RoadTile)_grid2[startY + k, startX + i + j]).VOffset = j;
 
                             }
                         }
@@ -396,49 +325,136 @@ namespace Game.City_Generator
                         else blockwidth = width;
                         if ((blockwidth < 0) || (blockLength < 0))
                             Console.Error.WriteLine(startX + " ERROR!!! " + startY); //TODO - remove (debug)
-                        else blocks.Add(new Block(lenBlockEdge[i], widBlockEdge[j], blockLength, blockwidth));
+                        else blocks.Add(new Block(widBlockEdge[j],lenBlockEdge[i], blockLength, blockwidth));
                         // Console.Out.WriteLine(lenBlockEdge[i]+"-"+lenBlockEdge[i+1]+"X"+widBlockEdge[j]+"-"+widBlockEdge[j+1]+" legnthXwid =" +blockLength+"X"+blockwidth);
                     }
                 }
             }
         }
 
-        internal void addBuildings() {
+
+        /**
+         * this method adds some info to the road tiles to determin thier type and their rotate attribute.
+         * */
+        internal void translateRoads()
+        {
+            RoadTile current;
+            for (int i = 0; i < _len; ++i)
+            {
+                for (int j = 0; j < _wid; ++j)
+                {
+                    if (_grid2[i, j].Type == ContentType.ROAD)
+                    {
+                        current = (RoadTile)_grid2[i, j];
+                        //set number of exits from the tile
+                        if (isConnected(i, j, Directions.E, current.VOffset))
+                            current.addExit();
+                        if (isConnected(i, j, Directions.N, current.HOffset))
+                            current.addExit();
+                        if (isConnected(i, j, Directions.W, current.VWidth - current.VOffset - 1)) //the "-1" part is so that the offset will lead to the edge of the road
+                            current.addExit();
+                        if (isConnected(i, j, Directions.S, current.HWidth - current.HOffset - 1))
+                            current.addExit();
+
+                        //set rotate (note that "Rotate=0" is redundant, but it's done anyway.
+                        // rotate 4 means error.
+                        switch (current.Exits)
+                        {
+                            case 1:
+                                if (isConnected(i, j, Directions.W, current.VOffset)) //EW begining
+                                    current.Rotate = 0;
+                                else if (isConnected(i, j, Directions.S, current.HOffset)) //NS begining
+                                    current.Rotate = 1;
+                                else if (isConnected(i, j, Directions.E, current.HOffset)) //EW end
+                                    current.Rotate = 2;
+                                else if (isConnected(i, j, Directions.N, current.HOffset)) //NS end
+                                    current.Rotate = 3;
+                                else current.Rotate = 4;
+                                break;
+                            case 2: //either 90 deg turn or none
+                                if (current.Direction == Directions.EW)
+                                    current.Rotate = 1;
+                                else if (current.Direction == Directions.NS) current.Rotate = 0;
+                                break;
+                            case 3:
+                                if (!isConnected(i, j, Directions.W, current.VOffset))
+                                { //3rd road to the East
+                                    current.Rotate = 0;
+                                    current.Direction = Directions.NS;
+                                }
+                                else if (!isConnected(i, j, Directions.S, current.HOffset))
+                                { //3rd road to the North
+                                    current.Rotate = 1;
+                                    current.Direction = Directions.EW;
+                                }
+                                else if (!isConnected(i, j, Directions.E, current.HOffset))
+                                { //3rd road to the West
+                                    current.Rotate = 2;
+                                    current.Direction = Directions.NS;
+                                }
+                                else if (!isConnected(i, j, Directions.N, current.HOffset))
+                                { //3rd road to the South
+                                    current.Rotate = 3;
+                                    current.Direction = Directions.EW;
+                                }
+                                else current.Rotate = 4; break;
+                            case 4: if (current.Direction == Directions.FOURWAY) current.Rotate = 0; else current.Rotate = 4;
+                                break;
+                            default: current.Rotate = 4; break;
+                        }
+                    }
+                }
+            }
+        }
+
+
+
+
+        /********************************Adding Buildings To a City***************************************/
+        
+        /**
+         * Adds building to a city using the "add building" method.
+         * */
+        internal void addBuildings()
+        {
             for (int i = 0; i < _len; ++i)
                 for (int j = 0; j < _wid; ++j)
-                    if (_grid2[i, j].getType() == ContentType.EMPTY)
+                    if (_grid2[i, j].Type == ContentType.EMPTY)
                         addBuilding(i, j); //j will be bigger in the width of the new building
             Console.Out.WriteLine("buildings num=" + _buildings.Count);
-            connectBuildings2Roads();
+           connectBuildings2Roads();
             //_bp.print();
         }
+
 
         /*
          * creates a building, adds it to the buildings list
          * */
-        private void addBuilding(int y, int x) {
+        private void addBuilding(int y, int x)
+        {
             Block buildingSize;
             Building b;
-            int length,width;
+            int length, width;
             width = 0;
             length = 0;
-            for (; ((x+width<_wid) &&(_grid2[y, x + width].getType() == ContentType.EMPTY)); ++width);
+            for (; ((x + width < _wid) && (_grid2[y, x + width].Type == ContentType.EMPTY)); ++width) ;
             width--; //no matter why we've stopped, we need to go one step backwards
-            for (; ((y + length < _len) && (_grid2[y + length, x + width].getType() == ContentType.EMPTY)); ++length) ;
+            for (; ((y + length < _len) && (_grid2[y + length, x + width].Type == ContentType.EMPTY)); ++length) ;
             length--;
-           
-            
-            if (length < 1) 
+
+
+            if (length < 1)
                 return;
             if (width < 1)
                 return;
 
-            buildingSize = new Block(x ,y,_bp.getVDimension(length),_bp.getHDimension(width));
-            b= new Building(buildingSize);
-            for (int i = y; i < y+buildingSize.Length; ++i)
-                for (int j = x; j < x+buildingSize.Width; ++j)
+            buildingSize = new Block(x, y, _bp.getVDimension(length), _bp.getHDimension(width));
+            b = new Building(buildingSize);
+            for (int i = y; i < y + buildingSize.Length; ++i)
+                for (int j = x; j < x + buildingSize.Width; ++j)
                 {
-                    
+                    if (_grid2[i, j].Type != ContentType.EMPTY)
+                        continue;
                     _grid[i, j] = c;
                     _grid2[i, j] = new BuildingTile(b);
                 }
@@ -446,76 +462,124 @@ namespace Game.City_Generator
             c++;
             if (c > 'Z')
                 c = 'A';
-            
+
         }
 
-        
+
+        /**
+         * this method is helping me find out whether a building is connected to a road in a certain direction.
+         * */
+        private bool isConnected(int x, int y, Directions dir, int offset)
+        {
+            switch (dir)
+            {
+                case Directions.E:
+                    if (y - offset < 0) return false; //error. print?
+                    if (y - offset == 0) return false; //legit.
+                    if (_grid2[x, y - offset - 1].Type == ContentType.ROAD)
+                        return true;
+                    return false;
+
+                case Directions.N:
+                    if (x - offset < 0) return false; //error.
+                    if (x - offset == 0) return false; //legit.
+                    if (_grid2[x - offset - 1, y].Type == ContentType.ROAD)
+                        return true;
+                    return false;
+
+                case Directions.W:
+                    if (y + offset + 1 > _wid) return false; //error
+                    if (y + offset + 1 == _wid) return false; //legit
+                    return (_grid2[x, y + offset + 1].Type == ContentType.ROAD);
+                case Directions.S:
+                    if (x + offset + 1 > _wid) return false;//error
+                    if (x + offset + 1 == _wid) return false;//legit
+                    return (_grid2[x + offset + 1, y].Type == ContentType.ROAD);
+                default: return false; //error
+            }
+        }
+
+        /**
+         * if there's a building that is one row remote from a road - enlarge this building so that it reaches a road.
+         * */
         private void connectBuildings2Roads()
         {
-           bool cond=true; 
-           while (cond) //this while allows me to wreak havoc to the _buildings list without ruining my iterator.
-           {
-               cond = false;
-               foreach (Building b in _buildings)
-               {
-                   if (b.StartY + b.Length < _len)
-                   {
-                       if (_grid2[b.StartY + b.Length, b.StartX].getType() == ContentType.ROAD)
-                       {
-                           //Console.Out.WriteLine("(" + b.StartY + "," + b.StartX + ") ---ROAD Below");
-                           continue;
-                       }
-                   }
+            bool cond = true;
+            bool connected;
+            while (cond) //this while allows me to wreak havoc to the _buildings list without ruining my iterator.
+            {
+                cond = false;
+                foreach (Building b in _buildings)
+                {
+                    connected = false;
+                    if (b.StartY + b.Length < _len)
+                    {
+                        if (_grid2[b.StartY + b.Length, b.StartX].Type == ContentType.ROAD)
+                        {
+                            //Console.Out.WriteLine("(" + b.StartY + "," + b.StartX + ") ---ROAD Below");
+                            //continue;
+                            connected = true;
+                        }
+                    }
 
-                   if (b.StartY > 0)
-                   {
-                       if (_grid2[b.StartY - 1, b.StartX].getType() == ContentType.ROAD)
-                       {
-                           //Console.Out.WriteLine("("+b.StartY+","+b.StartX+") ---ROAD above");
-                           continue;
-                       }
-                   }
-                   if (b.StartX > 0)
-                   {
-                       if (_grid2[b.StartY, b.StartX - 1].getType() == ContentType.ROAD)
-                       {
-                           //Console.Out.WriteLine("(" + b.StartY + "," + b.StartX + ") ---ROAD to Left");
-                           continue;
-                       }
-                   }
+                    if (b.StartY > 0)
+                    {
+                        if (_grid2[b.StartY - 1, b.StartX].Type == ContentType.ROAD)
+                        {
+                           // Console.Out.WriteLine("("+b.StartY+","+b.StartX+") ---ROAD above");
+                            //continue;
+                            connected = true;
+                        }
+                    }
+                    if (b.StartX > 0)
+                    {
+                        if (_grid2[b.StartY, b.StartX - 1].Type == ContentType.ROAD)
+                        {
+                            //Console.Out.WriteLine("(" + b.StartY + "," + b.StartX + ") ---ROAD to Left");
+                            //continue;
+                            connected = true;
+                        }
+                    }
 
-                   if (b.StartX + b.Width < _wid)
-                   {
-                       if (_grid2[b.StartY, b.StartX + b.Width].getType() == ContentType.ROAD)
-                       {
-                           //  Console.Out.WriteLine("(" + b.StartY + "," + b.StartX + ") ---ROAD to Right");
-                           continue;
-                       }
-                   }
-                   if (canConnect(b))
-                       continue;
-
+                    if (b.StartX + b.Width < _wid)
+                    {
+                        if (_grid2[b.StartY, b.StartX + b.Width].Type == ContentType.ROAD)
+                        {
+                            // Console.Out.WriteLine("(" + b.StartY + "," + b.StartX + ") ---ROAD to Right");
+                            //continue;
+                            connected = true;
+                        }
+                    }
+                    if (expandToRoad(b)||connected)
+                        continue;
+                
                    for (int i = 0; i < b.Length; ++i)
-                       for (int j = 0; j < b.Width; ++j)
-                       {
-                           _grid2[b.StartY + i, b.StartX + j] = new Tile();
-                           _grid[b.StartY + i, b.StartX + j] = '/';
-                       }
-                   _buildings.Remove(b);
-                   cond = true;
-                   break;
-               }
-           }
+                        for (int j = 0; j < b.Width; ++j)
+                        {
+                            _grid2[b.StartY + i, b.StartX + j] = new Tile();
+                            _grid[b.StartY + i, b.StartX + j] = '/';
+                        }
+                    _buildings.Remove(b);
+                    cond = true;
+                    break;
+                }
+            }
         }
 
-        private bool canConnect(Building b) {
+        /**
+         * this method connects a building to all roads within 1 step of it.
+         * */
+        private bool expandToRoad(Building b)
+        {
+            bool retVal = false;
+
             if (b.StartX + b.Width + 1 < _wid)
-                if ((_grid2[b.StartY, b.StartX+b.Width].Type == ContentType.EMPTY) && (_grid2[b.StartY, b.StartX + b.Width + 1].Type == ContentType.ROAD))
+                if ((_grid2[b.StartY, b.StartX + b.Width].Type == ContentType.EMPTY) && (_grid2[b.StartY, b.StartX + b.Width + 1].Type == ContentType.ROAD))
                 {
                     for (int i = b.StartY; i < b.StartY + b.Length; ++i)
                     {
                         if (_grid2[i, b.StartX + b.Width].Type != ContentType.EMPTY)
-                            Console.Out.WriteLine("trying to override (" + (b.StartY - 1) + "," + i + ")");
+                            Console.Out.WriteLine("trying to overwrite (" + (b.StartY - 1) + "," + i + ")");
                         else
                         {
                             _grid2[i, b.StartX + b.Width] = new BuildingTile(b);
@@ -523,10 +587,11 @@ namespace Game.City_Generator
                         }
                     }
                     b.Width++;
-                    return true;
+                    retVal = true;
+                    
                 }
 
-            if (b.StartY>1)
+            if (b.StartY > 1)
                 if ((_grid2[b.StartY - 1, b.StartX].Type == ContentType.EMPTY) && (_grid2[b.StartY - 2, b.StartX].Type == ContentType.ROAD))
                 {
                     for (int i = b.StartX; i < b.StartX + b.Width; ++i)
@@ -541,15 +606,16 @@ namespace Game.City_Generator
                     }
                     b.Length++;
                     b.StartY--;
-                    return true;
+                    retVal = true;
+                    
                 }
 
             if (b.StartX > 1)
-                if ((_grid2[b.StartY, b.StartX -1].Type == ContentType.EMPTY) && (_grid2[b.StartY, b.StartX-2].Type == ContentType.ROAD))
+                if ((_grid2[b.StartY, b.StartX - 1].Type == ContentType.EMPTY) && (_grid2[b.StartY, b.StartX - 2].Type == ContentType.ROAD))
                 {
                     for (int i = b.StartY; i < b.StartY + b.Length; ++i)
                     {
-                        if (_grid2[i, b.StartX-1].Type != ContentType.EMPTY)
+                        if (_grid2[i, b.StartX - 1].Type != ContentType.EMPTY)
                             Console.Out.WriteLine("trying to override (" + (b.StartY - 1) + "," + i + ")");
                         else
                         {
@@ -559,17 +625,18 @@ namespace Game.City_Generator
                     }
                     b.Width++;
                     b.StartX--;
-                    return true;
+                    retVal =  true;
+                
                 }
 
-            
+
 
             if (b.StartY + b.Length + 1 < _len)
-                if ((_grid2[b.StartY+b.Length, b.StartX].Type == ContentType.EMPTY) && (_grid2[b.StartY+b.Length+1, b.StartX].Type == ContentType.ROAD))
+                if ((_grid2[b.StartY + b.Length, b.StartX].Type == ContentType.EMPTY) && (_grid2[b.StartY + b.Length + 1, b.StartX].Type == ContentType.ROAD))
                 {
                     for (int i = b.StartX; i < b.StartX + b.Width; ++i)
                     {
-                        if (_grid2[b.StartY+b.Length, i].Type != ContentType.EMPTY)
+                        if (_grid2[b.StartY + b.Length, i].Type != ContentType.EMPTY)
                             Console.Out.WriteLine("trying to override (" + (b.StartY - 1) + "," + i + ")");
                         else
                         {
@@ -578,15 +645,20 @@ namespace Game.City_Generator
                         }
                     }
                     b.Length++;
-                    return true;
+                    retVal = true;
+                   
                 }
-
-
-
-
-            return false;
+            return retVal;
         }
 
+
+
+
+        /********************************Adding Corporations To a City***************************************/
+    /**
+     * divides the buildings between corporates according to geographical location
+     * TODO: not tested (waiting for graphical interface)
+     * */
         internal void addCorporates() {
             Building b;
             foreach (Tile t in _grid2)
@@ -600,6 +672,9 @@ namespace Game.City_Generator
                 takeover(_rand.Next(_len / CORP_DIM), _rand.Next(_wid / CORP_DIM));
         }
 
+        /**
+         * it's a way to make some corporates bigger then the others.
+         * */
         private void takeover(int iLoc, int jLoc) {
 
             for (int i = iLoc - 1; i <= iLoc + 1; ++i) {
@@ -610,50 +685,11 @@ namespace Game.City_Generator
                     if (j >= _corpList.GetLength(1)) break;
                     if (_rand.NextDouble() <TAKEOVER_CHANCE)
                     {
-                        _corpList[iLoc, jLoc].merge(_corpList[i, j]);
+                        _corpList[iLoc, jLoc].takeover(_corpList[i, j]);
                         _corpList[i, j] = _corpList[iLoc, jLoc];
                     }
                 }
             }
-        }
-
-
-
-        /****************************************************************************
-         * Getters, Setters, simple functions
-         * ****************************************************/
-
-        public List<Building> getBuildings() { return _buildings; }
-        public int getLen() { return _len; }
-        public int getWid() { return _wid; }
-        public char[,] getGrid() { return _grid; }
-        public Tile[,] getGrid2() { return _grid2; } /*HACK(amit)(2nd round)
-        * I've added our standard getters\setters, tell me whan I can delete those.
-        * (shachar): didn't understand the question. I need the basic getters & setters for the game board, and that's all. 
-        * BTW, why aren't you using properties to ease getting/setting?
-        * (amit) That's exactly what I've added, so the "getX" is redundant. they are still here since
-        * I don't know if you are using them in any of your files and don't trust the GIT to keep my changes on files that you changed as well. 
-        */
-
-
-        public short[][] getShortGrid() { 
-            short[][] retVal = new short[_len][];
-            for (int i = 0; i < _len; ++i)
-            {
-                retVal[i] = new short[_wid];
-                for (int j = 0; j < _wid; ++j)
-                    retVal[i][j] = (short)_grid[i, j];
-            }
-            return retVal;
-
-        } 
-
-        public void setGrid(char[,] grid)
-        {
-            _grid = grid;
-        }
-        
-
-
+        }  
     }
 }

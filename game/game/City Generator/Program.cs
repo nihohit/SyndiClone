@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using Game.City_Generator;
 
+/**
+ * this is my temporary main. I'm using it to test the city generation process. 
+ * need to be replaced as soon as there's a graphical interface.
+ * */
 namespace Game
 {
     static class Program
@@ -18,7 +22,7 @@ namespace Game
            // Application.SetCompatibleTextRenderingDefault(false);
            // Application.Run(new Form1());
             
-            GameBoard city = CityFactory.createMap(200,200);
+            GameBoard city = CityFactory.createCity(200,200);
             //City.BuildingPlacer bp = new City.BuildingPlacer();
             //bp.print();
 

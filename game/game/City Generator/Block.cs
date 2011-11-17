@@ -3,30 +3,38 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
+/**
+ * Block is a data structure that holds rectangles. it does so by keeping the upper-left corner, a length and a width. 
+ * NOTE: when regarding matrixes, remember that X is the second coordinate (matrix[Y,X]).
+ * */
 namespace Game.City_Generator
 {
     class Block
     {
-       // Point _corner;
+        /********************************fields***************************************/
         private  int _len, _wid,_startX,_startY;
-        /*HACK (shachar) (with ans)
-         * you can use here (and I guess in similar areas) Vector & Point.
-         * (amit): I know, but it's not helping me. just adding more to write (and another call to to "point" object)
-         * */
 
+        /********************************Constructor***************************************/
+        internal Block(int x, int y, int len, int wid)
+        {
+            _startX = x;
+            _startY = y;
+            _len = len;
+            _wid = wid;
+        }
+
+        /********************************Properties***************************************/
         public int Length
         {
           get { return _len; }
           set { _len = value; }
         } 
 
-
         public int Width
         {
           get { return _wid; }
           set { _wid = value; }
         } 
-
 
         public int StartY
         {
@@ -40,13 +48,7 @@ namespace Game.City_Generator
           set { _startX = value; }
         }
 
-        internal Block(int x, int y, int len, int wid) {
-          //  _corner = new Point(x,y);
-            _startX = x;
-            _startY = y;
-            _len = len;
-            _wid = wid;
-        }
+        
 
     }
 }

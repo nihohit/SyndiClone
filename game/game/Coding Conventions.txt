@@ -1,0 +1,12 @@
+﻿Use properties, not Getters & setters/ 
+
+Class structure:
+0) Enums.
+1) class name
+2) Class constants and static variables(a constant or enum-field will be marked by CAPITAL LETTERS)
+3) class fields (each field will start in an underscore)
+**************************************************************************************************
+4) constructor.
+5)properties - a property name will start with a capital letter.
+**************************************************************************************************
+6)other methods. in case of a big class, use asterisks separators to divide into logic parts

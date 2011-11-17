@@ -3,11 +3,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
+/**
+ * RoadTile is one of the possible tiles in the initial grid. 
+ * it holds the road-tile, the direction in which the road is going, the roads width
+ * */
 namespace Game.City_Generator
 {
+    /********************************Enum ***************************************/
     enum Directions {NS,EW,FOURWAY, N,S,E,W,NONE} //N,S,E,W are for either 3-way junctions or dead-end roads, in the first case they note the "lone" direction
+
     class RoadTile : Tile
     {
+        /********************************Constants***************************************/
+        internal const int WEST = 0, NORTH = 1, EAST = 2, SOUTH = 3;
+
+        /********************************Fields***************************************/
         Point _loc;
         Directions _dir;
         int _vWidth,_hWidth;
@@ -15,16 +25,54 @@ namespace Game.City_Generator
         //TODO: decide whether junctions need info about all their directions.
         private int _exitsNum;
        // private int _rotate; //assuming that 0 means exit to west, moving clockwise (north, east, south)
-        internal const int WEST = 0, NORTH = 1, EAST = 2, SOUTH = 3;
 
+        /********************************Constructor***************************************/
         public RoadTile() : base()
         {
-            Type = ContentType.ROAD;
+            _type = ContentType.ROAD;
             //_loc = new Point(x, y);
             _dir = Directions.NONE;
             _hOffset = 0;
             _vOffset = 0;
         }
+
+
+        /********************************Properties***************************************/
+        internal int HWidth {
+            set { _hWidth = value; }
+            get { return _hWidth; }
+        }
+
+        internal int VWidth
+        {
+            set { _vWidth = value; }
+            get { return _vWidth; }
+        }
+
+        internal int HOffset {
+            set { _hOffset = value; }
+            get { return _hOffset; }
+        }
+
+        internal int VOffset
+        {
+            set { _vOffset = value; }
+            get { return _vOffset; }
+        }
+
+        internal Directions Direction
+        {
+            set { _dir = value; }
+            get { return _dir; }
+
+        }
+        internal int Exits{
+            set { _exitsNum = value; }
+            get { return _exitsNum; }
+        }
+
+        /********************************Simple Methods***************************************/
+
 
         /**
          * this is just an initial direction. It's assumed that after that there will be a pass over the grid to correct the data
@@ -46,42 +94,16 @@ namespace Game.City_Generator
             }
         }
 
-        internal Directions getDirection() {
-            return _dir;
-        }
         
          
-        internal void setDirection(Directions d) {
-            _dir = d;
-        }
-
-        internal void setHWidth(int width) {
-             _hWidth = width;
-        }
-        internal void setVWidth(int width)
-        {
-            _vWidth = width;
-        }
-        internal int getHWidth() { return _hWidth; }
-        internal int getVWidth() { return _vWidth; }
 
 
 
-        internal void setExits(int exits) {
-            _exitsNum = exits;
-        }
-
-        internal int getExits() {
-            return _exitsNum;
-        }
 
         internal void addExit() {
             _exitsNum++;
         }
 
-        internal void setHOffset(int offset) { _hOffset = offset; }
-        internal int getHOffset() { return _hOffset; }
-        internal void setVOffset(int offset) { _vOffset = offset; }
-        internal int getVOffset() { return _vOffset; }
+        
     }
 }

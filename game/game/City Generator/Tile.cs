@@ -3,48 +3,48 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
+/**
+ * tile is the basic Grid object. it holds any type of data required to build the map. 
+ * note - just "Tile" is an empty tile. Make sure to replace it with a child object of the relevant type.
+ * */
 namespace Game.City_Generator
 {
     enum ContentType { ROAD, BUILDING, EMPTY, SPECIAL };
     class Tile
     {
+        /********************************Fields***************************************/
         protected ContentType _type;
         protected int _rotate;
         protected Building _building;
 
-        internal ContentType Type
-        {
-            get { return _type; }
-            set { _type = value; }
-        }
-
+        /********************************Constructor***************************************/
         public Tile()
         {
             _type = ContentType.EMPTY;
             _rotate = 0;
             _building = null;
         }
-        public Block getFlip()
+
+        /********************************Properties***************************************/
+        internal ContentType Type
         {
-            //uses block to hold two points to form a flip-line.
-            //TODO - missing function
-            return null;
-        }
-        public int getRotate() {
-            return _rotate;
+            get { return _type; }
+            set { }//this way I'm hoping to make "type" immutable. HACK(amit): do you think it'll work?
         }
 
-        internal void setRotate(int rotate)
-        {
-            _rotate = rotate;
-        }
-        public ContentType getType() {
-            return _type;
-        }
-
-        internal Building Building
+        internal virtual Building Building
         {
             get { return _building; }
+            set { }
+        }
+
+        internal int Rotate {
+            set { _rotate = value; }
+            get { return _rotate; }
+        }
+
+        internal virtual Block Flip {
+            get { return null; }//TODO: if this will be required, make something real here.
         }
 
     }
