@@ -9,10 +9,12 @@ namespace Game.City_Generator
     {
      //   static int counter = 0;
         private List<Building> _buildings;
+        private readonly int id;
         
-        internal Corporate() {
+        internal Corporate(int _id) {
            // counter++;
             _buildings = new List<Building>();
+            this.id = _id;
         }
         
         internal void addBuilding (Building b){
@@ -54,7 +56,17 @@ namespace Game.City_Generator
                 other.Buildings.First().joinCorp(this);
         }
 
-        
+
+        public int Id
+        {
+            get { return id; }
+        } 
+
+
+        public override bool Equals(object obj)
+        {
+            return ((obj is Corporate) && (((Corporate)obj).Id == this.Id));
+        }
 
     }
 }

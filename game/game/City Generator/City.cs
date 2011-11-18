@@ -144,9 +144,13 @@ namespace Game.City_Generator
                 for (int j = 0; j < _wid; ++j)
                     _grid2[i, j] = new Tile();
             _corpList = new Corporate[(_len / CORP_DIM), (_wid / CORP_DIM)];
+            int corpCounter = 0;
             for (int i = 0; i < (_len / CORP_DIM) ; ++i)
-                for (int j = 0; j < (_wid / CORP_DIM) ; ++j)
-                    _corpList[i, j] = new Corporate();
+                for (int j = 0; j < (_wid / CORP_DIM); ++j)
+                {
+                    _corpList[i, j] = new Corporate(corpCounter);
+                    corpCounter++;
+                }
  
             _buildings = new List<Building>();
             
@@ -646,7 +650,6 @@ namespace Game.City_Generator
                     retVal[i][j] = (short)_grid[i, j];
             }
             return retVal;
-
         } 
 
         public void setGrid(char[,] grid)

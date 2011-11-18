@@ -108,81 +108,6 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <None Include="City Generator\images\road2intersect2.jpg" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="City Generator\images\road2intersect3.jpg" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="City Generator\images\road2side.jpg" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="City Generator\images\road3intersect1.jpg" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="City Generator\images\road3intersect2.jpg" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="City Generator\images\road3intersect3.jpg" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="City Generator\images\road3middle.jpg" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="City Generator\images\road3side.jpg" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="City Generator\images\empty.jpg" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="City Generator\images\road1.jpg" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="City Generator\images\road1intersect1.jpg" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="City Generator\images\road1intersect2.jpg" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="City Generator\images\road1intersect3.jpg" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="City Generator\images\road1mid.jpg" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="City Generator\images\road2intersect1.jpg" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="City Generator\images\road1mid222.jpg" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="City Generator\images\road1mid11.jpg" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="City Generator\images\road1mid12.jpg" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="City Generator\images\road1mid13.jpg" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="City Generator\images\road1mid23.jpg" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="City Generator\images\road1mid33.jpg" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="City Generator\images\road1mid221.jpg" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="City Generator\images\road2intersect.jpg" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="City Generator\images\road3intersect.jpg" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="City Generator\images\road1intersect.jpg" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="City Generator\images\2_road1intersect.jpg" />
   </ItemGroup>
   <ItemGroup>
@@ -213,6 +138,9 @@
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="City Generator\images\0_buildingmiddle.jpg" />
+    <None Include="City Generator\images\9_corner.jpg" />
+    <None Include="City Generator\images\9_edge.jpg" />
     <Content Include="Graphic Manager\images\PersonBlue.jpg" />
     <Content Include="Graphic Manager\images\PersonRed.jpg" />
     <Content Include="Graphic Manager\images\PersonYellow.jpg" />

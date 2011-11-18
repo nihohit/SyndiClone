@@ -44,5 +44,10 @@ namespace Game.City_Generator
             _wid = wid;
         }
 
+        public override bool Equals(object obj)
+        {
+            return ((obj is Block) && (((Block)obj).Length == this.Length) && (((Block)obj).Width == this.Width) && (((Block)obj).StartX == this.StartX) && (((Block)obj).StartY == this.StartY));
+        }
+
     }
 }

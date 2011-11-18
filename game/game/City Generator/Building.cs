@@ -48,6 +48,12 @@ namespace Game.City_Generator
             set { _owner = value; }
         }
 
+        internal Block Dimensions
+        {
+            get { return _dimensions; }
+            set { _dimensions = value; }
+        }
+
         public Corporate Corp{
             set { _corp = value;}
             get { return _corp; }
