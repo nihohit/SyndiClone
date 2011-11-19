@@ -50,6 +50,10 @@ namespace Game.City_Generator
 
 
         /********************************Methods***************************************/
+        
+        /*
+         * This function checks if two blocks are of equal size. 
+         */
         public bool EqualSize(Block b)
         {
             return (this._len == b.Length && this._wid == b.Width);

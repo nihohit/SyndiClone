@@ -10,6 +10,34 @@ using System.Text;
 namespace Game.City_Generator
 {
     /********************************Enum ***************************************/
+    /*HACK (shachar): please fill this up, because I don't get how your variables work. 
+     * when to use each tile:
+     * 1-way, regular, east-to-west - 
+     * 1-way, regular, north-to-south - 
+     * 1-way, turn-to-west, north-to-south - 
+     * 1-way, turn-to-east, north-to-south - 
+     * 1-way, turn-to-north, east-to-west - 
+     * 1-way, turn-to-south, east-to-west - 
+     * 1-way cross - 
+     * 2-way, northern, east-to-west - 
+     * 2-way, southern, east-to-west - 
+     * 2-way, western, north-to-south - 
+     * 2-way, eastern, north-to-south -
+     * 2-way, turn-to-west, north-to-south - 
+     * 2-way, turn-to-east, north-to-south - 
+     * 2-way, turn-to-north, east-to-west - 
+     * 2-way, turn-to-south, east-to-west - 
+     * 3-way, middle, east-to-west - 
+     * 3-way, middle, north-to-south -
+     * 3-way, northern, east-to-west - 
+     * 3-way, southern, east-to-west - 
+     * 3-way, western, north-to-south - 
+     * 3-way, eastern, north-to-south -
+     * 3-way, turn-to-west, north-to-south - 
+     * 3-way, turn-to-east, north-to-south - 
+     * 3-way, turn-to-north, east-to-west - 
+     * 3-way, turn-to-south, east-to-west - 
+     */
     enum Directions {NS,EW,FOURWAY, N,S,E,W,NONE} //N,S,E,W are for either 3-way junctions or dead-end roads, in the first case they note the "lone" direction
 
     class RoadTile : Tile
