@@ -374,6 +374,7 @@ namespace Game.City_Generator
                                 else current.Rotate = 4;
                                 break;
                             case 2: //either 90 deg turn or none
+                                //TODO: fix. I don't deal here with corners...
                                 if (current.Direction == Directions.EW)
                                     current.Rotate = 1;
                                 else if (current.Direction == Directions.NS) current.Rotate = 0;

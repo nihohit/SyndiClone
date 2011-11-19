@@ -36,7 +36,7 @@ namespace Game.City_Generator
                 heightOffset +=tileSize;
             }
 
-            return img; 
+            return img ;
         }
 
         private static Image get_image(Tile tile)

@@ -10,24 +10,29 @@ using System.Text;
 namespace Game.City_Generator
 {
     /********************************Enum ***************************************/
-    /*HACK (shachar): please fill this up, because I don't get how your variables work. 
+    /*HACK (shachar) (ans): please fill this up, because I don't get how your variables work. 
+     * 
+     * basically, you need to figur up a picture according to the widths, offsets and number of exits (works fine unless exits# is 2, in which case I've assumed a line: --- but it can be a corner)
+     * after finding the correct picture, rotate is given  = 1 for 90 deg, 2 for 180, 3 is 270 and 4 is error.
+     * "directions", apparently, is redundant, but I'll check that later.
+     * 
      * when to use each tile:
-     * 1-way, regular, east-to-west - 
-     * 1-way, regular, north-to-south - 
-     * 1-way, turn-to-west, north-to-south - 
-     * 1-way, turn-to-east, north-to-south - 
-     * 1-way, turn-to-north, east-to-west - 
+     * 1-way, regular, east-to-west - _rotate =0, Hoffset=0,Hwidth=1, exits=1 or 2 Directions=EW
+     * 1-way, regular, north-to-south - _rotate =1, Voffset=0,Vwidth=1, exits=1 or 2 Directions=NS
+     * 1-way, turn-to-west, north-to-south - no idea, what does "turn to west" means? is it a tile that looks like that _|  ? if so, I will need to fix it. 
+     * 1-way, turn-to-east, north-to-south - however, if you meantfor a 3-exits tile(like that: _|_), 
+     * 1-way, turn-to-north, east-to-west - the values will be (in this 3rd line): _rotate =1, Hoffset=0,Hwidth=1, Voffset=0,Vwidth=1, exits=3 Directions=EW
      * 1-way, turn-to-south, east-to-west - 
-     * 1-way cross - 
-     * 2-way, northern, east-to-west - 
-     * 2-way, southern, east-to-west - 
-     * 2-way, western, north-to-south - 
-     * 2-way, eastern, north-to-south -
-     * 2-way, turn-to-west, north-to-south - 
+     * 1-way cross -  _rotate =0, Hoffset=0,Hwidth=1, exits=4 Directions=FourWay
+     * 2-way, northern, east-to-west - _rotate =0, Hoffset=0,Hwidth=2, exits=1 or 2 Directions=EW
+     * 2-way, southern, east-to-west - _rotate =1, offset=1,Hwidth=2, exits=1 or 2 Directions=EW
+     * 2-way, western, north-to-south - //see above for 1 way values, Vwidth will be 2.
+     * 2-way, eastern, north-to-south - //as above, Voffset will be 1
+     * 2-way, turn-to-west, north-to-south - Dunno.
      * 2-way, turn-to-east, north-to-south - 
      * 2-way, turn-to-north, east-to-west - 
      * 2-way, turn-to-south, east-to-west - 
-     * 3-way, middle, east-to-west - 
+     * 3-way, middle, east-to-west - //as above, by induction.
      * 3-way, middle, north-to-south -
      * 3-way, northern, east-to-west - 
      * 3-way, southern, east-to-west - 
@@ -121,10 +126,6 @@ namespace Game.City_Generator
                 else _dir = Directions.EW;
             }
         }
-
-        
-         
-
 
 
 
