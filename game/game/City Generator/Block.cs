@@ -50,11 +50,9 @@ namespace Game.City_Generator
 
 
         /********************************Methods***************************************/
-        //HACK (amit): what is that and why do we use that? 
-        public override bool Equals(object obj)
+        public bool EqualSize(Block b)
         {
-            return ((obj is Block) && (((Block)obj).Length == this.Length) && (((Block)obj).Width == this.Width) && (((Block)obj).StartX == this.StartX) 
-                && (((Block)obj).StartY == this.StartY));
+            return (this._len == b.Length && this._wid == b.Width);
         }
 
     }

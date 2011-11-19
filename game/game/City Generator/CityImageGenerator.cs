@@ -6,13 +6,14 @@ using System;
 
 namespace Game.City_Generator
 {
+    enum BuildingStyle { GENERIC }
     class CityImageGenerator
     {
 
-        enum Style {GENERIC}
+        
         static int tileSize = 32;
         static Dictionary<Building, Image> buildings = new Dictionary<Building, Image>();
-        static Dictionary<Tuple<Block, Style>, Image> templates = new Dictionary<Tuple<Block, Style>, Image>();
+        static Dictionary<Tuple<Block, BuildingStyle>, Image> templates = new Dictionary<Tuple<Block, BuildingStyle>, Image>(new tupleEqualityComparer());
         
         public static Image convert_to_image(GameBoard city){
             Tile[,] grid = city.Grid; 
@@ -119,11 +120,11 @@ namespace Game.City_Generator
             return image;
         }
 
-        private static Image generateBuildingImage(Tuple<Block, Style> temp)
+        private static Image generateBuildingImage(Tuple<Block, BuildingStyle> temp)
         {
             int length = temp.Item1.Length;
             int width = temp.Item1.Width;
-            Style style = temp.Item2;
+            BuildingStyle style = temp.Item2;
             Image img = new Bitmap(tileSize * length, tileSize * width);
             List<Image> images = new List<Image>();
             for (int i = 1; i <= length; i++)
@@ -147,7 +148,7 @@ namespace Game.City_Generator
             return img; 
         }
 
-        private static Image getBuildingTile(int length, int width, int i, int j, Style style)
+        private static Image getBuildingTile(int length, int width, int i, int j, BuildingStyle style)
         {
             //TODO - account for style
             Image img = null;
@@ -203,17 +204,34 @@ namespace Game.City_Generator
                     img = new Bitmap(city_images._9_corner);
                     img.RotateFlip(RotateFlipType.Rotate90FlipNone);
                     break;
-
             }
 
-            //TODO - needs checking
+            //TODO - needs testing
             return img;
         }
 
-        private static Style generateStyle(Corporate corp)
+        private static BuildingStyle generateStyle(Corporate corp)
         {
             //TODO - missing function
-            return Style.GENERIC;
+            return BuildingStyle.GENERIC;
+        }
+
+    }
+
+    //TODO - needs testing
+    class tupleEqualityComparer : IEqualityComparer<Tuple<Block,BuildingStyle>>
+    {
+
+        public bool Equals(Tuple<Block, BuildingStyle> first, Tuple<Block, BuildingStyle> second)
+        {
+            return (first.Item1.EqualSize(second.Item1) && first.Item2 == second.Item2);
+        }
+
+
+        public int GetHashCode(Tuple<Block, BuildingStyle> item)
+        {
+            int hCode = item.Item1.Length * item.Item1.StartX * item.Item1.StartY * item.Item1.Width *item.Item2.GetHashCode();
+            return hCode.GetHashCode();
         }
 
     }
