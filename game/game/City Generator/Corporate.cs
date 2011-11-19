@@ -10,13 +10,15 @@ namespace Game.City_Generator
 {
     class Corporate
     {
-     //   static int counter = 0;
+        static int counter = 0;
         /********************************Fields***************************************/
         private List<Building> _buildings;
+        private int _id;
 
         /********************************Constructor***************************************/        
         internal Corporate() {
-           // counter++;
+            _id = counter;
+            counter++;
             _buildings = new List<Building>();
         }
 

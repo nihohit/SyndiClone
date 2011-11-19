@@ -173,8 +173,7 @@ namespace Game.City_Generator
             for (int i = 0; i < (_len / CORP_DIM)+1 ; ++i)
                 for (int j = 0; j < (_wid / CORP_DIM)+1 ; ++j)
                 {
-                    _corpList[i, j] = new Corporate(corpCounter);
-                    corpCounter++;
+                    _corpList[i, j] = new Corporate();
                 }
  
             _buildings = new List<Building>();
@@ -694,6 +693,5 @@ namespace Game.City_Generator
                 }
             }
         }  
-          (shachar:) go ahead and remove.
     }
 }
