@@ -8,17 +8,21 @@ namespace Game.City_Generator
 {
     class CityImageGenerator
     {
+
+        enum Style {GENERIC}
         static int tileSize = 32;
+        static Dictionary<Building, Image> buildings = new Dictionary<Building, Image>();
+        static Dictionary<Tuple<Block, Style>, Image> templates = new Dictionary<Tuple<Block, Style>, Image>();
         
-        public static Image convert_to_image(City_Generator.City city){
-            short[][] grid = city.getShortGrid(); 
-            Image img = new Bitmap(32*grid.GetLength(0),32*grid.GetLength(1));
+        public static Image convert_to_image(GameBoard city){
+            Tile[,] grid = city.Grid; 
+            Image img = new Bitmap(tileSize*grid.GetLength(0),tileSize*grid.GetLength(1));
             List<Image> images = new List<Image>();
-            foreach (short[] list in grid)
+            for (int i = 0 ; i < grid.GetLength(0) ; i ++)
             {
-                foreach (short num in list)
+                for (int j = 0; j < grid.GetLength(0); j++)
                 {
-                    images.Add(get_image(num));
+                    images.Add(get_image(grid[i,j]));
                 }
             }
             Graphics graphic = Graphics.FromImage(img);
@@ -27,58 +31,19 @@ namespace Game.City_Generator
             int heightOffset = 0;
             foreach (Image image in images){
                 graphic.DrawImage(image, new Rectangle(widthOffset,heightOffset,image.Width, image.Height));
-                widthOffset +=32;
-                heightOffset +=32;
+                widthOffset +=tileSize;
+                heightOffset +=tileSize;
             }
 
             return img; 
         }
 
-        public static Image test_convert_to_image(short[][] grid)
-        {
-            int width = tileSize * grid[0].GetLength(0);
-            int height = tileSize * grid.GetLength(0);
-            Image img = new Bitmap(width,height);
-            
-            List<Image> images = new List<Image>();
-            foreach (short[] list in grid)
-            {
-                foreach (short num in list)
-                {
-                    images.Add(get_image(num));
-                }
-            }
-            Graphics graphic = Graphics.FromImage(img);
-            graphic.Clear(Color.Gray);
-            int widthOffset = 0;
-            int heightOffset = 0;
-            foreach (Image image in images)
-            {
-                graphic.DrawImage(image, new Rectangle(widthOffset, heightOffset, image.Width, image.Height));
-                widthOffset += tileSize;
-                if (widthOffset == width)
-                {
-                    heightOffset += tileSize;
-                    widthOffset = 0;
-                }
-                
-            }
-
-            return img;
-        }
-
-        private static Image get_image(short id)
+        private static Image get_image(Tile tile)
         {
             Image img = null;
             
             //TODO - enter all types of tiles here. should we tile in buildings, and change the whole picture when they get destryed?
             /*code:
-             * WXYZ - 
-             * W - type?
-             * X - which pictures (1-8)
-             * Y - needs flip? 0 - no, 1 - X, 2 - Y, 3 - XY
-             * Z - needs Rotate? 0 - no, 1 - 90, 2 - 180, 3 - 270
-             * */
             switch (id/100)
             {
                 case 11:
@@ -132,9 +97,123 @@ namespace Game.City_Generator
                 case 3:
                     img.RotateFlip(RotateFlipType.RotateNoneFlipXY);
                     break;
-            }
+            }*/
 
             return img;
+        }
+
+        internal static Image GetBuildingImage(Building building)
+        {
+            if (buildings.ContainsKey(building))
+            {
+                return buildings[building];
+            }
+            var temp = Tuple.Create(building.Dimensions, generateStyle(building.Corp));
+            if (templates.ContainsKey(temp))
+            {
+                return templates[temp];
+            }
+            Image image = generateBuildingImage(temp);
+            buildings[building] = image;
+            templates[temp] = image;
+            return image;
+        }
+
+        private static Image generateBuildingImage(Tuple<Block, Style> temp)
+        {
+            int length = temp.Item1.Length;
+            int width = temp.Item1.Width;
+            Style style = temp.Item2;
+            Image img = new Bitmap(tileSize * length, tileSize * width);
+            List<Image> images = new List<Image>();
+            for (int i = 1; i <= length; i++)
+            {
+                for (int j = 1; j <= width; j++)
+                {
+                    images.Add(getBuildingTile(length,width,i,j,style));
+                }
+            }
+            Graphics graphic = Graphics.FromImage(img);
+            graphic.Clear(Color.Gray);
+            int widthOffset = 0;
+            int heightOffset = 0;
+            foreach (Image image in images)
+            {
+                graphic.DrawImage(image, new Rectangle(widthOffset, heightOffset, image.Width, image.Height));
+                widthOffset += tileSize;
+                heightOffset += tileSize;
+            }
+
+            return img; 
+        }
+
+        private static Image getBuildingTile(int length, int width, int i, int j, Style style)
+        {
+            //TODO - account for style
+            Image img = null;
+            int id = 0;
+            if (i == 1)
+            {
+                id += 1;
+            }
+            if (i == length)
+            {
+                id += 9;
+            }
+            if (j == 1)
+            {
+                id += 10;
+            }
+            if (j == width)
+            {
+                id += 90;
+            }
+            switch (id)
+            {
+                case(0):
+                    img = new Bitmap(city_images._0_buildingmiddle);
+                    break;
+                case(1):
+                    img = new Bitmap(city_images._9_edge);
+                    img.RotateFlip(RotateFlipType.Rotate180FlipNone);
+                    break;
+                case (9):
+                    img = new Bitmap(city_images._9_edge);
+                    break;
+                case (10):
+                    img = new Bitmap(city_images._9_edge);
+                    img.RotateFlip(RotateFlipType.Rotate270FlipNone);
+                    break;
+                case (90):
+                    img = new Bitmap(city_images._9_edge);
+                    img.RotateFlip(RotateFlipType.Rotate90FlipNone);
+                    break;
+                case (11):
+                    img = new Bitmap(city_images._9_corner);
+                    img.RotateFlip(RotateFlipType.RotateNoneFlipX);
+                    break;
+                case (91):
+                    img = new Bitmap(city_images._9_corner);
+                    img.RotateFlip(RotateFlipType.Rotate90FlipX);
+                    break;
+                case (19):
+                    img = new Bitmap(city_images._9_corner);
+                    break;
+                case (99):
+                    img = new Bitmap(city_images._9_corner);
+                    img.RotateFlip(RotateFlipType.Rotate90FlipNone);
+                    break;
+
+            }
+
+            //TODO - needs checking
+            return img;
+        }
+
+        private static Style generateStyle(Corporate corp)
+        {
+            //TODO - missing function
+            return Style.GENERIC;
         }
 
     }

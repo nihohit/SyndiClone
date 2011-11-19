@@ -14,14 +14,7 @@ namespace Game.City_Generator
         //fields:
         Block _dimensions; //holding the location and dimensions of the building in the already existing block type;
         Corporate _corp;
-        int _owner; //TODO: decide how will "player" be represented. can be either a number or an object.
-        /*
-         * HACK (amit)
-         * (amit) Q: see above - do you want player to be just a number?
-         * (Shachar) 
-         * (amit) was there an answer that I've missed?
-         */
-
+        int _owner; 
        /********************************constructor***************************************/
         internal Building(Block dim) {
             _dimensions = dim;
@@ -53,6 +46,12 @@ namespace Game.City_Generator
         public int Owner {
             get { return _owner; }
             set { _owner = value; }
+        }
+
+        internal Block Dimensions
+        {
+            get { return _dimensions; }
+            set { _dimensions = value; }
         }
 
         public Corporate Corp{

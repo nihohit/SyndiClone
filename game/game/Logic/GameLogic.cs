@@ -7,6 +7,11 @@ namespace Game.Logic
 
     class GameLogic
     {
+
+        /******************
+        Class Fields
+        ****************/
+
         private readonly UniqueList<Entity> activeEntities;
         private readonly UniqueList<MovingEntity> movers;
         private readonly UniqueList<Entity> playerUnits;
@@ -17,6 +22,10 @@ namespace Game.Logic
         private readonly DisplayBuffer displayBuffer;
         private readonly InputBuffer inputBuffer;
         private readonly SoundBuffer soundBuffer;
+
+        /******************
+        Constructors
+        ****************/
 
         public GameLogic(DisplayBuffer disp, InputBuffer input, SoundBuffer sound, Game.City_Generator.City city)
         {
@@ -29,9 +38,16 @@ namespace Game.Logic
             this.inputBuffer = input;
             this.soundBuffer = sound;
             City _city = new City(city);
-            //TODO - create the grid;
+            //TODO - finish creating the grid;
         }
 
+        /******************
+        Methods
+        ****************/
+
+        /*
+         * This is the main loop of the logic
+         */
         public void loop()
         {
             this.handleInput();
@@ -75,6 +91,9 @@ namespace Game.Logic
             //TODO - missing function
         }
 
+        /*
+         * This function iterates over every active entity, checks if they need to act, and if they do, finds their new reaction.
+         */
         private void resolveOrders()
         {
             foreach (Entity ent in activeEntities)
@@ -120,6 +139,9 @@ namespace Game.Logic
             }
         }
 
+        /*
+         * This function populates the active entities for this round, by the logic of - all player units, and every entity they see 
+         */
         private void listAdd()
         {
             activeEntities.listAdd(alwaysActive);
@@ -135,7 +157,6 @@ namespace Game.Logic
         }
 
         //TODO - add blocks, add the whole palyer logic, add research
-
 
     }
 }
