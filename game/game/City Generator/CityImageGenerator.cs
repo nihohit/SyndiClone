@@ -23,7 +23,21 @@ namespace Game.City_Generator
             {
                 for (int j = 0; j < grid.GetLength(0); j++)
                 {
-                    images.Add(get_image(grid[i,j]));
+                    switch(grid[i, j].Type)
+                    {
+                        case ContentType.ROAD:
+                        {
+                            images.Add(get_road_image((RoadTile)grid[i, j]));
+                            break;
+                        }
+                        //TODO - other tiles?
+                        default:
+                        {
+                            images.Add(new Bitmap(city_images._0_empty));
+                            break;
+                        }
+                    }
+                    
                 }
             }
             Graphics graphic = Graphics.FromImage(img);
@@ -35,17 +49,21 @@ namespace Game.City_Generator
                 widthOffset +=tileSize;
                 heightOffset +=tileSize;
             }
+            foreach (Building build in city.Buildings)
+            {
+                Image image = GetBuildingImage(build);
+                widthOffset = build.StartX * tileSize;
+                heightOffset = build.StartY * tileSize;
+                graphic.DrawImage(image, new Rectangle(widthOffset, heightOffset, image.Width, image.Height));
+            }
 
             return img ;
         }
 
-        private static Image get_image(Tile tile)
+        private static Image get_road_image(RoadTile tile)
         {
             Image img = null;
-            
-            //TODO - enter all types of tiles here. should we tile in buildings, and change the whole picture when they get destryed?
-            /*code:
-            switch (id/100)
+            switch (????)
             {
                 case 11:
                     img = new Bitmap(city_images._1_road1);
@@ -75,7 +93,7 @@ namespace Game.City_Generator
                     img = new Bitmap(city_images._0_empty);
                     break;
             }
-            switch (id % 10)
+            switch (????)
             {
                 case 1:
                     img.RotateFlip(RotateFlipType.Rotate90FlipNone);
@@ -87,7 +105,7 @@ namespace Game.City_Generator
                     img.RotateFlip(RotateFlipType.Rotate270FlipNone);
                     break;
             }
-            switch ((id % 100) / 10)
+            switch (????)
             {
                 case 1:
                     img.RotateFlip(RotateFlipType.RotateNoneFlipX);
@@ -98,7 +116,7 @@ namespace Game.City_Generator
                 case 3:
                     img.RotateFlip(RotateFlipType.RotateNoneFlipXY);
                     break;
-            }*/
+            }
 
             return img;
         }

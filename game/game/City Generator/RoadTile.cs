@@ -25,7 +25,7 @@ namespace Game.City_Generator
      * 1-way, turn-to-south, east-to-west - 
      * 1-way cross -  _rotate =0, Hoffset=0,Hwidth=1, exits=4 Directions=FourWay
      * 2-way, northern, east-to-west - _rotate =0, Hoffset=0,Hwidth=2, exits=1 or 2 Directions=EW
-     * 2-way, southern, east-to-west - _rotate =1, offset=1,Hwidth=2, exits=1 or 2 Directions=EW
+     * 2-way, southern, east-to-west - _rotate =1, offset=1,Hwidth=2, exits=1 or 2 Directions=EW //HACK(shachar): why is there rotate here
      * 2-way, western, north-to-south - //see above for 1 way values, Vwidth will be 2.
      * 2-way, eastern, north-to-south - //as above, Voffset will be 1
      * 2-way, turn-to-west, north-to-south - Dunno.
