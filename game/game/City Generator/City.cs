@@ -278,7 +278,6 @@ namespace Game.City_Generator
                                 _grid[startY + i + j, startX + k] = ROAD_GENERIC;
                                 if (_grid2[startY + i + j, startX + k].Type != ContentType.ROAD)
                                     _grid2[startY + i + j, startX + k] = new RoadTile();
-                                ((RoadTile)_grid2[startY + i + j, startX + k]).addDirection(false);
                                 ((RoadTile)_grid2[startY + i + j, startX + k]).HWidth = m;
                                 ((RoadTile)_grid2[startY + i + j, startX + k]).HOffset = j;
                             }
@@ -301,10 +300,8 @@ namespace Game.City_Generator
                                 _grid[startY + k, startX + i + j] = ROAD_GENERIC;
                                 if (_grid2[startY + k, startX + i + j].Type != ContentType.ROAD)
                                     _grid2[startY + k, startX + i + j] = new RoadTile();
-                                ((RoadTile)_grid2[startY + k, startX + i + j]).addDirection(true);
                                 ((RoadTile)_grid2[startY + k, startX + i + j]).VWidth = m;
                                 ((RoadTile)_grid2[startY + k, startX + i + j]).VOffset = j;
-
                             }
                         }
                 }
@@ -347,64 +344,19 @@ namespace Game.City_Generator
                 {
                     if (_grid2[i, j].Type == ContentType.ROAD)
                     {
+                        _grid2[i, j].Rotate = 0;
+
                         current = (RoadTile)_grid2[i, j];
                         //set number of exits from the tile
-                        if (isConnected(i, j, Directions.E, current.VOffset))
-                            current.addExit();
+                        
                         if (isConnected(i, j, Directions.N, current.HOffset))
-                            current.addExit();
+                            current.addExit(Directions.N);
                         if (isConnected(i, j, Directions.W, current.VWidth - current.VOffset - 1)) //the "-1" part is so that the offset will lead to the edge of the road
-                            current.addExit();
+                            current.addExit(Directions.W);
                         if (isConnected(i, j, Directions.S, current.HWidth - current.HOffset - 1))
-                            current.addExit();
-
-                        //set rotate (note that "Rotate=0" is redundant, but it's done anyway.
-                        // rotate 4 means error.
-                        switch (current.Exits)
-                        {
-                            case 1:
-                                if (isConnected(i, j, Directions.W, current.VOffset)) //EW begining
-                                    current.Rotate = 0;
-                                else if (isConnected(i, j, Directions.S, current.HOffset)) //NS begining
-                                    current.Rotate = 1;
-                                else if (isConnected(i, j, Directions.E, current.HOffset)) //EW end
-                                    current.Rotate = 2;
-                                else if (isConnected(i, j, Directions.N, current.HOffset)) //NS end
-                                    current.Rotate = 3;
-                                else current.Rotate = 4;
-                                break;
-                            case 2: //either 90 deg turn or none
-                                //TODO: fix. I don't deal here with corners...
-                                if (current.Direction == Directions.EW)
-                                    current.Rotate = 1;
-                                else if (current.Direction == Directions.NS) current.Rotate = 0;
-                                break;
-                            case 3:
-                                if (!isConnected(i, j, Directions.W, current.VOffset))
-                                { //3rd road to the East
-                                    current.Rotate = 0;
-                                    current.Direction = Directions.NS;
-                                }
-                                else if (!isConnected(i, j, Directions.S, current.HOffset))
-                                { //3rd road to the North
-                                    current.Rotate = 1;
-                                    current.Direction = Directions.EW;
-                                }
-                                else if (!isConnected(i, j, Directions.E, current.HOffset))
-                                { //3rd road to the West
-                                    current.Rotate = 2;
-                                    current.Direction = Directions.NS;
-                                }
-                                else if (!isConnected(i, j, Directions.N, current.HOffset))
-                                { //3rd road to the South
-                                    current.Rotate = 3;
-                                    current.Direction = Directions.EW;
-                                }
-                                else current.Rotate = 4; break;
-                            case 4: if (current.Direction == Directions.FOURWAY) current.Rotate = 0; else current.Rotate = 4;
-                                break;
-                            default: current.Rotate = 4; break;
-                        }
+                            current.addExit(Directions.S);
+                        if (isConnected(i, j, Directions.E, current.VOffset))
+                            current.addExit(Directions.E);
                     }
                 }
             }
@@ -470,7 +422,7 @@ namespace Game.City_Generator
 
 
         /**
-         * this method is helping me find out whether a building is connected to a road in a certain direction.
+         * this method is helping me find out whether a RoadTile is connected to another road in a certain direction.
          * */
         private bool isConnected(int x, int y, Directions dir, int offset)
         {

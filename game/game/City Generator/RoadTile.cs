@@ -10,40 +10,8 @@ using System.Text;
 namespace Game.City_Generator
 {
     /********************************Enum ***************************************/
-    /*HACK (shachar) (ans): please fill this up, because I don't get how your variables work. 
-     * 
-     * basically, you need to figur up a picture according to the widths, offsets and number of exits (works fine unless exits# is 2, in which case I've assumed a line: --- but it can be a corner)
-     * after finding the correct picture, rotate is given  = 1 for 90 deg, 2 for 180, 3 is 270 and 4 is error.
-     * "directions", apparently, is redundant, but I'll check that later.
-     * 
-     * when to use each tile:
-     * 1-way, regular, east-to-west - _rotate =0, Hoffset=0,Hwidth=1, exits=1 or 2 Directions=EW
-     * 1-way, regular, north-to-south - _rotate =1, Voffset=0,Vwidth=1, exits=1 or 2 Directions=NS
-     * 1-way, turn-to-west, north-to-south - no idea, what does "turn to west" means? is it a tile that looks like that _|  ? if so, I will need to fix it. 
-     * 1-way, turn-to-east, north-to-south - however, if you meantfor a 3-exits tile(like that: _|_), 
-     * 1-way, turn-to-north, east-to-west - the values will be (in this 3rd line): _rotate =1, Hoffset=0,Hwidth=1, Voffset=0,Vwidth=1, exits=3 Directions=EW
-     * 1-way, turn-to-south, east-to-west - 
-     * 1-way cross -  _rotate =0, Hoffset=0,Hwidth=1, exits=4 Directions=FourWay
-     * 2-way, northern, east-to-west - _rotate =0, Hoffset=0,Hwidth=2, exits=1 or 2 Directions=EW
-     * 2-way, southern, east-to-west - _rotate =1, offset=1,Hwidth=2, exits=1 or 2 Directions=EW //HACK(shachar): why is there rotate here
-     * 2-way, western, north-to-south - //see above for 1 way values, Vwidth will be 2.
-     * 2-way, eastern, north-to-south - //as above, Voffset will be 1
-     * 2-way, turn-to-west, north-to-south - Dunno.
-     * 2-way, turn-to-east, north-to-south - 
-     * 2-way, turn-to-north, east-to-west - 
-     * 2-way, turn-to-south, east-to-west - 
-     * 3-way, middle, east-to-west - //as above, by induction.
-     * 3-way, middle, north-to-south -
-     * 3-way, northern, east-to-west - 
-     * 3-way, southern, east-to-west - 
-     * 3-way, western, north-to-south - 
-     * 3-way, eastern, north-to-south -
-     * 3-way, turn-to-west, north-to-south - 
-     * 3-way, turn-to-east, north-to-south - 
-     * 3-way, turn-to-north, east-to-west - 
-     * 3-way, turn-to-south, east-to-west - 
-     */
-    enum Directions {NS,EW,FOURWAY, N,S,E,W,NONE} //N,S,E,W are for either 3-way junctions or dead-end roads, in the first case they note the "lone" direction
+    
+    enum Directions {N,S,E,W} //just for passing directions.
 
     class RoadTile : Tile
     {
@@ -52,11 +20,11 @@ namespace Game.City_Generator
 
         /********************************Fields***************************************/
         Point _loc;
-        Directions _dir;
         int _vWidth,_hWidth;
         int _vOffset,_hOffset; //how many steps till getting to either the north or west corner, depending on direction.
         //TODO: decide whether junctions need info about all their directions.
         private int _exitsNum;
+       
        // private int _rotate; //assuming that 0 means exit to west, moving clockwise (north, east, south)
 
         /********************************Constructor***************************************/
@@ -64,9 +32,10 @@ namespace Game.City_Generator
         {
             _type = ContentType.ROAD;
             //_loc = new Point(x, y);
-            _dir = Directions.NONE;
             _hOffset = 0;
             _vOffset = 0;
+            _hWidth = 0;
+            _vWidth = 0;
         }
 
 
@@ -93,43 +62,95 @@ namespace Game.City_Generator
             get { return _vOffset; }
         }
 
-        internal Directions Direction
-        {
-            set { _dir = value; }
-            get { return _dir; }
-
-        }
+        
         internal int Exits{
             set { _exitsNum = value; }
             get { return _exitsNum; }
         }
 
+       
+
         /********************************Simple Methods***************************************/
 
 
         /**
-         * this is just an initial direction. It's assumed that after that there will be a pass over the grid to correct the data
-         */
-        internal void addDirection(bool isVertical)
-        {
-            if (_dir == Directions.FOURWAY) return;
+         * NOTE! this function assumes that calling is done always in the following order: N,W,S,E.
+         * any directions not called in between are assumed to be roadless!
+         * */
+        internal void addExit(Directions dir) {
+            switch (dir){
+                case Directions.N: _img = Images.R_DEAD_END; _rotate = 0; break; //road to EAST
 
-            if (isVertical)
-            {
-                if (_dir == Directions.EW)
-                    _dir = Directions.FOURWAY;
-                else _dir = Directions.NS;
+                case Directions.W: //Either W or NW
+                    if (_exitsNum == 1)
+                    {
+                        _img = Images.R_CORNER;
+                        _rotate = 3;
+                    }
+                    else {
+                        _img = Images.R_DEAD_END;
+                        _rotate = 1;
+                    }
+                        break;
+
+                case Directions.S:
+                        if (_exitsNum == 2)
+                        {
+                            _img = Images.R_3WAY;
+                            _rotate = 2;
+                        }
+                        else if (_exitsNum == 1)
+                        {
+                            if (_rotate == 0)
+                                _img = Images.R_LINE;
+                            else _img = Images.R_CORNER;
+                        }
+                        else {
+                            _img = Images.R_DEAD_END;
+                            _rotate = 2;
+                        }
+                    break;
+                case Directions.E:
+                    if (_exitsNum == 3)
+                    {
+                        _img = Images.R_FOURWAY;
+                        _rotate = 0;
+                    }
+                    else if (_exitsNum == 2)
+                    {
+                        _img = Images.R_3WAY;
+                        if (_img == Images.R_LINE)
+                            _rotate = 0;
+                        else
+                            if (_rotate != 3) //if rotate is 2 it should become 1, if it's 3 it should remain that way. also, it must be either 0 (line) 2 or 3 (corners)
+                                _rotate = 1;
+                    }
+                    else if (_exitsNum == 1)
+                    {
+                        if (_rotate == 1)
+                            _img = Images.R_LINE;
+                        else
+                        {
+                            _img = Images.R_CORNER;
+                            if (_rotate == 0)
+                                _rotate = 1;
+                            else if (_rotate == 2)
+                                _rotate = 0;
+                        }
+
+                    }
+                    else// one dead-end road
+                    {
+                        _img = Images.R_DEAD_END;
+                        _rotate = 3;
+                    }
+
+      
+                    break;
+               
+
             }
-            else {
-                if (_dir == Directions.NS)
-                    _dir = Directions.FOURWAY;
-                else _dir = Directions.EW;
-            }
-        }
 
-
-
-        internal void addExit() {
             _exitsNum++;
         }
 

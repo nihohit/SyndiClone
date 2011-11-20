@@ -9,13 +9,15 @@ using System.Text;
  * */
 namespace Game.City_Generator
 {
-    enum ContentType { ROAD, BUILDING, EMPTY, SPECIAL };
+    internal enum ContentType { ROAD, BUILDING, EMPTY, SPECIAL };
+    internal enum Images {EMPTY,R_DEAD_END,R_CORNER, R_LINE,R_3WAY,R_FOURWAY,B_INNER,B_OUTER};//R means "road", B is building.
     class Tile
     {
         /********************************Fields***************************************/
         protected ContentType _type;
         protected int _rotate;
         protected Building _building;
+        protected Images _img;
 
         /********************************Constructor***************************************/
         public Tile()
@@ -23,6 +25,7 @@ namespace Game.City_Generator
             _type = ContentType.EMPTY;
             _rotate = 0;
             _building = null;
+            _img = Images.EMPTY;
         }
 
         /********************************Properties***************************************/
@@ -45,6 +48,12 @@ namespace Game.City_Generator
 
         internal virtual Block Flip {
             get { return null; }//TODO: if this will be required, make something real here.
+        }
+
+        internal Images Image {
+           get { return _img;}
+            set { _img = value; }
+
         }
 
     }

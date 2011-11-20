@@ -63,37 +63,148 @@ namespace Game.City_Generator
         private static Image get_road_image(RoadTile tile)
         {
             Image img = null;
-            switch (????)
+            switch (tile.Image)
             {
-                case 11:
-                    img = new Bitmap(city_images._1_road1);
+                case Images.R_LINE: //it's the same as dead-end, so no breaking here.
+                case Images.R_DEAD_END:
+                    if (tile.Rotate == 1)
+                    { //vertical road
+                        if (tile.VWidth == 1)
+                            img = new Bitmap(city_images._1_road1);
+                        else
+                        {
+                            if ((tile.VOffset == 0) || (tile.VOffset == tile.VWidth - 1)){
+                                img = new Bitmap(city_images._5_road2side);
+                                }
+                            else
+                                img = img = new Bitmap(city_images._7_road3middle);
+                        }
+                    }
+                    else { //horizontal road
+                        if (tile.HWidth == 1)
+                        {
+                            img = new Bitmap(city_images._1_road1);
+
+                        }
+                        else {
+                            if ((tile.HOffset == 0) || (tile.HOffset == tile.HWidth - 1)) {
+                                img = new Bitmap(city_images._5_road2side);
+                                if (tile.HOffset == tile.HWidth - 1)
+                                    img.RotateFlip(RotateFlipType.Rotate180FlipNone);
+                            }
+                            else img = new Bitmap(city_images._7_road3middle);
+                        }
+                            img.RotateFlip(RotateFlipType.Rotate90FlipNone);
+                    }
                     break;
-                case 12:
-                    img = new Bitmap(city_images._2_road1intersect);
+
+                case Images.R_3WAY:
+                    switch (tile.Rotate)
+                    {
+                        case 0: //road connect on east
+                            if (tile.VWidth == 1)
+                                img = new Bitmap(city_images._2_road1intersect);
+                            else {
+                                if (tile.VOffset == 0)
+                                    img = new Bitmap(city_images._4_road2intersect);
+                                else if (tile.VOffset == tile.VWidth - 1)
+                                {
+                                    img = new Bitmap(city_images._5_road2side);
+                                    img.RotateFlip(RotateFlipType.Rotate180FlipNone);
+                                }
+                                else img = new Bitmap(city_images._7_road3middle);                               
+                            }
+                            break;
+
+
+                        case 1: //road on north
+                            if (tile.HWidth == 1)
+                            {
+                                img = new Bitmap(city_images._2_road1intersect);
+                                img.RotateFlip(RotateFlipType.Rotate90FlipNone);
+                            }
+
+                            else
+                            {
+                                if (tile.HOffset == 0) {
+                                    img = new Bitmap(city_images._4_road2intersect);
+                                    img.RotateFlip(RotateFlipType.Rotate90FlipNone);
+                                }
+                                else if (tile.HOffset == tile.HWidth - 1)
+                                {
+                                    img = new Bitmap(city_images._5_road2side);
+                                    img.RotateFlip(RotateFlipType.Rotate270FlipNone);
+                                }
+                                else {
+                                    img = new Bitmap(city_images._7_road3middle);
+                                    img.RotateFlip(RotateFlipType.Rotate90FlipNone);
+                                }
+                            }
+                            break;
+
+
+                        case 2: //road connects on west side
+                            if (tile.VWidth == 1)
+                            {
+                                img = new Bitmap(city_images._2_road1intersect);
+                                img.RotateFlip(RotateFlipType.Rotate180FlipNone);
+                            }
+                            else
+                            {
+                                if (tile.VOffset == tile.VWidth - 1)
+                                {
+                                    img = new Bitmap(city_images._4_road2intersect);
+                                    img.RotateFlip(RotateFlipType.Rotate180FlipNone);
+                                }
+                                else if (tile.VOffset == 0)
+                                {
+                                    img = new Bitmap(city_images._5_road2side);
+                                }
+                                else img = new Bitmap(city_images._7_road3middle);
+                            }
+                            break;
+                        case 3: //road connects on south
+                            if (tile.VWidth == 1)
+                            {
+                                img = new Bitmap(city_images._2_road1intersect);
+                                img.RotateFlip(RotateFlipType.Rotate270FlipNone);
+                            }
+                            else {
+                                if (tile.HOffset == tile.HWidth - 1)
+                                {
+                                    img = new Bitmap(city_images._2_road1intersect);
+                                    img.RotateFlip(RotateFlipType.Rotate270FlipNone);
+                                }
+                                else if (tile.HOffset == 0)
+                                {
+                                    img = new Bitmap(city_images._5_road2side);
+                                    img.RotateFlip(RotateFlipType.Rotate270FlipNone); //could be 90 as well
+                                }
+                                else
+                                {
+                                    img = new Bitmap(city_images._7_road3middle);
+                                    img.RotateFlip(RotateFlipType.Rotate270FlipNone);
+                                }
+                            }
+                            break;
+                        default: img = new Bitmap(city_images._0_empty); break;
+                    }
+
+                    
                     break;
-                case 13:
-                    img = new Bitmap(city_images._3_road1mid);
+                case Images.R_CORNER: 
+                    img = new Bitmap(city_images._0_empty);//TODO: draw corners and fix this.
                     break;
-                case 14: 
-                    img = new Bitmap(city_images._4_road2intersect);
+                case Images.R_FOURWAY:
+                    img = new Bitmap(city_images._3_road1mid);//TODO: test. I think we need to draw another 4way images with other sidewalk formations.
                     break;
-                case 15:
-                    img = new Bitmap(city_images._5_road2side);
-                    break;
-                case 16:
-                    img = new Bitmap(city_images._6_road3intersect);
-                    break;
-                case 17:
-                    img = new Bitmap(city_images._7_road3middle);
-                    break;
-                case 18:
-                    img = new Bitmap(city_images._8_road3side);
-                    break;
+               
+               
                 default:
                     img = new Bitmap(city_images._0_empty);
                     break;
             }
-            switch (????)
+            switch (tile.Rotate)
             {
                 case 1:
                     img.RotateFlip(RotateFlipType.Rotate90FlipNone);
@@ -105,7 +216,7 @@ namespace Game.City_Generator
                     img.RotateFlip(RotateFlipType.Rotate270FlipNone);
                     break;
             }
-            switch (????)
+            /*switch (tile.Flip)
             {
                 case 1:
                     img.RotateFlip(RotateFlipType.RotateNoneFlipX);
@@ -116,7 +227,7 @@ namespace Game.City_Generator
                 case 3:
                     img.RotateFlip(RotateFlipType.RotateNoneFlipXY);
                     break;
-            }
+            }*/
 
             return img;
         }
