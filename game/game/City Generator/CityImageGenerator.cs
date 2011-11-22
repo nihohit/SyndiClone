@@ -1,23 +1,24 @@
 ﻿using System.Drawing;
 using System.Collections.Generic;
+using System.Drawing.Imaging;
 using System;
 
 
 
 namespace Game.City_Generator
 {
-    enum BuildingStyle { GENERIC }
+    enum BuildingStyle { BLUE, RED, GREEN, YELLOW }
     class CityImageGenerator
     {
 
         
-        static int tileSize = 32;
+        static int TILE_SIZE = 32;
         static Dictionary<Building, Image> buildings = new Dictionary<Building, Image>();
         static Dictionary<Tuple<Block, BuildingStyle>, Image> templates = new Dictionary<Tuple<Block, BuildingStyle>, Image>(new tupleEqualityComparer());
         
         public static Image convert_to_image(GameBoard city){
             Tile[,] grid = city.Grid; 
-            Image img = new Bitmap(tileSize*grid.GetLength(0),tileSize*grid.GetLength(1));
+            Image img = new Bitmap(TILE_SIZE*grid.GetLength(0),TILE_SIZE*grid.GetLength(1));
             List<Image> images = new List<Image>();
             for (int i = 0 ; i < grid.GetLength(0) ; i ++)
             {
@@ -28,6 +29,11 @@ namespace Game.City_Generator
                         case ContentType.ROAD:
                         {
                             images.Add(get_road_image((RoadTile)grid[i, j]));
+                            break;
+                        }
+                        case ContentType.BUILDING:
+                        {
+                            images.Add(city_images._0_buildingTemp1);
                             break;
                         }
                         //TODO - other tiles?
@@ -46,17 +52,21 @@ namespace Game.City_Generator
             int heightOffset = 0;
             foreach (Image image in images){
                 graphic.DrawImage(image, new Rectangle(widthOffset,heightOffset,image.Width, image.Height));
-                widthOffset +=tileSize;
-                heightOffset +=tileSize;
+                heightOffset +=TILE_SIZE;
+                if (heightOffset == img.Height)
+                {
+                    widthOffset += TILE_SIZE;
+                    heightOffset = 0;
+                }
             }
+            img.Save("test.jpg");
             foreach (Building build in city.Buildings)
             {
                 Image image = GetBuildingImage(build);
-                widthOffset = build.StartX * tileSize;
-                heightOffset = build.StartY * tileSize;
+                widthOffset = build.StartY * TILE_SIZE;
+                heightOffset = build.StartX * TILE_SIZE;
                 graphic.DrawImage(image, new Rectangle(widthOffset, heightOffset, image.Width, image.Height));
             }
-
             return img ;
         }
 
@@ -234,15 +244,15 @@ namespace Game.City_Generator
 
         internal static Image GetBuildingImage(Building building)
         {
-            if (buildings.ContainsKey(building))
+            var temp = Tuple.Create(building.Dimensions, generateStyle(building.Corp));
+            /*if (buildings.ContainsKey(building))
             {
                 return buildings[building];
             }
-            var temp = Tuple.Create(building.Dimensions, generateStyle(building.Corp));
             if (templates.ContainsKey(temp))
             {
                 return templates[temp];
-            }
+            }*/
             Image image = generateBuildingImage(temp);
             buildings[building] = image;
             templates[temp] = image;
@@ -251,27 +261,53 @@ namespace Game.City_Generator
 
         private static Image generateBuildingImage(Tuple<Block, BuildingStyle> temp)
         {
-            int length = temp.Item1.Length;
-            int width = temp.Item1.Width;
+            int width = temp.Item1.Length;
+            int height = temp.Item1.Width;
             BuildingStyle style = temp.Item2;
-            Image img = new Bitmap(tileSize * length, tileSize * width);
-            List<Image> images = new List<Image>();
-            for (int i = 1; i <= length; i++)
+            Color basic = Color.Gray;
+            switch (style)
             {
-                for (int j = 1; j <= width; j++)
+                case BuildingStyle.YELLOW:
+                    basic = Color.Yellow;
+                    break;
+                case BuildingStyle.RED:
+                    basic = Color.Red;
+                    break;
+                case BuildingStyle.GREEN:
+                    basic = Color.Green;
+                    break;
+                case BuildingStyle.BLUE:
+                    basic = Color.Blue;
+                    break;
+
+            }
+            Image img = new Bitmap(TILE_SIZE * width, TILE_SIZE * height);
+            List<Image> images = new List<Image>();
+            for (int i = 1; i <= width; i++)
+            {
+                for (int j = 1; j <= height; j++)
                 {
-                    images.Add(getBuildingTile(length,width,i,j,style));
+                    images.Add(getBuildingTile(width, height, i, j, style));
                 }
             }
+
             Graphics graphic = Graphics.FromImage(img);
-            graphic.Clear(Color.Gray);
+            graphic.Clear(basic);
             int widthOffset = 0;
             int heightOffset = 0;
+            int num = 1;
+
             foreach (Image image in images)
             {
                 graphic.DrawImage(image, new Rectangle(widthOffset, heightOffset, image.Width, image.Height));
-                widthOffset += tileSize;
-                heightOffset += tileSize;
+                num++;
+
+                heightOffset += TILE_SIZE;
+                if (heightOffset == img.Height)
+                {
+                    widthOffset += TILE_SIZE;
+                    heightOffset = 0;
+                }
             }
 
             return img; 
@@ -342,7 +378,8 @@ namespace Game.City_Generator
         private static BuildingStyle generateStyle(Corporate corp)
         {
             //TODO - missing function
-            return BuildingStyle.GENERIC;
+            int num = corp.Id % 4;
+            return (BuildingStyle)num;
         }
 
     }

@@ -376,7 +376,7 @@ namespace Game.City_Generator
                 for (int j = 0; j < _wid; ++j)
                     if (_grid2[i, j].Type == ContentType.EMPTY)
                         addBuilding(i, j); //j will be bigger in the width of the new building
-            Console.Out.WriteLine("buildings num=" + _buildings.Count);
+            //Console.Out.WriteLine("buildings num=" + _buildings.Count);
            connectBuildings2Roads();
             //_bp.print();
         }

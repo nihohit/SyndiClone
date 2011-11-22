@@ -33,6 +33,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>Game.main</StartupObject>
+  </PropertyGroup>
   <ItemGroup>
     <Folder Include="Audio Manager\" />
     <Folder Include="Screen Manager\" />
@@ -141,6 +144,10 @@
     <None Include="City Generator\images\0_buildingmiddle.jpg" />
     <None Include="City Generator\images\9_corner.jpg" />
     <None Include="City Generator\images\9_edge.jpg" />
+    <None Include="City Generator\images\0_buildingTemp.jpg" />
+    <None Include="City Generator\images\9_edge.gif" />
+    <None Include="City Generator\images\0_buildingmiddle.gif" />
+    <None Include="City Generator\images\9_corner.gif" />
     <Content Include="Graphic Manager\images\PersonBlue.jpg" />
     <Content Include="Graphic Manager\images\PersonRed.jpg" />
     <Content Include="Graphic Manager\images\PersonYellow.jpg" />

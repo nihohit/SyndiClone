@@ -11,6 +11,7 @@ namespace Game.City_Generator
     class Corporate
     {
         static int counter = 0;
+
         /********************************Fields***************************************/
         private List<Building> _buildings;
         private int _id;
@@ -23,7 +24,13 @@ namespace Game.City_Generator
         }
 
 
-        /********************************Simple Methods***************************************/   
+        /********************************Simple Methods***************************************/
+
+        public int Id
+        {
+            get { return _id; }
+        }
+        
         internal void addBuilding (Building b){
             _buildings.Add(b);
         }
