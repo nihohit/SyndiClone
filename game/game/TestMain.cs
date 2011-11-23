@@ -7,7 +7,11 @@ namespace Game
     {
         static int Main(string[] args)
         {
-            Image img = City_Generator.CityImageGenerator.convert_to_image(City_Generator.CityFactory.createCity());
+            City_Generator.GameBoard city = City_Generator.CityFactory.createCity(100, 100);
+            //City_Generator.GameBoard city = City_Generator.CityFactory.debugCity();
+
+            //Image img = City_Generator.CityImageGenerator.convert_to_image(city);
+            Image img = city.Img;
             if (img != null)
             {
 
@@ -18,6 +22,7 @@ namespace Game
             {
 
             }
+            //System.Console.ReadKey();
             return 1;
         }
 

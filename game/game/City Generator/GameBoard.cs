@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Drawing;
 
 namespace Game.City_Generator
 {
@@ -15,6 +16,7 @@ namespace Game.City_Generator
 
         protected List<Building> _buildings;
         protected Corporate[,] _corpList;
+        protected Image _img;
         
         protected int _len, _wid;
 
@@ -32,6 +34,12 @@ namespace Game.City_Generator
         internal int Width
         {
             get { return _wid; }
+        }
+
+        internal Image Img
+        {
+            get { return _img; }
+            set { _img = value; }
         }
 
         internal List<Building> Buildings {

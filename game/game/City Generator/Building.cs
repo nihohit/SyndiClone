@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Drawing;
 
 /**
  * this class holds a bulding object - it has place on the initial grid (represented by a "block"). 
@@ -14,7 +15,9 @@ namespace Game.City_Generator
         //fields:
         Block _dimensions; //holding the location and dimensions of the building in the already existing block type;
         Corporate _corp;
-        int _owner; 
+        int _owner;
+        Image _img;
+
        /********************************constructor***************************************/
         internal Building(Block dim) {
             _dimensions = dim;
@@ -57,6 +60,12 @@ namespace Game.City_Generator
         public Corporate Corp{
             set { _corp = value;}
             get { return _corp; }
+        }
+
+        internal Image Img
+        {
+            get { return _img; }
+            set { _img = value; }
         }
 
 

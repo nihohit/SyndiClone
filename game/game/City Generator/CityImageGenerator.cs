@@ -18,11 +18,12 @@ namespace Game.City_Generator
         
         public static Image convert_to_image(GameBoard city){
             Tile[,] grid = city.Grid; 
-            Image img = new Bitmap(TILE_SIZE*grid.GetLength(0),TILE_SIZE*grid.GetLength(1));
+            //Image img = new Bitmap(TILE_SIZE*grid.GetLength(0),TILE_SIZE*grid.GetLength(1));
+            Image img = new Bitmap(TILE_SIZE * city.Length, TILE_SIZE * city.Width);
             List<Image> images = new List<Image>();
-            for (int i = 0 ; i < grid.GetLength(0) ; i ++)
+            for (int i = 0 ; i < city.Length ; i ++)
             {
-                for (int j = 0; j < grid.GetLength(0); j++)
+                for (int j = 0; j < city.Width; j++)
                 {
                     switch(grid[i, j].Type)
                     {
@@ -63,6 +64,7 @@ namespace Game.City_Generator
             foreach (Building build in city.Buildings)
             {
                 Image image = GetBuildingImage(build);
+                build.Img = image;
                 widthOffset = build.StartY * TILE_SIZE;
                 heightOffset = build.StartX * TILE_SIZE;
                 graphic.DrawImage(image, new Rectangle(widthOffset, heightOffset, image.Width, image.Height));
@@ -77,44 +79,49 @@ namespace Game.City_Generator
             {
                 case Images.R_LINE: //it's the same as dead-end, so no breaking here.
                 case Images.R_DEAD_END:
-                    if (tile.Rotate == 1)
-                    { //vertical road
-                        if (tile.VWidth == 1)
+                    if ((tile.Rotate == 1)||(tile.Rotate==3))
+                    { //Horizontal road
+                        if (tile.HWidth == 1)
                             img = new Bitmap(city_images._1_road1);
                         else
                         {
-                            if ((tile.VOffset == 0) || (tile.VOffset == tile.VWidth - 1)){
+                            if ((tile.HOffset == 0) || (tile.HOffset == tile.HWidth - 1)){
                                 img = new Bitmap(city_images._5_road2side);
+                                if (tile.HOffset != 0)
+                                    img.RotateFlip(RotateFlipType.Rotate180FlipNone);
                                 }
                             else
                                 img = img = new Bitmap(city_images._7_road3middle);
                         }
+                        img.RotateFlip(RotateFlipType.Rotate90FlipNone);
                     }
-                    else { //horizontal road
-                        if (tile.HWidth == 1)
+                    else { //Vertical road
+                        if (tile.VWidth == 1)
                         {
                             img = new Bitmap(city_images._1_road1);
 
                         }
                         else {
-                            if ((tile.HOffset == 0) || (tile.HOffset == tile.HWidth - 1)) {
+                            if ((tile.VOffset == 0) || (tile.VOffset == tile.VWidth - 1)) {
                                 img = new Bitmap(city_images._5_road2side);
-                                if (tile.HOffset == tile.HWidth - 1)
+                                if (tile.VOffset == tile.VWidth - 1)
                                     img.RotateFlip(RotateFlipType.Rotate180FlipNone);
                             }
                             else img = new Bitmap(city_images._7_road3middle);
                         }
-                            img.RotateFlip(RotateFlipType.Rotate90FlipNone);
+                            
                     }
                     break;
 
                 case Images.R_3WAY:
+                    //System.Console.WriteLine("3Way. VWidth: " + tile.VWidth +" VOffset: "+tile.VOffset+" HWidth: " + tile.HWidth+" HOffset: "+tile.HOffset+" ROTATE: "+tile.Rotate);
                     switch (tile.Rotate)
                     {
                         case 0: //road connect on east
                             if (tile.VWidth == 1)
                                 img = new Bitmap(city_images._2_road1intersect);
                             else {
+                              //  System.Console.WriteLine("rotate is 0!");
                                 if (tile.VOffset == 0)
                                     img = new Bitmap(city_images._4_road2intersect);
                                 else if (tile.VOffset == tile.VWidth - 1)
@@ -136,6 +143,7 @@ namespace Game.City_Generator
 
                             else
                             {
+                                //System.Console.WriteLine("rotate is 1!");
                                 if (tile.HOffset == 0) {
                                     img = new Bitmap(city_images._4_road2intersect);
                                     img.RotateFlip(RotateFlipType.Rotate90FlipNone);
@@ -161,6 +169,7 @@ namespace Game.City_Generator
                             }
                             else
                             {
+                                //System.Console.WriteLine("rotate is 2!");
                                 if (tile.VOffset == tile.VWidth - 1)
                                 {
                                     img = new Bitmap(city_images._4_road2intersect);
@@ -174,21 +183,22 @@ namespace Game.City_Generator
                             }
                             break;
                         case 3: //road connects on south
-                            if (tile.VWidth == 1)
+                            if (tile.HWidth == 1)
                             {
                                 img = new Bitmap(city_images._2_road1intersect);
                                 img.RotateFlip(RotateFlipType.Rotate270FlipNone);
                             }
                             else {
+                                //System.Console.WriteLine("rotate is 3!");
                                 if (tile.HOffset == tile.HWidth - 1)
                                 {
-                                    img = new Bitmap(city_images._2_road1intersect);
+                                    img = new Bitmap(city_images._4_road2intersect);
                                     img.RotateFlip(RotateFlipType.Rotate270FlipNone);
                                 }
                                 else if (tile.HOffset == 0)
                                 {
                                     img = new Bitmap(city_images._5_road2side);
-                                    img.RotateFlip(RotateFlipType.Rotate270FlipNone); //could be 90 as well
+                                    img.RotateFlip(RotateFlipType.Rotate90FlipNone); 
                                 }
                                 else
                                 {
@@ -203,7 +213,7 @@ namespace Game.City_Generator
                     
                     break;
                 case Images.R_CORNER: 
-                    img = new Bitmap(city_images._0_empty);//TODO: draw corners and fix this.
+                    img = new Bitmap(city_images._0_buildingTemp1);//TODO: draw corners and fix this.
                     break;
                 case Images.R_FOURWAY:
                     img = new Bitmap(city_images._3_road1mid);//TODO: test. I think we need to draw another 4way images with other sidewalk formations.
@@ -214,18 +224,7 @@ namespace Game.City_Generator
                     img = new Bitmap(city_images._0_empty);
                     break;
             }
-            switch (tile.Rotate)
-            {
-                case 1:
-                    img.RotateFlip(RotateFlipType.Rotate90FlipNone);
-                    break;
-                case 2:
-                    img.RotateFlip(RotateFlipType.Rotate180FlipNone);
-                    break;
-                case 3:
-                    img.RotateFlip(RotateFlipType.Rotate270FlipNone);
-                    break;
-            }
+            
             /*switch (tile.Flip)
             {
                 case 1:

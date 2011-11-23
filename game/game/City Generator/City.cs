@@ -161,6 +161,7 @@ namespace Game.City_Generator
         public City(int gridL, int gridW)
         {
             //_rand = new Random();
+            _img = null;
             _bp = new BuildingPlacer();
             _len = gridL;
             _wid = gridW;
@@ -184,18 +185,6 @@ namespace Game.City_Generator
         //TODO: remove.
         //this section exists in the "GameBoard" parent class. here are just the redundant things. 
         public char[,] getGrid() { return _grid; } //This is left here till later. TODO: remove.
-        public short[][] getShortGrid()
-        {
-            short[][] retVal = new short[_len][];
-            for (int i = 0; i < _len; ++i)
-            {
-                retVal[i] = new short[_wid];
-                for (int j = 0; j < _wid; ++j)
-                    retVal[i][j] = (short)_grid[i, j];
-            }
-            return retVal;
-
-        }
 
         public void setGrid(char[,] grid)
         {
@@ -338,25 +327,39 @@ namespace Game.City_Generator
         internal void translateRoads()
         {
             RoadTile current;
-            for (int i = 0; i < _len; ++i)
+            for (int j = 0; j < _wid; ++j)
+          
             {
-                for (int j = 0; j < _wid; ++j)
+                for (int i = 0; i < _len; ++i)
                 {
                     if (_grid2[i, j].Type == ContentType.ROAD)
                     {
                         _grid2[i, j].Rotate = 0;
+                        //System.Console.WriteLine("new point: (" + i + "," + j + ")");
 
                         current = (RoadTile)_grid2[i, j];
                         //set number of exits from the tile
-                        
+
                         if (isConnected(i, j, Directions.N, current.HOffset))
+                        {
                             current.addExit(Directions.N);
-                        if (isConnected(i, j, Directions.W, current.VWidth - current.VOffset - 1)) //the "-1" part is so that the offset will lead to the edge of the road
+                            //System.Console.WriteLine("North!");
+                        }
+                        if (isConnected(i, j, Directions.W, current.VOffset))
+                        {
                             current.addExit(Directions.W);
-                        if (isConnected(i, j, Directions.S, current.HWidth - current.HOffset - 1))
+                            //System.Console.WriteLine("West!");
+                        }
+                        if (isConnected(i, j, Directions.S, current.HWidth - current.HOffset - 1))//the "-1" part is so that the offset will lead to the edge of the road
+                        {
                             current.addExit(Directions.S);
-                        if (isConnected(i, j, Directions.E, current.VOffset))
+                            //System.Console.WriteLine("South!");
+                        }
+                        if (isConnected(i, j, Directions.E, current.VWidth - current.VOffset - 1))
+                        {
                             current.addExit(Directions.E);
+                            //System.Console.WriteLine("East!");
+                        }
                     }
                 }
             }
@@ -428,28 +431,29 @@ namespace Game.City_Generator
         {
             switch (dir)
             {
-                case Directions.E:
+                case Directions.N:
                     if (y - offset < 0) return false; //error. print?
                     if (y - offset == 0) return false; //legit.
-                    if (_grid2[x, y - offset - 1].Type == ContentType.ROAD)
-                        return true;
-                    return false;
-
-                case Directions.N:
-                    if (x - offset < 0) return false; //error.
-                    if (x - offset == 0) return false; //legit.
-                    if (_grid2[x - offset - 1, y].Type == ContentType.ROAD)
+                    if (_grid2[x,y - offset - 1].Type == ContentType.ROAD)
                         return true;
                     return false;
 
                 case Directions.W:
+                    if (x - offset < 0) return false; //error.
+                    if (x - offset == 0) return false; //legit.
+                    if (_grid2[x - offset - 1,y].Type == ContentType.ROAD)
+                        return true;
+                    return false;
+
+                case Directions.S:
                     if (y + offset + 1 > _wid) return false; //error
                     if (y + offset + 1 == _wid) return false; //legit
-                    return (_grid2[x, y + offset + 1].Type == ContentType.ROAD);
-                case Directions.S:
+                    return (_grid2[x,y + offset + 1].Type == ContentType.ROAD);
+
+                case Directions.E:
                     if (x + offset + 1 > _wid) return false;//error
                     if (x + offset + 1 == _wid) return false;//legit
-                    return (_grid2[x + offset + 1, y].Type == ContentType.ROAD);
+                    return (_grid2[x + offset + 1,y].Type == ContentType.ROAD);
                 default: return false; //error
             }
         }

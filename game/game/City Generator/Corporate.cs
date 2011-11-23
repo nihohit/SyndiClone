@@ -8,16 +8,23 @@ using System.Text;
  * */
 namespace Game.City_Generator
 {
+    enum CorporateNames { ZOMBIE_LTD,BRAINS,UPGRADES,MINING,ARMORY,RND,DEFENCE,DIGGING}; //TODO: figure out what kinds of corporates do we want.
     class Corporate
     {
         static int counter = 0;
+        static Random rand = new Random();
 
         /********************************Fields***************************************/
         private List<Building> _buildings;
         private int _id;
+        private CorporateNames _type;
+      
 
         /********************************Constructor***************************************/        
         internal Corporate() {
+
+           _type = (CorporateNames)rand.Next(Enum.GetValues(typeof(CorporateNames)).Length);
+            
             _id = counter;
             counter++;
             _buildings = new List<Building>();

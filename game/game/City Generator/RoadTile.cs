@@ -34,8 +34,8 @@ namespace Game.City_Generator
             //_loc = new Point(x, y);
             _hOffset = 0;
             _vOffset = 0;
-            _hWidth = 0;
-            _vWidth = 0;
+            _hWidth = 1;
+            _vWidth = 1;
         }
 
 
@@ -85,7 +85,7 @@ namespace Game.City_Generator
                     if (_exitsNum == 1)
                     {
                         _img = Images.R_CORNER;
-                        _rotate = 3;
+                        _rotate = 1;
                     }
                     else {
                         _img = Images.R_DEAD_END;
@@ -97,13 +97,17 @@ namespace Game.City_Generator
                         if (_exitsNum == 2)
                         {
                             _img = Images.R_3WAY;
-                            _rotate = 2;
+                            _rotate = 0;
                         }
                         else if (_exitsNum == 1)
                         {
                             if (_rotate == 0)
                                 _img = Images.R_LINE;
-                            else _img = Images.R_CORNER;
+                            else
+                            {
+                                _img = Images.R_CORNER;
+                                Rotate = 0;
+                            }
                         }
                         else {
                             _img = Images.R_DEAD_END;
@@ -118,12 +122,13 @@ namespace Game.City_Generator
                     }
                     else if (_exitsNum == 2)
                     {
-                        _img = Images.R_3WAY;
+                        
                         if (_img == Images.R_LINE)
-                            _rotate = 0;
+                            _rotate = 2;
                         else
-                            if (_rotate != 3) //if rotate is 2 it should become 1, if it's 3 it should remain that way. also, it must be either 0 (line) 2 or 3 (corners)
-                                _rotate = 1;
+                            if (_rotate == 0)
+                                _rotate = 3;
+                        _img = Images.R_3WAY;
                     }
                     else if (_exitsNum == 1)
                     {
@@ -133,9 +138,9 @@ namespace Game.City_Generator
                         {
                             _img = Images.R_CORNER;
                             if (_rotate == 0)
-                                _rotate = 1;
+                                _rotate = 2;
                             else if (_rotate == 2)
-                                _rotate = 0;
+                                _rotate = 3;
                         }
 
                     }
