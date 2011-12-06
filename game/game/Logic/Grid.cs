@@ -280,6 +280,7 @@ namespace Game.Logic
          */
         private void moveToNewLocation(MovingEntity ent, Direction dir)
         {
+            int rotation = 0;
             Area location = this.locations[ent];
             if (ent.needFlip())
             {
@@ -298,7 +299,7 @@ namespace Game.Logic
             };
 
             iterateOverArea(toSwitch, putEntityInArea(ent));
-            this.addEvent(new MoveEvent(this.locations[ent], toSwitch, ent));
+            this.addEvent(new MoveEvent(this.locations[ent], toSwitch, ent, rotation));
             this.locations[ent] = toSwitch;
         }
 

@@ -83,12 +83,25 @@ namespace Game.Logic
                     this.playerUnits.Remove(((DestroyEvent)action).Ent);
                 }
             }
-            //TODO - missing function
+            //TODO - try smarter threading, with waiting only a limited time on entering. 
+            displayBuffer.getLock();
+            displayBuffer.receiveVisibleEntities(new List<Entity>(activeEntities));
+            displayBuffer.receiveActions(actions);
+            
+                //TODO - missing function
+            displayBuffer.releaseLock();
+            soundBuffer.getLock();
+
+            soundBuffer.releaseLock();
+            
         }
 
         private void handleInput()
         {
-            //TODO - missing function
+            lock (inputBuffer)
+            {
+                //TODO - missing function
+            }
         }
 
         /*

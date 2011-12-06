@@ -17,7 +17,6 @@ namespace Game.City_Generator
         protected List<Building> _buildings;
         protected Corporate[,] _corpList;
         protected Image _img;
-        
         protected int _len, _wid;
 
         /********************************Properties***************************************/

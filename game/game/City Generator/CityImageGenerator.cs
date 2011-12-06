@@ -59,7 +59,8 @@ namespace Game.City_Generator
                     widthOffset += TILE_SIZE;
                     heightOffset = 0;
                 }
-            }
+            }//HACK(shachar): correct me if I'm wrong, but the next step is to put the city & building images in the respective objects?
+            //TODO - generate destruction animations for the buildings. 
             img.Save("test.jpg");
             foreach (Building build in city.Buildings)
             {

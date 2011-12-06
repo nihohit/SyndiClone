@@ -38,6 +38,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Folder Include="Audio Manager\" />
+    <Folder Include="Graphic Manager\images\" />
     <Folder Include="Screen Manager\" />
   </ItemGroup>
   <ItemGroup>
@@ -58,13 +59,10 @@
     <Compile Include="City Generator\RoadTile.cs" />
     <Compile Include="City Generator\Tile.cs" />
     <Compile Include="Buffers\DisplayBuffer.cs" />
-    <Compile Include="Graphic Manager\DisplayBuffer.cs" />
-    <Compile Include="Graphic Manager\DisplayInfo.cs" />
     <Compile Include="Graphic Manager\DisplayManager.cs" />
     <Compile Include="Graphic Manager\GraphicInfo.cs" />
-    <Compile Include="Buffers\Input.cs" />
     <Compile Include="Buffers\InputBuffer.cs" />
-    <Compile Include="Graphic Manager\SpriteLoop.cs" />
+    <Compile Include="Buffers\SpriteLoop.cs" />
     <Compile Include="Logic\City.cs" />
     <Compile Include="Logic\Entities\Agent.cs" />
     <Compile Include="Logic\Entities\BlastEffect.cs" />
@@ -84,7 +82,6 @@
     <Compile Include="Logic\Entities\Shooter.cs" />
     <Compile Include="Logic\Entities\Sight.cs" />
     <Compile Include="Logic\Entities\Weapon.cs" />
-    <Compile Include="Buffers\Output.cs" />
     <Compile Include="Point.cs" />
     <Compile Include="Buffers\SoundBuffer.cs" />
     <Compile Include="TestMain.cs" />
@@ -148,9 +145,6 @@
     <None Include="City Generator\images\9_edge.gif" />
     <None Include="City Generator\images\0_buildingmiddle.gif" />
     <None Include="City Generator\images\9_corner.gif" />
-    <Content Include="Graphic Manager\images\PersonBlue.jpg" />
-    <Content Include="Graphic Manager\images\PersonRed.jpg" />
-    <Content Include="Graphic Manager\images\PersonYellow.jpg" />
     <Content Include="Coding Conventions.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

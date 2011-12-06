@@ -32,18 +32,6 @@ namespace Game.Logic
             this._size.flip();
         }
 
-
-
-        internal Vector Size
-        {
-            get { return _size; }
-        }
-
-        public Point Entry
-        {
-            get { return _entry; }
-        }
-
         internal Area(Point entry, Vector size)
         {
             this._entry = entry;
@@ -54,6 +42,16 @@ namespace Game.Logic
         {
             this._entry = new Point(location.Entry, vector);
             this._size = location.Size.addVector(vector);
+        }
+
+        internal Vector Size
+        {
+            get { return _size; }
+        }
+
+        public Point Entry
+        {
+            get { return _entry; }
         }
 
         internal Point[,] getPointArea()
@@ -290,13 +288,23 @@ namespace Game.Logic
         private readonly Area _exit;
         private readonly Area _entry;
         private readonly MovingEntity _mover;
+        private readonly int _rotation;
 
-        internal MoveEvent(Area exit, Area entry, MovingEntity mover)
+
+
+
+        internal MoveEvent(Area exit, Area entry, MovingEntity mover, int rotation)
         {
             this._entry = entry;
             this._exit = exit;
             this._mover = mover;
+            this._rotation = rotation;
         }
+
+        public int Rotation
+        {
+            get { return _rotation; }
+        } 
 
         internal MovingEntity Mover
         {

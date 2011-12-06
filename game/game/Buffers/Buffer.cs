@@ -1,16 +1,36 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Threading;
+using System;
 
 namespace Game.Buffers
 {
-    interface Buffer
+    abstract class Buffer
     {
-        void receiveInput(Input input);
-        bool readyForInput();
-        bool readyToOutput();
-        LinkedList<Output> returnOutput();
+        /******************
+        Class Fields
+        ****************/
+        
+        private readonly Object thisLock;
 
+
+        /******************
+        Constructors
+        ****************/
+        public Buffer()
+        {
+            this.thisLock = new Object();
+        }
+
+        /******************
+        Methods
+        ****************/
+        public void getLock()
+        {
+            Monitor.Enter(this.thisLock);
+        }
+
+        public void releaseLock()
+        {
+            Monitor.Exit(this.thisLock);
+        }
     }
 }
