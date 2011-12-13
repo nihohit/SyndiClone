@@ -6,7 +6,7 @@ using Game.Logic.Entities;
 
 namespace Game.Buffers
 {
-    class DisplayBuffer : Game.Buffers.Buffer
+    public class DisplayBuffer : Game.Buffers.Buffer
     {
 
         /******************
@@ -23,7 +23,7 @@ namespace Game.Buffers
         Constructors
         ****************/
 
-        DisplayBuffer()
+        public DisplayBuffer()
         {
             this.spriteFinder = new Dictionary<Entity, SpriteLoop>();
             this.removedSprites = new HashSet<Sprite>();
@@ -46,7 +46,7 @@ namespace Game.Buffers
         internal List<Sprite> spritesToRemove()
         {
             List<Sprite> ans = new List<Sprite>(removedSprites);
-            displaySprites.Clear();
+            removedSprites.Clear();
             return ans;
         }
 
@@ -96,7 +96,14 @@ namespace Game.Buffers
             displaySprites.Clear();
             foreach (Entity ent in visibleEntityList)
             {
-                Sprite temp = this.spriteFinder[ent].getSprite();
+                Sprite temp = null;
+                if (ent.Type == entityType.BUILDING)
+                    temp = ((Building)ent).Image;
+                else
+                {
+                    temp = this.spriteFinder[ent].getSprite();
+                }
+                //TODO - find a way to make sure that the sprite's position is correct.
                 displaySprites.Add(temp);
             }
         }

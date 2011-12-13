@@ -3,7 +3,7 @@ using System;
 
 namespace Game.Buffers
 {
-    abstract class Buffer
+    public abstract class Buffer
     {
         /******************
         Class Fields

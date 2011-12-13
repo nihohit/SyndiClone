@@ -13,23 +13,30 @@ namespace Game.Graphic_Manager
         HashSet<Animation> animations;
 
 
-        public DisplayManager(uint x, uint y, uint bits, Game.Buffers.DisplayBuffer buffer)
+        public DisplayManager(uint x, uint y, uint bits, Game.Buffers.DisplayBuffer buffer, Image background)
         {
             this._buffer = buffer;
             this._mainWindow = new RenderWindow(new VideoMode(x, y, bits), "main display");
+            Sprite back = new Sprite(background);
+            this._mainWindow.Draw(back);
+            displayedSprites = new HashSet<Sprite>();
+            removedSprites = new HashSet<Sprite>();
+            animations = new HashSet<Animation>();
+
         }
 
         private void findSpritesToDisplay()
         {
             this.displayedSprites.UnionWith(this._buffer.newSpritesToDisplay());
+            //TODO - see if we need to convert the sprite's position according to view
         }
 
         private void findSpritesToRemove()
         {
-            this.removedSprites = new HashSet<Sprite>(this._buffer.newSpritesToDisplay());
+            this.removedSprites = new HashSet<Sprite>(this._buffer.spritesToRemove());
         }
 
-        private void newAnimations()
+        private void updateAnimations()
         {
             //TODO - missing function
         }
@@ -54,7 +61,7 @@ namespace Game.Graphic_Manager
             {
                 findSpritesToRemove();
                 findSpritesToDisplay();
-                newAnimations();
+                updateAnimations();
             }
             removeSprites();
             enterAnimations();

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Drawing;
+using SFML.Graphics;
 
 /**
  * this class holds a bulding object - it has place on the initial grid (represented by a "block"). 

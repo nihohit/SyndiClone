@@ -63,7 +63,6 @@
     <Compile Include="Graphic Manager\GraphicInfo.cs" />
     <Compile Include="Buffers\InputBuffer.cs" />
     <Compile Include="Buffers\SpriteLoop.cs" />
-    <Compile Include="Logic\City.cs" />
     <Compile Include="Logic\Entities\Agent.cs" />
     <Compile Include="Logic\Entities\BlastEffect.cs" />
     <Compile Include="Logic\Entities\Building.cs" />

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing.Imaging;
 using System;
+using System.IO;
 
 
 
@@ -16,7 +17,7 @@ namespace Game.City_Generator
         static Dictionary<Building, Image> buildings = new Dictionary<Building, Image>();
         static Dictionary<Tuple<Block, BuildingStyle>, Image> templates = new Dictionary<Tuple<Block, BuildingStyle>, Image>(new tupleEqualityComparer());
         
-        public static Image convert_to_image(GameBoard city){
+        public static SFML.Graphics.Image convert_to_image(GameBoard city){
             Tile[,] grid = city.Grid; 
             //Image img = new Bitmap(TILE_SIZE*grid.GetLength(0),TILE_SIZE*grid.GetLength(1));
             Image img = new Bitmap(TILE_SIZE * city.Length, TILE_SIZE * city.Width);
@@ -65,12 +66,20 @@ namespace Game.City_Generator
             foreach (Building build in city.Buildings)
             {
                 Image image = GetBuildingImage(build);
+                /*magic code to convert from the Drawing image to SFML image)*/
+                MemoryStream stream = new MemoryStream();
+                image.Save(stream, ImageFormat.Png);
+                build.Img = new SFML.Graphics.Image(stream);
+                /* That's the code to embed the image of the building in the background
                 build.Img = image;
                 widthOffset = build.StartY * TILE_SIZE;
                 heightOffset = build.StartX * TILE_SIZE;
-                graphic.DrawImage(image, new Rectangle(widthOffset, heightOffset, image.Width, image.Height));
+                graphic.DrawImage(image, new Rectangle(widthOffset, heightOffset, image.Width, image.Height));*/
             }
-            return img ;
+
+            MemoryStream stream2 = new MemoryStream();
+            img.Save(stream2, ImageFormat.Png);
+            return new SFML.Graphics.Image(stream2);
         }
 
         private static Image get_road_image(RoadTile tile)

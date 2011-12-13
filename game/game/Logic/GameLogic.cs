@@ -27,7 +27,7 @@ namespace Game.Logic
         Constructors
         ****************/
 
-        public GameLogic(DisplayBuffer disp, InputBuffer input, SoundBuffer sound, Game.City_Generator.City city)
+        public GameLogic(DisplayBuffer disp, InputBuffer input, SoundBuffer sound, Game.City_Generator.GameBoard city)
         {
             this.activeEntities = new UniqueList<Entity>(); 
             this.movers = new UniqueList<MovingEntity>();
@@ -37,8 +37,7 @@ namespace Game.Logic
             this.displayBuffer = disp;
             this.inputBuffer = input;
             this.soundBuffer = sound;
-            City _city = new City(city);
-            //TODO - finish creating the grid;
+            this._grid = GameBoardToGameGridConverter.convert(city);
         }
 
         /******************
