@@ -6,18 +6,19 @@ using Game.Logic.Entities;
 
 namespace Game.Buffers
 {
-    public class DisplayBuffer : Game.Buffers.Buffer
+        public class DisplayBuffer : Game.Buffers.Buffer
     {
 
         /******************
         Class Fields
         ****************/
         
-        private readonly Dictionary<Entity, SpriteLoop> spriteFinder;
         private HashSet<Sprite> displaySprites;
         private HashSet<Sprite> removedSprites;
         private HashSet<Sprite> newDecalsSprites;
         private HashSet<Game.Graphic_Manager.Animation> newAnimations;
+        private ImageFinder finder;
+        private Dictionary<ExternalEntity, SpriteLoop> spriteLoopFinder;
 
         /******************
         Constructors
@@ -25,11 +26,12 @@ namespace Game.Buffers
 
         public DisplayBuffer()
         {
-            this.spriteFinder = new Dictionary<Entity, SpriteLoop>();
+            this.spriteLoopFinder = new Dictionary<ExternalEntity, SpriteLoop>();
             this.removedSprites = new HashSet<Sprite>();
             this.displaySprites = new HashSet<Sprite>();
             this.newDecalsSprites = new HashSet<Sprite>();
             this.newAnimations = new HashSet<Game.Graphic_Manager.Animation>();
+            this.finder = new SpriteFinder();
         }
 
         /******************
@@ -57,21 +59,17 @@ namespace Game.Buffers
                 switch (action.type())
                 {
                     case BufferType.DESTROY:
-                        Entity ent = ((DestroyEvent)action).Ent;
-                        this.spriteFinder.Remove(ent);
+                        ExternalEntity ent = ((DestroyEvent)action).Ent;
+                        this.spriteLoopFinder.Remove(ent);
                         this.newAnimations.Add(this.generateExplosion(((DestroyEvent)action).Area, ent.Type));
                         break;
                     case BufferType.MOVE:
-                        MovingEntity mover = ((MoveEvent)action).Mover;
-                        Sprite toRemove = this.spriteFinder[mover].getSprite();
+                        ExternalEntity mover = ((MoveEvent)action).Mover;
+                        Sprite toRemove = this.spriteLoopFinder[mover].getSprite();
                         this.removedSprites.Add(toRemove);
-                        Sprite movement = this.spriteFinder[mover].Next();
+                        Sprite movement = this.spriteLoopFinder[mover].Next();
                         movement.Rotation = ((MoveEvent)action).Rotation;
-                        Point pos = ((MoveEvent)action).Exit.Entry; /*The reason for the double calling is 
-                                                                     * that we call the area to which the animation leads, 
-                                                                     * and then the entry point to that area
-                                                                     */
-                        Vector2 position = new Vector2(pos.X, pos.Y);
+                        Vector2 position = new Vector2(mover.Position.X, mover.Position.Y);
                         movement.Position = position;
                         //TODO - generate turning animation
                         break;
@@ -91,21 +89,20 @@ namespace Game.Buffers
             return new Graphic_Manager.Animation(area, type);
         }
 
-        internal void receiveVisibleEntities(List<Entity> visibleEntityList)
+        internal void receiveVisibleEntities(List<ExternalEntity> visibleExternalEntityList)
         {
             displaySprites.Clear();
-            foreach (Entity ent in visibleEntityList)
+            foreach (ExternalEntity ent in visibleExternalEntityList)
             {
-                Sprite temp = null;
-                if (ent.Type == entityType.BUILDING)
-                    temp = ((Building)ent).Image;
-                else
-                {
-                    temp = this.spriteFinder[ent].getSprite();
-                }
+                Sprite temp = finder.getSprite(ent);
+                temp.Position = new Vector2(ent.Position.Y, ent.Position.X);
                 //TODO - find a way to make sure that the sprite's position is correct.
                 displaySprites.Add(temp);
             }
         }
+
+        
     }
+
+
 }

@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Game.City_Generator {
+namespace Game.Buffers {
     using System;
     
     
@@ -22,14 +22,14 @@ namespace Game.City_Generator {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class city_images {
+    internal class entity_images {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal city_images() {
+        internal entity_images() {
         }
         
         /// <summary>
@@ -39,7 +39,7 @@ namespace Game.City_Generator {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Game.City_Generator.city_images", typeof(city_images).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Game.Buffers.entity_images", typeof(entity_images).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -60,72 +60,65 @@ namespace Game.City_Generator {
             }
         }
         
-        internal static System.Drawing.Bitmap _0_buildingTemp1 {
+        internal static System.Drawing.Bitmap _0_buildingmiddle {
             get {
-                object obj = ResourceManager.GetObject("_0_buildingTemp1", resourceCulture);
+                object obj = ResourceManager.GetObject("_0_buildingmiddle", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
         
-        internal static System.Drawing.Bitmap _0_empty {
+        internal static System.Drawing.Bitmap _9_corner {
             get {
-                object obj = ResourceManager.GetObject("_0_empty", resourceCulture);
+                object obj = ResourceManager.GetObject("_9_corner", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
         
-        internal static System.Drawing.Bitmap _1_road1 {
+        internal static System.Drawing.Bitmap _9_edge {
             get {
-                object obj = ResourceManager.GetObject("_1_road1", resourceCulture);
+                object obj = ResourceManager.GetObject("_9_edge", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
         
-        internal static System.Drawing.Bitmap _2_road1intersect {
+        internal static System.Drawing.Bitmap person_black {
             get {
-                object obj = ResourceManager.GetObject("_2_road1intersect", resourceCulture);
+                object obj = ResourceManager.GetObject("person_black", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
         
-        internal static System.Drawing.Bitmap _3_road1mid {
+        internal static System.Drawing.Bitmap person_blue {
             get {
-                object obj = ResourceManager.GetObject("_3_road1mid", resourceCulture);
+                object obj = ResourceManager.GetObject("person_blue", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
         
-        internal static System.Drawing.Bitmap _4_road2intersect {
+        internal static System.Drawing.Bitmap person_green {
             get {
-                object obj = ResourceManager.GetObject("_4_road2intersect", resourceCulture);
+                object obj = ResourceManager.GetObject("person_green", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
         
-        internal static System.Drawing.Bitmap _5_road2side {
+        internal static System.Drawing.Bitmap person_purple {
             get {
-                object obj = ResourceManager.GetObject("_5_road2side", resourceCulture);
+                object obj = ResourceManager.GetObject("person_purple", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
         
-        internal static System.Drawing.Bitmap _6_road3intersect {
+        internal static System.Drawing.Bitmap person_red {
             get {
-                object obj = ResourceManager.GetObject("_6_road3intersect", resourceCulture);
+                object obj = ResourceManager.GetObject("person_red", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
         
-        internal static System.Drawing.Bitmap _7_road3middle {
+        internal static System.Drawing.Bitmap person_yellow {
             get {
-                object obj = ResourceManager.GetObject("_7_road3middle", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        internal static System.Drawing.Bitmap _8_road3side {
-            get {
-                object obj = ResourceManager.GetObject("_8_road3side", resourceCulture);
+                object obj = ResourceManager.GetObject("person_yellow", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

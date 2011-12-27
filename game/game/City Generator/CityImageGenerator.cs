@@ -8,14 +8,12 @@ using System.IO;
 
 namespace Game.City_Generator
 {
-    enum BuildingStyle { BLUE, RED, GREEN, YELLOW }
+    
     class CityImageGenerator
     {
 
         
         static int TILE_SIZE = 32;
-        static Dictionary<Building, Image> buildings = new Dictionary<Building, Image>();
-        static Dictionary<Tuple<Block, BuildingStyle>, Image> templates = new Dictionary<Tuple<Block, BuildingStyle>, Image>(new tupleEqualityComparer());
         
         public static SFML.Graphics.Image convert_to_image(GameBoard city){
             Tile[,] grid = city.Grid; 
@@ -63,19 +61,6 @@ namespace Game.City_Generator
             }//HACK(shachar): correct me if I'm wrong, but the next step is to put the city & building images in the respective objects?
             //TODO - generate destruction animations for the buildings. 
             img.Save("test.jpg");
-            foreach (Building build in city.Buildings)
-            {
-                Image image = GetBuildingImage(build);
-                /*magic code to convert from the Drawing image to SFML image)*/
-                MemoryStream stream = new MemoryStream();
-                image.Save(stream, ImageFormat.Png);
-                build.Img = new SFML.Graphics.Image(stream);
-                /* That's the code to embed the image of the building in the background
-                build.Img = image;
-                widthOffset = build.StartY * TILE_SIZE;
-                heightOffset = build.StartX * TILE_SIZE;
-                graphic.DrawImage(image, new Rectangle(widthOffset, heightOffset, image.Width, image.Height));*/
-            }
 
             MemoryStream stream2 = new MemoryStream();
             img.Save(stream2, ImageFormat.Png);
@@ -249,164 +234,6 @@ namespace Game.City_Generator
             }*/
 
             return img;
-        }
-
-        internal static Image GetBuildingImage(Building building)
-        {
-            var temp = Tuple.Create(building.Dimensions, generateStyle(building.Corp));
-            /*if (buildings.ContainsKey(building))
-            {
-                return buildings[building];
-            }
-            if (templates.ContainsKey(temp))
-            {
-                return templates[temp];
-            }*/
-            Image image = generateBuildingImage(temp);
-            buildings[building] = image;
-            templates[temp] = image;
-            return image;
-        }
-
-        private static Image generateBuildingImage(Tuple<Block, BuildingStyle> temp)
-        {
-            int width = temp.Item1.Length;
-            int height = temp.Item1.Width;
-            BuildingStyle style = temp.Item2;
-            Color basic = Color.Gray;
-            switch (style)
-            {
-                case BuildingStyle.YELLOW:
-                    basic = Color.Yellow;
-                    break;
-                case BuildingStyle.RED:
-                    basic = Color.Red;
-                    break;
-                case BuildingStyle.GREEN:
-                    basic = Color.Green;
-                    break;
-                case BuildingStyle.BLUE:
-                    basic = Color.Blue;
-                    break;
-
-            }
-            Image img = new Bitmap(TILE_SIZE * width, TILE_SIZE * height);
-            List<Image> images = new List<Image>();
-            for (int i = 1; i <= width; i++)
-            {
-                for (int j = 1; j <= height; j++)
-                {
-                    images.Add(getBuildingTile(width, height, i, j, style));
-                }
-            }
-
-            Graphics graphic = Graphics.FromImage(img);
-            graphic.Clear(basic);
-            int widthOffset = 0;
-            int heightOffset = 0;
-            int num = 1;
-
-            foreach (Image image in images)
-            {
-                graphic.DrawImage(image, new Rectangle(widthOffset, heightOffset, image.Width, image.Height));
-                num++;
-
-                heightOffset += TILE_SIZE;
-                if (heightOffset == img.Height)
-                {
-                    widthOffset += TILE_SIZE;
-                    heightOffset = 0;
-                }
-            }
-
-            return img; 
-        }
-
-        private static Image getBuildingTile(int length, int width, int i, int j, BuildingStyle style)
-        {
-            //TODO - account for style
-            Image img = null;
-            int id = 0;
-            if (i == 1)
-            {
-                id += 1;
-            }
-            if (i == length)
-            {
-                id += 9;
-            }
-            if (j == 1)
-            {
-                id += 10;
-            }
-            if (j == width)
-            {
-                id += 90;
-            }
-            switch (id)
-            {
-                case(0):
-                    img = new Bitmap(city_images._0_buildingmiddle);
-                    break;
-                case(1):
-                    img = new Bitmap(city_images._9_edge);
-                    img.RotateFlip(RotateFlipType.Rotate180FlipNone);
-                    break;
-                case (9):
-                    img = new Bitmap(city_images._9_edge);
-                    break;
-                case (10):
-                    img = new Bitmap(city_images._9_edge);
-                    img.RotateFlip(RotateFlipType.Rotate270FlipNone);
-                    break;
-                case (90):
-                    img = new Bitmap(city_images._9_edge);
-                    img.RotateFlip(RotateFlipType.Rotate90FlipNone);
-                    break;
-                case (11):
-                    img = new Bitmap(city_images._9_corner);
-                    img.RotateFlip(RotateFlipType.RotateNoneFlipX);
-                    break;
-                case (91):
-                    img = new Bitmap(city_images._9_corner);
-                    img.RotateFlip(RotateFlipType.Rotate90FlipX);
-                    break;
-                case (19):
-                    img = new Bitmap(city_images._9_corner);
-                    break;
-                case (99):
-                    img = new Bitmap(city_images._9_corner);
-                    img.RotateFlip(RotateFlipType.Rotate90FlipNone);
-                    break;
-            }
-
-            //TODO - needs testing
-            return img;
-        }
-
-        private static BuildingStyle generateStyle(Corporate corp)
-        {
-            //TODO - missing function
-            int num = corp.Id % 4;
-            return (BuildingStyle)num;
-        }
-
-    }
-
-    //TODO - needs testing
-    class tupleEqualityComparer : IEqualityComparer<Tuple<Block,BuildingStyle>>
-    {
-
-        public bool Equals(Tuple<Block, BuildingStyle> first, Tuple<Block, BuildingStyle> second)
-        {
-            return (first.Item1.EqualSize(second.Item1) && first.Item2 == second.Item2);
-        }
-
-
-        public int GetHashCode(Tuple<Block, BuildingStyle> item)
-        {
-            int hCode = item.Item1.Length * item.Item1.StartX * item.Item1.StartY * item.Item1.Width *item.Item2.GetHashCode();
-            return hCode.GetHashCode();
         }
 
     }

@@ -38,11 +38,16 @@
   </PropertyGroup>
   <ItemGroup>
     <Folder Include="Audio Manager\" />
-    <Folder Include="Graphic Manager\images\" />
     <Folder Include="Screen Manager\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Buffers\Buffer.cs" />
+    <Compile Include="Buffers\ImageFinder.cs" />
+    <Compile Include="Buffers\entity_images.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>entity_images.resx</DependentUpon>
+    </Compile>
     <Compile Include="City Generator\Block.cs" />
     <Compile Include="City Generator\Building.cs" />
     <Compile Include="City Generator\BuildingTile.cs" />
@@ -68,6 +73,7 @@
     <Compile Include="Logic\Entities\Building.cs" />
     <Compile Include="Logic\Entities\Civilian.cs" />
     <Compile Include="Logic\Entities\Cop.cs" />
+    <Compile Include="Logic\Entities\ExternalEntity.cs" />
     <Compile Include="Logic\Entities\Person.cs" />
     <Compile Include="Logic\Entities\Shot.cs" />
     <Compile Include="Logic\Entities\Vehicle.cs" />
@@ -101,9 +107,14 @@
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Buffers\entity_images.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>entity_images.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
     <EmbeddedResource Include="City Generator\city_images.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>city_images.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
@@ -137,13 +148,16 @@
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="City Generator\images\0_buildingmiddle.jpg" />
-    <None Include="City Generator\images\9_corner.jpg" />
-    <None Include="City Generator\images\9_edge.jpg" />
-    <None Include="City Generator\images\0_buildingTemp.jpg" />
-    <None Include="City Generator\images\9_edge.gif" />
-    <None Include="City Generator\images\0_buildingmiddle.gif" />
-    <None Include="City Generator\images\9_corner.gif" />
+    <None Include="Buffers\images\9_edge.gif" />
+    <None Include="Buffers\images\0_buildingmiddle.gif" />
+    <None Include="Buffers\images\9_corner.gif" />
+    <None Include="Buffers\images\person yellow.png" />
+    <None Include="Buffers\images\person black.png" />
+    <None Include="Buffers\images\person blue.png" />
+    <None Include="Buffers\images\person green.png" />
+    <None Include="Buffers\images\person purple.png" />
+    <None Include="Buffers\images\person red.png" />
+    <Content Include="City Generator\images\0_buildingtemp.jpg" />
     <Content Include="Coding Conventions.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

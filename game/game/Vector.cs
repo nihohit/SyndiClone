@@ -35,6 +35,12 @@ namespace Game
             this._y = a.Y - b.Y;
         }
 
+        public Vector(Point a)
+        {
+            this._x = a.X;
+            this._y = a.Y;
+        }
+
         public void flip()
         {
             int temp = this._x;

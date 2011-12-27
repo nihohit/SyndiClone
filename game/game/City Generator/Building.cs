@@ -16,7 +16,6 @@ namespace Game.City_Generator
         Block _dimensions; //holding the location and dimensions of the building in the already existing block type;
         Corporate _corp;
         int _owner;
-        Image _img;
 
        /********************************constructor***************************************/
         internal Building(Block dim) {
@@ -60,12 +59,6 @@ namespace Game.City_Generator
         public Corporate Corp{
             set { _corp = value;}
             get { return _corp; }
-        }
-
-        internal Image Img
-        {
-            get { return _img; }
-            set { _img = value; }
         }
 
 

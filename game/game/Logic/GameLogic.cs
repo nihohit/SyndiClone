@@ -78,16 +78,21 @@ namespace Game.Logic
             {
                 if (action.type() == BufferType.DESTROY)
                 {
-                    this.alwaysActive.Remove(((DestroyEvent)action).Ent);
-                    this.playerUnits.Remove(((DestroyEvent)action).Ent);
+                    this.alwaysActive.Remove(((DestroyEvent)action).Ent.Ent);
+                    this.playerUnits.Remove(((DestroyEvent)action).Ent.Ent);
                 }
             }
             //TODO - try smarter threading, with waiting only a limited time on entering. 
             displayBuffer.getLock();
-            displayBuffer.receiveVisibleEntities(new List<Entity>(activeEntities));
+            List<ExternalEntity> newList = new List<ExternalEntity>();
+            foreach(Entity ent in activeEntities)
+            {
+                newList.Add(new ExternalEntity(ent, this._grid.getPosition(ent)));
+            }
+            displayBuffer.receiveVisibleEntities(newList);
             displayBuffer.receiveActions(actions);
             
-                //TODO - missing function
+            //TODO - missing function
             displayBuffer.releaseLock();
             soundBuffer.getLock();
 

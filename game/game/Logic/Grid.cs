@@ -44,7 +44,13 @@ namespace Game.Logic
         ****************/ 
 
         //////////COMMUNICATION LOGIC////////
-        
+
+        internal Vector getPosition(Entity ent)
+        {
+            return new Vector(this.locations[ent].Entry);
+        }
+
+
         /*
          * This function returns the list of actions performed in the current round.
          */
@@ -299,7 +305,7 @@ namespace Game.Logic
             };
 
             iterateOverArea(toSwitch, putEntityInArea(ent));
-            this.addEvent(new MoveEvent(this.locations[ent], toSwitch, ent, rotation));
+            this.addEvent(new MoveEvent(toSwitch, new ExternalEntity(ent, new Vector(location.Entry)), rotation));
             this.locations[ent] = toSwitch;
         }
 

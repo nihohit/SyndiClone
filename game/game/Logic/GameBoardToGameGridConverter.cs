@@ -56,10 +56,8 @@ namespace Game.Logic
             Vector size = new Vector (build.Length, build.Width);
             Vector realSize = new Vector(size.X * TILE_SIZE_CONVERSION, size.Y * TILE_SIZE_CONVERSION);
             int sizeModifier = (size.X * size.Y);
-            SFML.Graphics.Sprite sprite = new SFML.Graphics.Sprite(build.Img);
             //TODO - why do I need to flip x & y?!
-            sprite.Position = new SFML.Graphics.Vector2(build.StartY * TILE_SIZE_CONVERSION, build.StartX * TILE_SIZE_CONVERSION);
-            return new Game.Logic.Entities.Building(BASE_BUILD_REACTION_TIME / sizeModifier, civBuildReact, BASE_BUILD_HEALTH * sizeModifier, realSize, Affiliation.INDEPENDENT, Sight.instance(SightType.CIV_SIGHT), sprite);
+            return new Game.Logic.Entities.Building(BASE_BUILD_REACTION_TIME / sizeModifier, civBuildReact, BASE_BUILD_HEALTH * sizeModifier, realSize, Affiliation.INDEPENDENT, Sight.instance(SightType.CIV_SIGHT));
         }
 
         /*

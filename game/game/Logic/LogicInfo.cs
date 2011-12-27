@@ -259,15 +259,15 @@ namespace Game.Logic
     internal struct DestroyEvent : BufferEvent
     {
         private readonly Area _area;
-        private readonly Entity _ent;
+        private readonly ExternalEntity _ent;
 
         internal DestroyEvent(Area area, Entity ent)
         {
             this._area = area;
-            this._ent = ent;
+            this._ent = new ExternalEntity (ent);
         }
 
-        internal Entity Ent
+        internal ExternalEntity Ent
         {
             get { return _ent; }
         }
@@ -285,18 +285,14 @@ namespace Game.Logic
 
     internal struct MoveEvent : BufferEvent
     {
-        private readonly Area _exit;
+
         private readonly Area _entry;
-        private readonly MovingEntity _mover;
+        private readonly ExternalEntity _mover;
         private readonly int _rotation;
 
-
-
-
-        internal MoveEvent(Area exit, Area entry, MovingEntity mover, int rotation)
+        internal MoveEvent(Area entry, ExternalEntity mover, int rotation)
         {
             this._entry = entry;
-            this._exit = exit;
             this._mover = mover;
             this._rotation = rotation;
         }
@@ -306,7 +302,7 @@ namespace Game.Logic
             get { return _rotation; }
         } 
 
-        internal MovingEntity Mover
+        internal ExternalEntity Mover
         {
             get { return _mover; }
         }
@@ -314,11 +310,6 @@ namespace Game.Logic
         internal Area Entry
         {
             get { return _entry; }
-        }
-
-        public Area Exit
-        {
-            get { return _exit; }
         }
 
         public BufferType type()
