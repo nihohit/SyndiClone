@@ -11,14 +11,14 @@ namespace Game.Graphic_Manager
         HashSet<Sprite> displayedSprites;
         HashSet<Sprite> removedSprites;
         HashSet<Animation> animations;
+        Sprite back;
 
 
         public DisplayManager(uint x, uint y, uint bits, Game.Buffers.DisplayBuffer buffer, Image background)
         {
             this._buffer = buffer;
             this._mainWindow = new RenderWindow(new VideoMode(x, y, bits), "main display");
-            Sprite back = new Sprite(background);
-            this._mainWindow.Draw(back);
+            back = new Sprite(background);
             displayedSprites = new HashSet<Sprite>();
             removedSprites = new HashSet<Sprite>();
             animations = new HashSet<Animation>();
@@ -51,6 +51,8 @@ namespace Game.Graphic_Manager
 
         public void loop()
         {
+            this._mainWindow.Clear();
+            this._mainWindow.Draw(back);
             this.updateInfo();
             this.display();
         }

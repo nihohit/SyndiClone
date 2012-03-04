@@ -87,6 +87,7 @@ namespace Game.Logic
             List<ExternalEntity> newList = new List<ExternalEntity>();
             foreach(Entity ent in activeEntities)
             {
+                //TODO - remove redundat creation of external entities - by using a list from the grid?
                 newList.Add(new ExternalEntity(ent, this._grid.getPosition(ent)));
             }
             displayBuffer.receiveVisibleEntities(newList);

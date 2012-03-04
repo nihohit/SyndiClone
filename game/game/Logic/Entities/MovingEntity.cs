@@ -27,7 +27,11 @@ namespace Game.Logic.Entities
         {
             this._speed = speed;
             this._path = path;
-            this._headed = path.First.Value;
+            if (path != null && path.Count !=0)
+                this._headed = path.First.Value;
+            else
+                this._headed = Direction.DOWN;
+
         }
 
         /******************

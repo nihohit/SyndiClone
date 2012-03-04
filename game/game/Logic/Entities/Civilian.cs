@@ -30,7 +30,7 @@ namespace Game.Logic.Entities
         ****************/
 
         internal Civilian() :
-            base(CIV_REACTION_TIME, civReact, CIV_HEALTH, Affiliation.INDEPENDENT, Sight.instance(SightType.CIV_SIGHT), CIV_SPEED, new LinkedList<Direction>())
+            base(CIV_REACTION_TIME, civReact, CIV_HEALTH, Affiliation.CIVILIAN, Sight.instance(SightType.CIV_SIGHT), CIV_SPEED, new LinkedList<Direction>())
         {
             this.newPathFlag = true;
             this.fleeing = false;

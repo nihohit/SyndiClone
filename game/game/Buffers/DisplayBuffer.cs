@@ -65,13 +65,22 @@ namespace Game.Buffers
                         break;
                     case BufferType.MOVE:
                         ExternalEntity mover = ((MoveEvent)action).Mover;
-                        Sprite toRemove = this.spriteLoopFinder[mover].getSprite();
-                        this.removedSprites.Add(toRemove);
-                        Sprite movement = this.spriteLoopFinder[mover].Next();
+                        Sprite movement = null;
+                        if (mover.Type == Logic.entityType.VEHICLE)
+                        {
+                            Sprite toRemove = this.spriteLoopFinder[mover].getSprite();
+                            this.removedSprites.Add(toRemove);
+                            movement = this.spriteLoopFinder[mover].Next();
+                        }
+                        else
+                        {
+                            movement = this.finder.getSprite(mover);
+                        }
                         movement.Rotation = ((MoveEvent)action).Rotation;
                         Vector2 position = new Vector2(mover.Position.X, mover.Position.Y);
                         movement.Position = position;
                         //TODO - generate turning animation
+                        this.displaySprites.Add(movement);
                         break;
                     case BufferType.CREATE:
                         //TODO

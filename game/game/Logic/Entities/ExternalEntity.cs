@@ -10,7 +10,7 @@ namespace Game.Logic.Entities
         private readonly Vector _size;
         private readonly entityType _type;
         private readonly Affiliation _loyalty;
-        private readonly Vector _position;
+        private Vector _position;
         private readonly Entity _ent;
 
         internal ExternalEntity(Entity ent, Vector position)
@@ -45,6 +45,7 @@ namespace Game.Logic.Entities
         internal Vector Position
         {
             get { return _position; }
+            set { _position = value; }
         }
 
         internal Affiliation Loyalty
@@ -62,5 +63,9 @@ namespace Game.Logic.Entities
             get { return _ent; }
         } 
 
+        public bool Equals(ExternalEntity obj)
+        {
+            return this.Ent.Equals(obj.Ent);
+        }
     }
 }

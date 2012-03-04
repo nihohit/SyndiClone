@@ -19,10 +19,10 @@ namespace Game.Logic
         delegate boolPointOperator CurriedPointOperator(Entity entity); //These are the curried version, which curry and entity for the question
 
         /******************
-        Getters & setters
+        Fields
         ****************/
-        
-        
+
+        private readonly Dictionary<Entity, ExternalEntity> entities;
         private readonly Dictionary<Entity, Area> locations;
         private readonly Entity[,] gameGrid;
         private readonly List<BufferEvent> actionsDone;
@@ -36,7 +36,8 @@ namespace Game.Logic
         {
             this.gameGrid = grid;
             this.actionsDone = new List<BufferEvent>();
-            this.locations = new Dictionary<Entity, Area>(); 
+            this.locations = new Dictionary<Entity, Area>();
+            this.entities = new Dictionary<Entity, ExternalEntity>();
         }
 
         /******************
@@ -305,7 +306,20 @@ namespace Game.Logic
             };
 
             iterateOverArea(toSwitch, putEntityInArea(ent));
-            this.addEvent(new MoveEvent(toSwitch, new ExternalEntity(ent, new Vector(location.Entry)), rotation));
+            //TODO - remove redundat creation of external entities
+            if (this.entities.ContainsKey(ent))
+            {
+                ExternalEntity newEnt = this.entities[ent];
+                newEnt.Position = new Vector(location.Entry);
+                this.addEvent(new MoveEvent(toSwitch, newEnt, rotation));
+            }
+            else
+            {
+                ExternalEntity newEnt = new ExternalEntity(ent, new Vector(location.Entry));
+                this.addEvent(new MoveEvent(toSwitch, newEnt, rotation));
+                this.entities.Add(ent, newEnt);
+
+            }
             this.locations[ent] = toSwitch;
         }
 
@@ -489,6 +503,7 @@ namespace Game.Logic
         {
             this.addEvent(new DestroyEvent(this.locations[ent], ent));
             locations.Remove(ent);
+            this.entities.Remove(ent);
             this.removeFromLocation(ent);
         }
 

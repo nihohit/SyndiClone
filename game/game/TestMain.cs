@@ -25,9 +25,55 @@ namespace Game
             {
                 buildings.Add(new Game.Logic.Entities.ExternalEntity(Logic.GameBoardToGameGridConverter.convertBuilding(build), new Vector (build.StartX*32, build.StartY *32)));
             }
+            Logic.Entities.ExternalEntity civ = new Logic.Entities.ExternalEntity(new Logic.Entities.Civilian(), new Vector(0, 0));
+            buildings.Add(civ);
             disp.receiveVisibleEntities(buildings);
-
             display.loop();
+            List<Logic.BufferEvent> list = new List<Logic.BufferEvent>();
+            Random generator = new Random();
+            Vector nextLocation = new Vector(generator.Next(-2, 2), generator.Next(-2, 2));
+            int check = 0;
+
+            while (true)
+            {
+                if (check == 100)
+                {
+                    check = 0;
+                    int x,y;
+                    if (civ.Position.X > 0)
+                    {
+                        x = generator.Next(-2, 2);
+                    }
+                    else
+                    {
+                        x = generator.Next(0, 2);
+                    }
+                    if (civ.Position.Y > 0)
+                    {
+                        y = generator.Next(-2, 2);
+                    }
+                    else
+                    {
+                        y = generator.Next(0, 2);
+                    }
+                    nextLocation = new Vector(x, y);
+                }
+                Console.WriteLine("move now " + nextLocation.ToString());
+                Logic.Area area = new Logic.Area(new Point(civ.Position.X, civ.Position.Y), nextLocation);
+                Logic.BufferEvent eventMove = new Logic.MoveEvent(area, civ, 1);
+                list.Add(eventMove);
+                disp.receiveActions(list);
+                display.loop();
+                list.Clear();
+                civ.Position = new Vector(civ.Position.X + nextLocation.X, civ.Position.Y + nextLocation.Y);
+                check++;
+                for (int i = 0; i < 10000000; i++)
+                {
+                    i++;
+                    i--;
+                }
+            }
+
 
             Console.ReadKey();
             //System.Console.ReadKey();

@@ -11,8 +11,6 @@ namespace Game.Buffers
     //Just some random stuff for the class
     enum BuildingStyle { BLUE, RED, GREEN, YELLOW }
 
-    
-
     internal class Block
     {
         const int TILE_SIZE = 32;
@@ -41,28 +39,46 @@ namespace Game.Buffers
         }
     }
     
-    abstract class ImageFinder
+    internal abstract class ImageFinder
     {
         internal abstract SFML.Graphics.Sprite getSprite(ExternalEntity ent);
         internal abstract SFML.Graphics.Sprite getSpriteLoop(ExternalEntity ent);
     }
 
-    class SpriteFinder : ImageFinder
+    internal class SpriteFinder : ImageFinder
     {
         const int TILE_SIZE = 32;
-
-        private Dictionary <ExternalEntity, SFML.Graphics.Sprite> finder = new Dictionary<ExternalEntity, SFML.Graphics.Sprite>();
-        private static Dictionary<ExternalEntity, Image> buildings = new Dictionary<ExternalEntity, Image>();
+        private Dictionary<ExternalEntity, SFML.Graphics.Sprite> finder = new Dictionary<ExternalEntity, SFML.Graphics.Sprite>();
+        private static Dictionary<ExternalEntity, Image> buildings = new Dictionary<ExternalEntity, Image>(new externalEntityEqualityComparer());
         private static Dictionary<Tuple<Block, BuildingStyle>, Image> templates = new Dictionary<Tuple<Block, BuildingStyle>, Image>(new tupleEqualityComparer());
+        private Dictionary<Logic.Affiliation, Image> personFinder = new Dictionary<Logic.Affiliation, Image>();
+
+        internal SpriteFinder()
+        {
+            personFinder.Add(Logic.Affiliation.INDEPENDENT, new Bitmap(entity_images.person_black));
+            personFinder.Add(Logic.Affiliation.CORP1, new Bitmap(entity_images.person_green));
+            personFinder.Add(Logic.Affiliation.CORP2, new Bitmap(entity_images.person_blue));
+            personFinder.Add(Logic.Affiliation.CORP3, new Bitmap(entity_images.person_red));
+            personFinder.Add(Logic.Affiliation.CORP4, new Bitmap(entity_images.person_purple));
+            personFinder.Add(Logic.Affiliation.CIVILIAN, new Bitmap(entity_images.person_yellow));
+            
+        }
 
         internal override SFML.Graphics.Sprite getSprite(ExternalEntity ent)
         {
             SFML.Graphics.Sprite sprite = null;
-            if (!finder.ContainsKey(ent))
+            if (finder.ContainsKey(ent))
             {
-                sprite = this.generateNewSprite(ent);
+                sprite = finder[ent];
+                
             }
-            sprite = finder[ent];
+            else
+            {
+                Console.WriteLine(finder.ContainsKey(ent));
+                Console.WriteLine("couldn't find the sprite!");
+                sprite = this.generateNewSprite(ent);
+                finder.Add(ent, sprite);
+            }
             return sprite;
         }
 
@@ -74,10 +90,17 @@ namespace Game.Buffers
                 case(Game.Logic.entityType.BUILDING):
                     sprite = new SFML.Graphics.Sprite(this.getBuildingSFMLImage(ent));
                     break;
+
+                case(Logic.entityType.PERSON):
+                    Image temp = personFinder[ent.Loyalty];
+                    MemoryStream stream = new MemoryStream();
+                    temp.Save(stream, ImageFormat.Png);
+                    sprite = new SFML.Graphics.Sprite(new SFML.Graphics.Image(stream));
+                    stream.Dispose();
+                    break;
                 //TODO - cases missing
 
             }
-            finder.Add(ent, sprite);
             return sprite;
         }
 
@@ -93,7 +116,9 @@ namespace Game.Buffers
             /*magic code to convert from the Drawing image to SFML image)*/
             MemoryStream stream = new MemoryStream();
             image.Save(stream, ImageFormat.Png);
-            return new SFML.Graphics.Image(stream);
+            SFML.Graphics.Image temp = new SFML.Graphics.Image(stream);
+            stream.Dispose();
+            return temp;
         }
 
         internal static Image GetBuildingImage(ExternalEntity building)
@@ -242,6 +267,23 @@ namespace Game.Buffers
         public int GetHashCode(Tuple<Block, BuildingStyle> item)
         {
             int hCode = item.Item1.X * item.Item1.Y * item.Item2.GetHashCode();
+            return hCode.GetHashCode();
+        }
+
+    }
+
+    class externalEntityEqualityComparer : IEqualityComparer<ExternalEntity>
+    {
+
+        public bool Equals(ExternalEntity first, ExternalEntity second)
+        {
+            return (first.Ent.Equals(second.Ent));
+        }
+
+
+        public int GetHashCode(ExternalEntity item)
+        {
+            int hCode = item.Ent.GetHashCode();
             return hCode.GetHashCode();
         }
 
