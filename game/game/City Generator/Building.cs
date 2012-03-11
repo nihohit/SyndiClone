@@ -16,12 +16,14 @@ namespace Game.City_Generator
         Block _dimensions; //holding the location and dimensions of the building in the already existing block type;
         Corporate _corp;
         int _owner;
+        private int _exitDirection;
 
        /********************************constructor***************************************/
         internal Building(Block dim) {
             _dimensions = dim;
             _corp = null;
             _owner = -1;
+            this._exitDirection = 0;
         }
 
         /********************************Properties***************************************/
@@ -61,6 +63,12 @@ namespace Game.City_Generator
             get { return _corp; }
         }
 
+        public int ExitDirection
+        {
+            get { return _exitDirection; }
+            set { _exitDirection = value; }
+        }
+
 
         /**********************************Simple methods*********************************/
         internal bool hasCorp() { return _corp != null; }
@@ -73,5 +81,6 @@ namespace Game.City_Generator
             if (_corp != null)
                 _corp.addBuilding(this);
         }
+
     }
 }

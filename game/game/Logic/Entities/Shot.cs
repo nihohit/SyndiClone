@@ -31,8 +31,10 @@ namespace Game.Logic.Entities
             {
                 switch (type)
                 {
+                    case(ShotType.SIGHT):
+                        break;
 
-                    //missing types
+                    //TODO - missing types
 
                 }
             }

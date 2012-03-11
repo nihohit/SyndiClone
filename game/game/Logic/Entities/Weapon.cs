@@ -39,8 +39,9 @@ namespace Game.Logic.Entities
             {
                 switch (type)
                 {
-
-                    //missing types
+                    case(WeaponType.ASSAULT):
+                        break;
+                    //TODO - missing types
 
                 }
             }

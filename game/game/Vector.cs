@@ -93,7 +93,12 @@ namespace Game
             else { return ((this._x == ((Vector)obj).X) && (this._y == ((Vector)obj).Y)); }
         }
 
-        public string ToString()
+        public override int GetHashCode()
+        {
+            return _x.GetHashCode()+_y.GetHashCode();
+        }
+
+        public override string ToString()
         {
             return "Vector " + this.X + " , " + this.Y;
         }

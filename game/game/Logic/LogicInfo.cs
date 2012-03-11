@@ -202,6 +202,11 @@ namespace Game.Logic
         {
         }
 
+        public UniqueList(UniqueList<T> old)
+            : base(old)
+        {
+        }
+
         public void uniqueAdd(T obj)
         {
             if (!base.Contains(obj)) base.Add(obj);
@@ -315,6 +320,33 @@ namespace Game.Logic
         public BufferType type()
         {
             return BufferType.MOVE;
+        }
+    }
+
+    internal struct CreateEvent : BufferEvent
+    {
+        private readonly ExternalEntity _mover;
+        private readonly Area _location;
+
+        internal CreateEvent(ExternalEntity _mover, Area location)
+        {
+            this._mover = _mover;
+            this._location = location;
+        }
+
+        internal Area Location
+        {
+            get { return _location; }
+        }
+
+        internal ExternalEntity Mover
+        {
+            get { return _mover; }
+        } 
+
+        public BufferType type()
+        {
+            return BufferType.CREATE;
         }
     }
 

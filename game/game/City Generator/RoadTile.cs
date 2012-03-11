@@ -19,7 +19,7 @@ namespace Game.City_Generator
         internal const int WEST = 0, NORTH = 1, EAST = 2, SOUTH = 3;
 
         /********************************Fields***************************************/
-        Point _loc;
+        //Point _loc;
         int _vWidth,_hWidth;
         int _vOffset,_hOffset; //how many steps till getting to either the north or west corner, depending on direction.
         //TODO: decide whether junctions need info about all their directions.

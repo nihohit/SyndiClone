@@ -54,10 +54,9 @@ namespace Game.Logic.Entities
             return (this._health <= 0);
         }
 
-        virtual internal Reaction resolveOrders()
+        virtual internal void resolveOrders()
         {
             this.Reaction = this.HowReact(this.WhatSees);
-            return this.Reaction;
         }
 
         internal virtual bool doesReact()
@@ -87,6 +86,11 @@ namespace Game.Logic.Entities
         /******************
         Getters & setters
         ****************/
+        public int ReactionTime
+        {
+            get { return _reactionTime; }
+        } 
+
 
         internal Reaction Reaction
         {

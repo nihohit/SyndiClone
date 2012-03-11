@@ -26,6 +26,7 @@ namespace Game.Logic
         private readonly Dictionary<Entity, Area> locations;
         private readonly Entity[,] gameGrid;
         private readonly List<BufferEvent> actionsDone;
+        private readonly UniqueList<ExternalEntity> visible;
         //TODO - add corporations?
 
         /******************
@@ -38,6 +39,7 @@ namespace Game.Logic
             this.actionsDone = new List<BufferEvent>();
             this.locations = new Dictionary<Entity, Area>();
             this.entities = new Dictionary<Entity, ExternalEntity>();
+            this.visible = new UniqueList<ExternalEntity>();
         }
 
         /******************
@@ -45,6 +47,16 @@ namespace Game.Logic
         ****************/ 
 
         //////////COMMUNICATION LOGIC////////
+
+        internal List<ExternalEntity> getVisibleEntities()
+        {
+            return this.visible;
+        }
+
+        internal void clearVisibleEntities()
+        {
+            this.visible.Clear();
+        }
 
         internal Vector getPosition(Entity ent)
         {
@@ -75,29 +87,6 @@ namespace Game.Logic
             Point ans = grid[x, y];
             return ans;
         } 
-
-        /*
-         * this function adds an entity to the board, from another entity. Basically, a unit constructed from a building.
-         */
-        internal void addEntity(Entity ent, Entity from, Vector displacement)
-        {
-            //TODO - convert data & call the next addEntity
-        }
-
-
-        /*
-         * This function adds an entity to a certain area
-         */
-        internal void addEntity(Entity ent, Area area)
-        {
-            //TODO - missing function
-            Point[,] loc = new Point[ent.Size.X, ent.Size.Y];
-            //TODO - if (gameGrid[loc.getX, loc.Y] != null) throw new LocationFullException(loc.ToString() + " " + gameGrid[loc.getX, loc.getY].ToString());
-            //else
-            {
-
-            }
-        }
 
         /*
          * This function adds events to be reported to future buffers
@@ -468,32 +457,39 @@ namespace Game.Logic
             if (x0 < x1) sx = 1; else sx = -1;
             if (y0 < y1) sy = 1; else sy = -1;
             int err = dx-dy;
+
             while (!(x0 == x1 & y0 == y1))
             {
                 Entity ent = gameGrid[x0, y0];
-                effect(ent);
-                if (ent.destroyed())
+                if (ent != null)
                 {
-                    this.destroy(ent);
-                }
-                if (blocked(ent.Visible)) break;
-                e2 = 2 * err;
-                if (e2 > -dy)
-                {
-                    err = err - dy;
-                    x0 = x0 + sx;
-                }
-                if (e2 < dx)
-                {
-                    err = err + dx;
-                    y0 = y0 + sy;
+                    effect(ent);
+                    if (ent.destroyed())
+                    {
+                        this.destroy(ent);
+                    }
+                    if (blocked(ent.Visible)) break;
+                    e2 = 2 * err;
+                    if (e2 > -dy)
+                    {
+                        err = err - dy;
+                        x0 = x0 + sx;
+                    }
+                    if (e2 < dx)
+                    {
+                        err = err + dx;
+                        y0 = y0 + sy;
+                    }
+                    this.visible.Add(this.entities[ent]);
                 }
             }
+
             Point res = new Point(x0, y0);
 
             if (!(shot.Type == ShotType.SIGHT))
             {
                 this.addEvent(new ShotEvent(shot.Type, exit, res));
+
             }
 
             return res;
@@ -505,6 +501,42 @@ namespace Game.Logic
             locations.Remove(ent);
             this.entities.Remove(ent);
             this.removeFromLocation(ent);
+        }
+
+        /**************
+         construction logic
+         **************/
+
+        /*
+         * This function adds an entity to a certain area
+         */
+        internal void addEntity(Entity ent, Area area)
+        {
+            Point[,] loc = new Point[ent.Size.X, ent.Size.Y];
+            //TODO - if (gameGrid[loc.getX, loc.Y] != null) throw new LocationFullException(loc.ToString() + " " + gameGrid[loc.getX, loc.getY].ToString());
+            //else
+            this.locations.Add(ent, area);
+            foreach (Point point in area.getPointArea())
+            {
+                this.gameGrid[point.X, point.Y] = ent;
+            }
+            ExternalEntity temp = new ExternalEntity(ent);
+            this.entities.Add(ent, temp);
+            this.addEvent(new CreateEvent(temp, area));
+        }
+
+        internal void resolveConstruction(Constructor constructor, MovingEntity entity)
+        {
+            if (constructor.readyToConstruct())
+            {
+                this.addEntity(entity, findConstructionSpot(constructor, entity));
+                //TODO - add the transition of the entity from the center of the building to outside. currently just pops out. 
+            }
+        }
+
+        private Area findConstructionSpot(Constructor constructor, Entity ent)
+        {
+            return new Area(new Point(this.locations[(Entity)constructor].Entry, constructor.exitPoint()), ent.Size);
         }
 
     }

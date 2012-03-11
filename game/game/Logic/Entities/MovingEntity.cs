@@ -31,7 +31,6 @@ namespace Game.Logic.Entities
                 this._headed = path.First.Value;
             else
                 this._headed = Direction.DOWN;
-
         }
 
         /******************
@@ -100,5 +99,6 @@ namespace Game.Logic.Entities
         {
             this._size = new Vector(this._size.Y, this._size.X);
         }
+
     }
 }

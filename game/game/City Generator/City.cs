@@ -103,8 +103,8 @@ namespace Game.City_Generator
                 int retVal;
                 max = Math.Min(max, ARR_SIZE - 1);
 
-                double step = DECREASE_FACTOR / (ARR_SIZE - 3);//"-3" is meant to represent the fact that I'm not increasing the size of places 0,1 and i;
-                double total = 0;
+                //double step = DECREASE_FACTOR / (ARR_SIZE - 3);//"-3" is meant to represent the fact that I'm not increasing the size of places 0,1 and i;
+                //double total = 0;
                 double rand = _rand.NextDouble() * _vPlaces[Math.Min(max, ARR_SIZE - 1)]; 
                 for (retVal = 2; ((rand > _vPlaces[retVal])&&(retVal<=max)); ++retVal) ; //make sure that retVal is not higher than max (in case of non-positive probabilities)
                /* for (int j = 2; j < ARR_SIZE; ++j)
@@ -130,8 +130,8 @@ namespace Game.City_Generator
                  //   Console.Out.WriteLine("H: Overshot. max is:" + max + " and the array is just:" + ARR_SIZE);//TODO - remove (debug)
 
                 int retVal;
-                double step = DECREASE_FACTOR / (ARR_SIZE - 3);//"-3" is meant to represent the fact that I'm not increasing the size of places 0,1 and i;
-                double total = 0;
+                //double step = DECREASE_FACTOR / (ARR_SIZE - 3);//"-3" is meant to represent the fact that I'm not increasing the size of places 0,1 and i;
+                //double total = 0;
                 max = Math.Min(max, ARR_SIZE - 1);
                 double rand = _rand.NextDouble() * _hPlaces[max];
                 for (retVal = 2; (rand > _hPlaces[retVal])&&(retVal<=max); ++retVal) ;
@@ -477,6 +477,7 @@ namespace Game.City_Generator
                         {
                             //Console.Out.WriteLine("(" + b.StartY + "," + b.StartX + ") ---ROAD Below");
                             //continue;
+                            b.ExitDirection = 3;
                             connected = true;
                         }
                     }
@@ -487,6 +488,7 @@ namespace Game.City_Generator
                         {
                            // Console.Out.WriteLine("("+b.StartY+","+b.StartX+") ---ROAD above");
                             //continue;
+                            b.ExitDirection = 2;
                             connected = true;
                         }
                     }
@@ -496,6 +498,7 @@ namespace Game.City_Generator
                         {
                             //Console.Out.WriteLine("(" + b.StartY + "," + b.StartX + ") ---ROAD to Left");
                             //continue;
+                            b.ExitDirection = 0;
                             connected = true;
                         }
                     }
@@ -506,6 +509,7 @@ namespace Game.City_Generator
                         {
                             // Console.Out.WriteLine("(" + b.StartY + "," + b.StartX + ") ---ROAD to Right");
                             //continue;
+                            b.ExitDirection = 1;
                             connected = true;
                         }
                     }

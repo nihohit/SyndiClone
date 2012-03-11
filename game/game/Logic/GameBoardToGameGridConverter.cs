@@ -9,10 +9,8 @@ namespace Game.Logic
         /******************
         class consts
         ****************/
-        
+
         const int TILE_SIZE_CONVERSION = 32;
-        const int BASE_BUILD_REACTION_TIME = 200;
-        const int BASE_BUILD_HEALTH = 10;
 
 
         /******************
@@ -36,16 +34,8 @@ namespace Game.Logic
                 Area area = convertToArea(origin);
                 grid.addEntity(result, area);
             }
+            //TODO - insert police/other buildings
             return grid;
-        }
-
-        /*
-         * This function is just the basic reaction function for the basic civic buildings.
-         */
-        public static Reaction civBuildReact(List<Entity> ent)
-        {
-            //TODO - missing function
-            return new Reaction(null, Action.IGNORE);
         }
 
         /*
@@ -53,11 +43,32 @@ namespace Game.Logic
          */
         public static Game.Logic.Entities.Building convertBuilding(Game.City_Generator.Building build)
         {
-            Vector size = new Vector (build.Length, build.Width);
-            Vector realSize = new Vector(size.X * TILE_SIZE_CONVERSION, size.Y * TILE_SIZE_CONVERSION);
-            int sizeModifier = (size.X * size.Y);
+            Vector realSize = new Vector(build.Length * TILE_SIZE_CONVERSION, build.Width * TILE_SIZE_CONVERSION);
+            int sizeModifier = (build.Width * build.Length);
             //TODO - why do I need to flip x & y?!
-            return new Game.Logic.Entities.Building(BASE_BUILD_REACTION_TIME / sizeModifier, civBuildReact, BASE_BUILD_HEALTH * sizeModifier, realSize, Affiliation.INDEPENDENT, Sight.instance(SightType.CIV_SIGHT));
+            return new Game.Logic.Entities.CivilianBuilding(realSize,sizeModifier, getExitVector(build));
+        }
+
+        private static Vector getExitVector(City_Generator.Building build)
+        {
+            int x = 0 , y = 0;
+            switch (build.ExitDirection)
+            {
+                case(0):
+                    x = -1;
+                    break;
+                case (1):
+                    x = 1;
+                    break;
+                case (2):
+                    y = -1;
+                    break;
+                case (3):
+                    y = 1;
+                    break;
+            }
+
+            return new Vector(x * build.Dimensions.Length, y * build.Dimensions.Width);
         }
 
         /*

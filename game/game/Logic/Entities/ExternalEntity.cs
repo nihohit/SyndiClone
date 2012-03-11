@@ -67,5 +67,10 @@ namespace Game.Logic.Entities
         {
             return this.Ent.Equals(obj.Ent);
         }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
     }
 }
