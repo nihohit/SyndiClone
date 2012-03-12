@@ -17,19 +17,27 @@ namespace Game.City_Generator
         Corporate _corp;
         int _owner;
         private int _exitDirection;
+        int _id;
 
        /********************************constructor***************************************/
-        internal Building(Block dim) {
+        internal Building(Block dim, int id) {
             _dimensions = dim;
             _corp = null;
             _owner = -1;
             this._exitDirection = 0;
+            this._id = id;
         }
 
         /********************************Properties***************************************/
         public int StartX { 
             get {return _dimensions.StartX;}
             set { _dimensions.StartX = value; }
+        }
+
+        public int Id
+        {
+            get { return _id; }
+            set { _id = value; }
         }
 
         public int StartY {
@@ -42,9 +50,9 @@ namespace Game.City_Generator
             set { _dimensions.Length = value; }
         }
 
-        public int Width {
-            get { return _dimensions.Width; }
-            set { _dimensions.Width = value; }
+        public int Depth {
+            get { return _dimensions.Depth; }
+            set { _dimensions.Depth = value; }
         }
 
         public int Owner {

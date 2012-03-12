@@ -40,7 +40,7 @@ namespace Game
             System.IO.StreamWriter file = new System.IO.StreamWriter("city.mf");
             for (int i = 0; i < city.Length; ++i)
             {
-                for (int j = 0; j < city.Width; ++j)
+                for (int j = 0; j < city.Depth; ++j)
                 {
                     Console.Out.Write(grid[i, j]);
                     file.Write(grid[i, j]);

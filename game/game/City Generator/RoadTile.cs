@@ -5,7 +5,7 @@ using System.Text;
 
 /**
  * RoadTile is one of the possible tiles in the initial grid. 
- * it holds the road-tile, the direction in which the road is going, the roads width
+ * it holds the road-tile, the direction in which the road is going, the roads depth
  * */
 namespace Game.City_Generator
 {
@@ -20,7 +20,7 @@ namespace Game.City_Generator
 
         /********************************Fields***************************************/
         //Point _loc;
-        int _vWidth,_hWidth;
+        int _vDepth,_hDepth;
         int _vOffset,_hOffset; //how many steps till getting to either the north or west corner, depending on direction.
         //TODO: decide whether junctions need info about all their directions.
         private int _exitsNum;
@@ -34,21 +34,21 @@ namespace Game.City_Generator
             //_loc = new Point(x, y);
             _hOffset = 0;
             _vOffset = 0;
-            _hWidth = 1;
-            _vWidth = 1;
+            _hDepth = 1;
+            _vDepth = 1;
         }
 
 
         /********************************Properties***************************************/
-        internal int HWidth {
-            set { _hWidth = value; }
-            get { return _hWidth; }
+        internal int HDepth {
+            set { _hDepth = value; }
+            get { return _hDepth; }
         }
 
-        internal int VWidth
+        internal int VDepth
         {
-            set { _vWidth = value; }
-            get { return _vWidth; }
+            set { _vDepth = value; }
+            get { return _vDepth; }
         }
 
         internal int HOffset {

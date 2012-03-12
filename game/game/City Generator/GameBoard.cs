@@ -17,7 +17,7 @@ namespace Game.City_Generator
         protected List<Building> _buildings;
         protected Corporate[,] _corpList;
         protected Image _img;
-        protected int _len, _wid;
+        protected int _len, _dep;
 
         /********************************Properties***************************************/
         internal Tile[,] Grid 
@@ -30,9 +30,9 @@ namespace Game.City_Generator
             get { return _len; }
         }
 
-        internal int Width
+        internal int Depth
         {
-            get { return _wid; }
+            get { return _dep; }
         }
 
         internal Image Img

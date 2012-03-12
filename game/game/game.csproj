@@ -159,7 +159,17 @@
     <None Include="Buffers\images\person green.png" />
     <None Include="Buffers\images\person purple.png" />
     <None Include="Buffers\images\person red.png" />
+    <None Include="City Generator\images\0.png" />
     <Content Include="City Generator\images\0_buildingtemp.jpg" />
+    <None Include="City Generator\images\9.png" />
+    <None Include="City Generator\images\8.png" />
+    <None Include="City Generator\images\7.png" />
+    <None Include="City Generator\images\6.png" />
+    <None Include="City Generator\images\5.png" />
+    <None Include="City Generator\images\4.png" />
+    <None Include="City Generator\images\3.png" />
+    <None Include="City Generator\images\2.png" />
+    <None Include="City Generator\images\1.png" />
     <Content Include="Coding Conventions.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

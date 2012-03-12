@@ -60,6 +60,13 @@ namespace Game.City_Generator {
             }
         }
         
+        internal static System.Drawing.Bitmap _0 {
+            get {
+                object obj = ResourceManager.GetObject("_0", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
         internal static System.Drawing.Bitmap _0_buildingTemp1 {
             get {
                 object obj = ResourceManager.GetObject("_0_buildingTemp1", resourceCulture);
@@ -74,9 +81,23 @@ namespace Game.City_Generator {
             }
         }
         
+        internal static System.Drawing.Bitmap _1 {
+            get {
+                object obj = ResourceManager.GetObject("_1", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
         internal static System.Drawing.Bitmap _1_road1 {
             get {
                 object obj = ResourceManager.GetObject("_1_road1", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap _2 {
+            get {
+                object obj = ResourceManager.GetObject("_2", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -88,9 +109,23 @@ namespace Game.City_Generator {
             }
         }
         
+        internal static System.Drawing.Bitmap _3 {
+            get {
+                object obj = ResourceManager.GetObject("_3", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
         internal static System.Drawing.Bitmap _3_road1mid {
             get {
                 object obj = ResourceManager.GetObject("_3_road1mid", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap _4 {
+            get {
+                object obj = ResourceManager.GetObject("_4", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -102,9 +137,23 @@ namespace Game.City_Generator {
             }
         }
         
+        internal static System.Drawing.Bitmap _5 {
+            get {
+                object obj = ResourceManager.GetObject("_5", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
         internal static System.Drawing.Bitmap _5_road2side {
             get {
                 object obj = ResourceManager.GetObject("_5_road2side", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap _6 {
+            get {
+                object obj = ResourceManager.GetObject("_6", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -116,6 +165,13 @@ namespace Game.City_Generator {
             }
         }
         
+        internal static System.Drawing.Bitmap _7 {
+            get {
+                object obj = ResourceManager.GetObject("_7", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
         internal static System.Drawing.Bitmap _7_road3middle {
             get {
                 object obj = ResourceManager.GetObject("_7_road3middle", resourceCulture);
@@ -123,9 +179,23 @@ namespace Game.City_Generator {
             }
         }
         
+        internal static System.Drawing.Bitmap _8 {
+            get {
+                object obj = ResourceManager.GetObject("_8", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
         internal static System.Drawing.Bitmap _8_road3side {
             get {
                 object obj = ResourceManager.GetObject("_8_road3side", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap _9 {
+            get {
+                object obj = ResourceManager.GetObject("_9", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

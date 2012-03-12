@@ -23,9 +23,9 @@ namespace Game.Logic
          */
         internal static Grid convert(GameBoard board)
         {
-            int x = board.Length * TILE_SIZE_CONVERSION;
-            int y = board.Width * TILE_SIZE_CONVERSION;
-            Entity[,] gameGrid = intiateGrid(x,y);
+            int y = board.Length * TILE_SIZE_CONVERSION;
+            int x = board.Depth * TILE_SIZE_CONVERSION;
+            Entity[,] gameGrid = intiateGrid(y,x);
 
             Grid grid = new Grid(gameGrid);
             foreach(Game.City_Generator.Building origin in board.Buildings)
@@ -43,8 +43,8 @@ namespace Game.Logic
          */
         public static Game.Logic.Entities.Building convertBuilding(Game.City_Generator.Building build)
         {
-            Vector realSize = new Vector(build.Length * TILE_SIZE_CONVERSION, build.Width * TILE_SIZE_CONVERSION);
-            int sizeModifier = (build.Width * build.Length);
+            Vector realSize = new Vector(build.Depth * TILE_SIZE_CONVERSION, build.Length * TILE_SIZE_CONVERSION);
+            int sizeModifier = (build.Depth * build.Length);
             //TODO - why do I need to flip x & y?!
             return new Game.Logic.Entities.CivilianBuilding(realSize,sizeModifier, getExitVector(build));
         }
@@ -68,7 +68,7 @@ namespace Game.Logic
                     break;
             }
 
-            return new Vector(x * build.Dimensions.Length, y * build.Dimensions.Width);
+            return new Vector(x * build.Dimensions.Length, y * build.Dimensions.Depth);
         }
 
         /*
@@ -76,7 +76,7 @@ namespace Game.Logic
          */
         private static Area convertToArea(Game.City_Generator.Building build)
         {
-            return new Area(new Point (build.StartX * TILE_SIZE_CONVERSION, build.StartY * TILE_SIZE_CONVERSION), new Vector(build.Length * TILE_SIZE_CONVERSION, build.Width * TILE_SIZE_CONVERSION));
+            return new Area(new Point(build.StartY * TILE_SIZE_CONVERSION, build.StartX * TILE_SIZE_CONVERSION), new Vector(build.Length * TILE_SIZE_CONVERSION, build.Depth * TILE_SIZE_CONVERSION));
         }
 
 

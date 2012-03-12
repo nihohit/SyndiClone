@@ -132,7 +132,7 @@ namespace Game.Buffers
 
         private static System.Drawing.Image generateBuildingImage(Tuple<Block, BuildingStyle> temp)
         {
-            int width = temp.Item1.X;
+            int depth = temp.Item1.X;
             int height = temp.Item1.Y;
             BuildingStyle style = temp.Item2;
             System.Drawing.Color basic = System.Drawing.Color.Gray;
@@ -152,31 +152,31 @@ namespace Game.Buffers
                     break;
 
             }
-            Image img = new Bitmap(TILE_SIZE * width, TILE_SIZE * height);
+            Image img = new Bitmap(TILE_SIZE * depth, TILE_SIZE * height);
             List<Image> images = new List<Image>();
-            for (int i = 1; i <= width; i++)
+            for (int i = 1; i <= depth; i++)
             {
                 for (int j = 1; j <= height; j++)
                 {
-                    images.Add(getBuildingTile(width, height, i, j, style));
+                    images.Add(getBuildingTile(depth, height, i, j, style));
                 }
             }
 
             Graphics graphic = Graphics.FromImage(img);
             graphic.Clear(basic);
-            int widthOffset = 0;
+            int depthOffset = 0;
             int heightOffset = 0;
             int num = 1;
 
             foreach (Image image in images)
             {
-                graphic.DrawImage(image, new Rectangle(widthOffset, heightOffset, image.Width, image.Height));
+                graphic.DrawImage(image, new Rectangle(depthOffset, heightOffset, image.Width, image.Height));
                 num++;
 
                 heightOffset += TILE_SIZE;
                 if (heightOffset == img.Height)
                 {
-                    widthOffset += TILE_SIZE;
+                    depthOffset += TILE_SIZE;
                     heightOffset = 0;
                 }
             }
@@ -184,7 +184,7 @@ namespace Game.Buffers
             return img;
         }
 
-        private static Image getBuildingTile(int length, int width, int i, int j, BuildingStyle style)
+        private static Image getBuildingTile(int length, int depth, int i, int j, BuildingStyle style)
         {
             //TODO - account for style
             Image img = null;
@@ -201,7 +201,7 @@ namespace Game.Buffers
             {
                 id += 10;
             }
-            if (j == width)
+            if (j == depth)
             {
                 id += 90;
             }
