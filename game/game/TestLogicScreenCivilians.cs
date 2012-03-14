@@ -21,12 +21,13 @@ namespace Game
             Graphic_Manager.DisplayManager display = new Graphic_Manager.DisplayManager(30 * 32, 20 * 32, 32, disp, city.Img);
             city.Img.SaveToFile("result.jpg");
             Logic.GameLogic logic = new Logic.GameLogic(disp, input, sound, city,30);
-            while (true)
+            bool check = true;
+            while (check)
             {
-                logic.loop();
+                logic.miniLoop();
                 display.loop();
             }
-            //System.Console.ReadKey();
+            System.Console.ReadKey();
             return 1;
         }
 

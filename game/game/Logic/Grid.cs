@@ -512,7 +512,6 @@ namespace Game.Logic
          */
         internal void addEntity(Entity ent, Area area)
         {
-            Point[,] loc = new Point[ent.Size.X, ent.Size.Y];
             //TODO - if (gameGrid[loc.getX, loc.Y] != null) throw new LocationFullException(loc.ToString() + " " + gameGrid[loc.getX, loc.getY].ToString());
             //else
             this.locations.Add(ent, area);
@@ -520,7 +519,7 @@ namespace Game.Logic
             {
                 this.gameGrid[point.X, point.Y] = ent;
             }
-            ExternalEntity temp = new ExternalEntity(ent);
+            ExternalEntity temp = new ExternalEntity(ent, new Vector(area.Entry.X, area.Entry.Y));
             this.entities.Add(ent, temp);
             this.addEvent(new CreateEvent(temp, area));
         }
@@ -538,6 +537,13 @@ namespace Game.Logic
         {
             return new Area(new Point(this.locations[(Entity)constructor].Entry, constructor.exitPoint()), ent.Size);
         }
+
+
+        internal List<ExternalEntity> getAllEntities()
+        {
+            return new List<ExternalEntity>(this.entities.Values);
+        }
+
 
     }
 }

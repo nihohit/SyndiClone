@@ -123,7 +123,7 @@ namespace Game.Buffers
 
         internal static Image GetBuildingImage(ExternalEntity building)
         {
-            var temp = Tuple.Create(new Block(building.Size.X, building.Size.Y), generateStyle(building.Loyalty));
+            var temp = Tuple.Create(new Block(building.Size.Y, building.Size.X), generateStyle(building.Loyalty));
             System.Drawing.Image image = generateBuildingImage(temp);
             buildings[building] = image;
             templates[temp] = image;

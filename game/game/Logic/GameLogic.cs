@@ -65,6 +65,15 @@ namespace Game.Logic
             this.clearData();
         }
 
+        public void miniLoop()
+        {
+            this.handleInput();
+            this.listAdd();
+            this.resolveOrders();
+            this.updateOutput();
+            this.clearData();
+        }
+
         private void handleUnitCreation()
         {
             int civAmountToCreate = this.civAmountGoal - this.civAmount;
@@ -122,7 +131,7 @@ namespace Game.Logic
             //TODO - try smarter threading, with waiting only a limited time on entering. 
             displayBuffer.getLock();
             List<ExternalEntity> newList = this._grid.getVisibleEntities();
-            displayBuffer.receiveVisibleEntities(newList);
+            displayBuffer.receiveVisibleEntities(this._grid.getAllEntities());
             displayBuffer.receiveActions(actions);
             //TODO - missing function
             displayBuffer.releaseLock();

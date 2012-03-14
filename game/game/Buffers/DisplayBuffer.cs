@@ -104,7 +104,7 @@ namespace Game.Buffers
             foreach (ExternalEntity ent in visibleExternalEntityList)
             {
                 Sprite temp = finder.getSprite(ent);
-                temp.Position = new Vector2(ent.Position.Y, ent.Position.X);
+                temp.Position = new Vector2(ent.Position.X, ent.Position.Y);
                 //TODO - find a way to make sure that the sprite's position is correct.
                 displaySprites.Add(temp);
             }
