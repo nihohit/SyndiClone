@@ -53,9 +53,18 @@ namespace Game.Logic.Entities
         Methods
         ****************/
 
-        internal bool needToMove(int speed)
+        internal bool ReadyToMove(int speed)
         {
-            return reachAffect(AMOUNT_OF_MOVES_FOR_STEP, _steps, speed);
+            bool ans =  reachAffect(AMOUNT_OF_MOVES_FOR_STEP, _steps, speed);
+            if (ans)
+            {
+                _steps -= AMOUNT_OF_MOVES_FOR_STEP;
+            }
+            else
+            {
+                _steps += speed;
+            }
+            return ans;
         }
 
         internal virtual Direction getDirection()
@@ -81,16 +90,19 @@ namespace Game.Logic.Entities
 
         internal bool needFlip()
         {
-            switch (this._headed)
+            if (this._path.Count > 0)
             {
-                case Direction.DOWN:
-                    return ((this.getDirection() == Direction.LEFT) || (this.getDirection() == Direction.RIGHT));
-                case Direction.UP:
-                    return ((this.getDirection() == Direction.LEFT) || (this.getDirection() == Direction.RIGHT));
-                case Direction.RIGHT:
-                    return ((this.getDirection() == Direction.UP) || (this.getDirection() == Direction.DOWN));
-                case Direction.LEFT:
-                    return ((this.getDirection() == Direction.UP) || (this.getDirection() == Direction.DOWN));
+                switch (this._headed)
+                {
+                    case Direction.DOWN:
+                        return ((this.getDirection() == Direction.LEFT) || (this.getDirection() == Direction.RIGHT));
+                    case Direction.UP:
+                        return ((this.getDirection() == Direction.LEFT) || (this.getDirection() == Direction.RIGHT));
+                    case Direction.RIGHT:
+                        return ((this.getDirection() == Direction.UP) || (this.getDirection() == Direction.DOWN));
+                    case Direction.LEFT:
+                        return ((this.getDirection() == Direction.UP) || (this.getDirection() == Direction.DOWN));
+                }
             }
             return false;
         }

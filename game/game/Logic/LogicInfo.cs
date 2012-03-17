@@ -41,7 +41,7 @@ namespace Game.Logic
         internal Area(Area location, Vector vector)
         {
             this._entry = new Point(location.Entry, vector);
-            this._size = location.Size.addVector(vector);
+            this._size = location.Size;
         }
 
         internal Vector Size

@@ -79,16 +79,17 @@ namespace Game.Logic
             int civAmountToCreate = this.civAmountGoal - this.civAmount;
             foreach(Constructor constructor in constructors)
             {
-                switch(((Entity)constructor).Loyalty)
+                switch (((Entity)constructor).Loyalty)
                 {
-                    case(Affiliation.CIVILIAN):
+                    case (Affiliation.CIVILIAN):
                         if (civAmountToCreate > 0)
                         {
                             this._grid.resolveConstruction(constructor, constructor.getConstruct());
                             civAmountToCreate--;
+                            this.civAmount++;
                         }
                         break;
-                    case(Affiliation.INDEPENDENT):
+                    case (Affiliation.INDEPENDENT):
                         //TODO - missing function
                         break;
                     default:
@@ -155,9 +156,15 @@ namespace Game.Logic
         private void resolveOrders()
         {
             foreach (Entity ent in activeEntities)
-            { 
+            {
+                bool currentlyActed = false;
                 if (ent.doesReact())
                 {
+                    currentlyActed = true;
+                    if (ent.WhatSees == null)
+                    {
+                        this._grid.whatSees(ent);
+                    }
                     ent.resolveOrders();
                 }
                 Reaction react = ent.Reaction;
@@ -165,18 +172,30 @@ namespace Game.Logic
 
                 if (action == Action.FIRE_AT || action == Action.MOVE_WHILE_SHOOT)
                 {
-                    this.shooters.Add((Shooter)ent);
+                    Shooter temp = (Shooter)ent;
+                    if (temp.readyToShoot())
+                    {
+                        this.shooters.Add(temp);
+                    } 
                 }
 
                 if (action == Action.MOVE_TOWARDS || action == Action.MOVE_WHILE_SHOOT || action == Action.RUN_AWAY_FROM || 
                     (action == Action.IGNORE && ent.Type != entityType.BUILDING))
                 {
-                    this.movers.Add((MovingEntity)ent);
+                    MovingEntity temp = (MovingEntity)ent;
+                    if (temp.ReadyToMove(temp.Speed))
+                    {
+                        this.movers.Add(temp);
+                    }
                 }
 
                 if (action == Action.CREATE_ENTITY)
                 {
-                    this.constructors.Add((Constructor)ent);
+                    Constructor temp = (Constructor)ent;
+                    if (temp.readyToConstruct() && currentlyActed) //TODO - for structures, to make sure they update their building order. other solution?
+                    {
+                        this.constructors.Add(temp);
+                    }
                 }
             }
         }
@@ -206,7 +225,7 @@ namespace Game.Logic
             foreach (Entity t in playerUnits)
             {
                 activeEntities.uniqueAdd(t);
-                t.WhatSees = _grid.whatSees(t);
+                _grid.whatSees(t);
                 foreach (Entity temp in t.WhatSees)
                 {
                     activeEntities.uniqueAdd(temp);

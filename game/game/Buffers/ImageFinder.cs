@@ -74,8 +74,6 @@ namespace Game.Buffers
             }
             else
             {
-                Console.WriteLine(finder.ContainsKey(ent));
-                Console.WriteLine("couldn't find the sprite!");
                 sprite = this.generateNewSprite(ent);
                 finder.Add(ent, sprite);
             }

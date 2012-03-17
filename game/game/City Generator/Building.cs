@@ -71,6 +71,7 @@ namespace Game.City_Generator
             get { return _corp; }
         }
 
+        //TODO - known bug - sometimes the exit spot isn't on a road.
         public int ExitDirection
         {
             get { return _exitDirection; }

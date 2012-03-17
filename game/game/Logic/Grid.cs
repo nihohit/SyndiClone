@@ -82,8 +82,8 @@ namespace Game.Logic
         {
             Point[,] grid = this.locations[ent].getPointArea();
             int x, y;
-            if (grid.GetLength(0) % 2 == 0) x = grid.GetLength(0) / 2; else x = (grid.GetLength(0) + 1) / 2;
-            if (grid.GetLength(1) % 2 == 0) y = grid.GetLength(1) / 2; else y = (grid.GetLength(1) + 1) / 2;
+            if (grid.GetLength(0) % 2 == 0) x = grid.GetLength(0) / 2; else x = (grid.GetLength(0) - 1) / 2;
+            if (grid.GetLength(1) % 2 == 0) y = grid.GetLength(1) / 2; else y = (grid.GetLength(1) - 1) / 2;
             Point ans = grid[x, y];
             return ans;
         } 
@@ -97,7 +97,7 @@ namespace Game.Logic
         }
 
         //This function checks if any entity in the radius around the point answers the conditions in checker
-        internal UniqueList<Entity> whatSees(Entity ent)
+        internal void whatSees(Entity ent)
         {
             //TODO - look into Sight simply having a list and the given blast, instead of craeating a new list & blast for every iteration
             //Get all the relevant variables
@@ -119,7 +119,7 @@ namespace Game.Logic
 
             BlastEffect blast = BlastEffect.instance(radius, effect, blocked, ShotType.SIGHT);
 
-            return ans;
+            ent.WhatSees = ans;
         }
 
         //////////MOVEMENT LOGIC//////////
@@ -129,27 +129,26 @@ namespace Game.Logic
          */
         internal void resolveMove(MovingEntity ent)
         {
-            if (ent.needToMove(ent.Speed))
+
+            Action action = ent.Reaction.ActionChosen;
+            switch (action)
             {
-                Action action = ent.Reaction.ActionChosen;
-                switch (action)
-                {
-                    case Action.IGNORE:
-                        this.move(ent);
-                        break;
+                case Action.IGNORE:
+                    this.move(ent);
+                    break;
 
-                    case Action.RUN_AWAY_FROM:
-                        Point from = this.convertToCentralPoint(ent.Reaction.Focus);
-                        Point currentLocation = this.convertToCentralPoint(ent);
-                        Point runTo = getOppositePoint(from, currentLocation, CIV_FLEE_RANGE);
-                        ent.Path = getSimplePath(currentLocation, runTo);
-                        ((Civilian)ent).runningAway();
-                        this.move(ent);
-                        break;
-                }
+                case Action.RUN_AWAY_FROM:
+                    Point from = this.convertToCentralPoint(ent.Reaction.Focus);
+                    Point currentLocation = this.convertToCentralPoint(ent);
+                    Point runTo = getOppositePoint(from, currentLocation, CIV_FLEE_RANGE);
+                    ent.Path = getSimplePath(currentLocation, runTo);
+                    ((Civilian)ent).runningAway();
+                    this.move(ent);
+                    break;
+                //TODO - missing cases
             }
-
-            //TODO - missing function
+            
+            
         }
 
         /*
@@ -157,13 +156,38 @@ namespace Game.Logic
          */
         private void move(MovingEntity ent)
         {
-            Direction dir = ent.getDirection();
-            bool result = canMove(ent, dir);
+            Direction dir = Direction.UP;
+            if (ent.Path.Count > 0)
+            {
+                dir = ent.getDirection();
+            }
+            else
+            {
+                Point temp = this.convertToCentralPoint(ent);
+                ent.Path = this.getSimplePath(temp, this.generateRandomPoint(temp));
+                dir = ent.getDirection();
+            }
+            bool result = this.canMove(ent, dir);
             if (result)
             {
                 doMove(ent, dir);
             }
+            else
+            {
+                Point temp = this.convertToCentralPoint(ent);
+                ent.Path = this.getSimplePath(temp, this.generateRandomPoint(temp));
+            }
             ent.moveResult(result);
+        }
+
+        private Point generateRandomPoint(Point temp)
+        {
+            int maxX = Math.Min(temp.X + 50, this.gameGrid.GetLength(0)-1);
+            int minX = Math.Max(0, temp.X-50);
+            int maxY = Math.Min(temp.Y + 50, this.gameGrid.GetLength(1)-1);
+            int minY = Math.Max(0, temp.Y-50);
+            return new Point(minX, maxX, minY, maxY);
+
         }
 
 
@@ -200,17 +224,37 @@ namespace Game.Logic
             while (!(x0 == x1 & y0 == y1))
             {
                 Entity ent = gameGrid[x0, y0];
-                if (ent.Type == entityType.BUILDING) break;
+                if (ent != null && ent.Type == entityType.BUILDING) break;
                 e2 = 2 * err;
                 if (e2 > -dy)
                 {
                     err = err - dy;
                     x0 = x0 + sx;
+                    if (sx > 0)
+                    {
+                        ans.AddLast(Direction.RIGHT);
+                    }
+                    else
+                    {
+                        ans.AddLast(Direction.LEFT);
+                    }
                 }
                 if (e2 < dx)
                 {
                     err = err + dx;
                     y0 = y0 + sy;
+                    if (sy > 0)
+                    {
+                        ans.AddLast(Direction.DOWN);
+                    }
+                    else
+                    {
+                        ans.AddLast(Direction.UP);
+                    }
+                }
+                if ((y0 < 0) ||(x0 < 0) || (x0 >= this.gameGrid.GetLength(0)) || (y0 >= this.gameGrid.GetLength(1)))
+                {
+                    throw new IndexOutOfRangeException();
                 }
             }
             return ans;
@@ -226,14 +270,13 @@ namespace Game.Logic
          */
         private bool canMove(MovingEntity ent, Direction direction)
         {
-            Area areaToCheck = new Area();
             Area location = this.locations[ent];
             if(ent.needFlip())
             {
                 location.flip();
             }
 
-            areaToCheck = new Area(location, this.directionToVector(direction));
+            Area areaToCheck = new Area(location, this.directionToVector(direction));
 
             return canMove(ent, areaToCheck);
         }
@@ -248,7 +291,8 @@ namespace Game.Logic
             {
                 return delegate(Point point)
                 {
-                    return entity == this.getEntityInPoint(point);
+                    Entity temp = this.getEntityInPoint(point);
+                    return (entity == temp|| temp == null);
                 };
             };
             return iterateOverArea(area, checkEntityInArea(ent));
@@ -327,10 +371,10 @@ namespace Game.Logic
         private Direction vectorToDirection(Vector vector)
         {
             vector.normalise();
-            if (vector.Equals(new Vector(-1, 0))) return Direction.UP;
-            if (vector.Equals(new Vector(1, 0))) return Direction.DOWN;
-            if (vector.Equals(new Vector(0, -1))) return Direction.LEFT;
-            if (vector.Equals(new Vector(0, 1))) return Direction.RIGHT;
+            if (vector.Equals(new Vector(0, -1))) return Direction.UP;
+            if (vector.Equals(new Vector(0, 1))) return Direction.DOWN;
+            if (vector.Equals(new Vector(-1, 0))) return Direction.LEFT;
+            if (vector.Equals(new Vector(1, 0))) return Direction.RIGHT;
             throw new Exception("not valid direction found");
         }
 
@@ -340,16 +384,16 @@ namespace Game.Logic
             switch (direction)
             {
                 case(Direction.UP):
-                    return new Vector(-1, 0);
-
-                case(Direction.DOWN):
-                    return new Vector(1, 0);
-
-                case(Direction.LEFT):
                     return new Vector(0, -1);
 
-                case(Direction.RIGHT):
+                case(Direction.DOWN):
                     return new Vector(0, 1);
+
+                case(Direction.LEFT):
+                    return new Vector(-1, 0);
+
+                case(Direction.RIGHT):
+                    return new Vector(1, 0);
                 
                 default:
                     throw new Exception("not valid direction found");
@@ -380,10 +424,7 @@ namespace Game.Logic
 
         internal void resolveShoot(Shooter shooter, Entity target)
         {
-            if (shooter.readyToShoot())
-            {
-                shoot(shooter, target);
-            }
+             shoot(shooter, target);
         }
 
         internal void areaEffect(Entity ent, BlastEffect blast)
@@ -517,6 +558,7 @@ namespace Game.Logic
             this.locations.Add(ent, area);
             foreach (Point point in area.getPointArea())
             {
+                //if (this.gameGrid[point.X, point.Y] != null) throw new Exception();
                 this.gameGrid[point.X, point.Y] = ent;
             }
             ExternalEntity temp = new ExternalEntity(ent, new Vector(area.Entry.X, area.Entry.Y));
@@ -526,16 +568,13 @@ namespace Game.Logic
 
         internal void resolveConstruction(Constructor constructor, MovingEntity entity)
         {
-            if (constructor.readyToConstruct())
-            {
-                this.addEntity(entity, findConstructionSpot(constructor, entity));
-                //TODO - add the transition of the entity from the center of the building to outside. currently just pops out. 
-            }
+            this.addEntity(entity, findConstructionSpot(constructor, entity));
+            //TODO - add the transition of the entity from the center of the building to outside. currently just pops out. 
         }
 
         private Area findConstructionSpot(Constructor constructor, Entity ent)
         {
-            return new Area(new Point(this.locations[(Entity)constructor].Entry, constructor.exitPoint()), ent.Size);
+            return new Area(new Point(this.convertToCentralPoint((Entity)constructor), constructor.exitPoint()), ent.Size);
         }
 
 

@@ -38,7 +38,8 @@ namespace Game.Logic.Entities
          */
         public static Reaction civBuildReact(List<Entity> ent)
         {
-            return new Reaction(new Civilian(), Action.CREATE_ENTITY);
+            Civilian temp = new Civilian();
+            return new Reaction(temp, Action.CREATE_ENTITY);
         }
 
         public MovingEntity getConstruct()

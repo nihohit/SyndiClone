@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Threading;
 
 namespace Game
 {
@@ -20,11 +17,15 @@ namespace Game
             Buffers.SoundBuffer sound = new Buffers.SoundBuffer();
             Graphic_Manager.DisplayManager display = new Graphic_Manager.DisplayManager(30 * 32, 20 * 32, 32, disp, city.Img);
             city.Img.SaveToFile("result.jpg");
-            Logic.GameLogic logic = new Logic.GameLogic(disp, input, sound, city,30);
+            Logic.GameLogic logic = new Logic.GameLogic(disp, input, sound, city,100);
+            Thread logicThread = new Thread(new ThreadStart(logic.loop));
+            Thread graphicThread = new Thread(new ThreadStart(display.loop));
             bool check = true;
+            int i = 0;
             while (check)
             {
-                logic.miniLoop();
+                i++;
+                logic.loop();
                 display.loop();
             }
             System.Console.ReadKey();

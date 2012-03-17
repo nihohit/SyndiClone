@@ -322,7 +322,7 @@ namespace Game.City_Generator
 
 
         /**
-         * this method adds some info to the road tiles to determin thier type and their rotate attribute.
+         * this method adds some info to the road tiles to determine thier type and their rotate attribute.
          * */
         internal void translateRoads()
         {
@@ -429,37 +429,61 @@ namespace Game.City_Generator
 
 
         /**
-         * this method is helping me find out whether a RoadTile is connected to another road in a certain direction.
-         * */
-        private bool isConnected(int x, int y, Directions dir, int offset)
+
+* this method is helping me find out whether a RoadTile is connected to another road in a certain direction.
+
+* */
+
+        private bool isConnected(int y, int x, Directions dir, int offset)
         {
+
             switch (dir)
             {
+
                 case Directions.N:
-                    if (y - offset < 0) return false; //error. print?
-                    if (y - offset == 0) return false; //legit.
-                    if (_grid2[x,y - offset - 1].Type == ContentType.ROAD)
+
+                    if (x - offset < 0) return false; //error. print?
+
+                    if (x - offset == 0) return false; //legit.
+
+                    if (_grid2[y, x - offset - 1].Type == ContentType.ROAD)
+
                         return true;
+
                     return false;
 
                 case Directions.W:
-                    if (x - offset < 0) return false; //error.
-                    if (x - offset == 0) return false; //legit.
-                    if (_grid2[x - offset - 1,y].Type == ContentType.ROAD)
+
+                    if (y - offset < 0) return false; //error.
+
+                    if (y - offset == 0) return false; //legit.
+
+                    if (_grid2[y - offset - 1, x].Type == ContentType.ROAD)
+
                         return true;
+
                     return false;
 
                 case Directions.S:
-                    if (y + offset + 1 > _dep) return false; //error
-                    if (y + offset + 1 == _dep) return false; //legit
-                    return (_grid2[x,y + offset + 1].Type == ContentType.ROAD);
+
+                    if (x + offset + 1 > _dep) return false; //error
+
+                    if (x + offset + 1 == _dep) return false; //legit
+
+                    return (_grid2[y, x + offset + 1].Type == ContentType.ROAD);
 
                 case Directions.E:
-                    if (x + offset + 1 > _dep) return false;//error
-                    if (x + offset + 1 == _dep) return false;//legit
-                    return (_grid2[x + offset + 1,y].Type == ContentType.ROAD);
+
+                    if (y + offset + 1 > _len) return false;//error
+
+                    if (y + offset + 1 == _len) return false;//legit
+
+                    return (_grid2[y + offset + 1, x].Type == ContentType.ROAD);
+
                 default: return false; //error
+
             }
+
         }
 
         /**

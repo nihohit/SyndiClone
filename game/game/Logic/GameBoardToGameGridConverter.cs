@@ -55,20 +55,22 @@ namespace Game.Logic
             switch (build.ExitDirection)
             {
                 case(0):
-                    x = -1;
-                    break;
-                case (1):
-                    x = 1;
-                    break;
-                case (2):
                     y = -1;
                     break;
-                case (3):
+                case (1):
                     y = 1;
+                    break;
+                case (2):
+                    x = -1;
+                    break;
+                case (3):
+                    x = 1;
                     break;
             }
 
-            return new Vector(x * build.Dimensions.Length, y * build.Dimensions.Depth);
+
+            //TODO - something here is wrong, and the default exit locations seem rather random.
+            return new Vector(x * build.Dimensions.Length * TILE_SIZE_CONVERSION/2, y * build.Dimensions.Depth * TILE_SIZE_CONVERSION/2);
         }
 
         /*
