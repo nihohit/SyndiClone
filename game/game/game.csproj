@@ -77,6 +77,7 @@
     <Compile Include="Logic\Entities\ExternalEntity.cs" />
     <Compile Include="Logic\Entities\Constructor.cs" />
     <Compile Include="Logic\Entities\Person.cs" />
+    <Compile Include="Logic\Entities\PoliceStation.cs" />
     <Compile Include="Logic\Entities\Shot.cs" />
     <Compile Include="Logic\Entities\Vehicle.cs" />
     <Compile Include="Logic\GameBoardToGameGridConverter.cs" />
@@ -85,7 +86,6 @@
     <Compile Include="Logic\Entities\MovingEntity.cs" />
     <Compile Include="Logic\Entities\Entity.cs" />
     <Compile Include="Logic\GameLogic.cs" />
-    <Compile Include="City Generator\Program.cs" />
     <Compile Include="Logic\Entities\Shooter.cs" />
     <Compile Include="Logic\Entities\Sight.cs" />
     <Compile Include="Logic\Entities\Weapon.cs" />

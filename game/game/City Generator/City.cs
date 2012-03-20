@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Windows.Forms; //TODO: remove using - it's here so I can use Messagebox
+
 
 /**
  * It's a city. a pre-processing phase city, but a city nonetheless.
@@ -27,7 +25,6 @@ namespace Game.City_Generator
         private const int MIN_BLOCK_SIZE = 0; // the smaller block that will have sub-roads is of size 7X6
         private const int CORP_DIM = 20; //see "add corporates()" for use, signifies the size of each initial corporate
         private static readonly Random _rand = new Random();
-        private static char c = 'A';//TODO: remove after debug phase
 
 
         /********************************Fields***************************************/
@@ -182,15 +179,6 @@ namespace Game.City_Generator
         }
 
         /********************************Properties***************************************/
-        //TODO: remove.
-        //this section exists in the "GameBoard" parent class. here are just the redundant things. 
-        public char[,] getGrid() { return _grid; } //This is left here till later. TODO: remove.
-
-        public void setGrid(char[,] grid)
-        {
-            _grid = grid;
-        }
-
 
 
         /********************************Adding Roads To a City***************************************/
@@ -417,13 +405,9 @@ namespace Game.City_Generator
                 {
                     if (_grid2[i, j].Type != ContentType.EMPTY)
                         continue;
-                    _grid[i, j] = c;
                     _grid2[i, j] = new BuildingTile(b);
                 }
             _buildings.Add(b);
-            c++;
-            if (c > 'Z')
-                c = 'A';
 
         }
 

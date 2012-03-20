@@ -59,7 +59,10 @@ namespace Game.Logic.Entities
                 {
 
                     case (SightType.CIV_SIGHT):
-                        _sights.Add(SightType.CIV_SIGHT, new Sight(CIV_RANGE, CIV_BLOCKED, CIV_CLOAKED));
+                        _sights.Add(type, new Sight(CIV_RANGE, CIV_BLOCKED, CIV_CLOAKED));
+                        break;
+                    case(SightType.POLICE_SIGHT):
+                        _sights.Add(type, new Sight(CIV_RANGE, CIV_BLOCKED, CIV_CLOAKED));
                         break;
 
                     //TODO - missing types

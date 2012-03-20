@@ -5,7 +5,7 @@ using Game.Logic.Entities;
 namespace Game.Logic
 {
     internal delegate bool EntityChecker(Entity ent); //These functions check basic questions about entities and return a bool
-    internal delegate Point HitFunction(Point target); //These functions calculate the actual point of impact of a bullet, relative to the target
+    internal delegate Point HitFunction(Point target, int range, double weaponAcc); //These functions calculate the actual point of impact of a bullet, relative to the target
     internal delegate void Effect(Entity ent); //These functions simulate effects on entities. mostly will be damage
     internal delegate bool wasBlocked(Visibility ent); //These functions check whether an entitiy blocks a certain effect
     internal delegate Entity targetChooser(List<Entity> targets); //These functions choose which entity, out of the list of possible entities, to target
@@ -15,11 +15,11 @@ namespace Game.Logic
     internal enum entityType { PERSON, VEHICLE, BUILDING} //the different types of entities
     internal enum Visibility { CLOAKED, MASKED, REVEALED, SOLID } //the visibility of an entity
     internal enum Affiliation { INDEPENDENT, CORP1, CORP2, CORP3, CORP4, CIVILIAN } //to which player each entity belongs
-    internal enum SightType { CIV_SIGHT } //different sights
+    internal enum SightType { CIV_SIGHT, POLICE_SIGHT } //different sights
     internal enum WeaponType { PISTOL, ASSAULT, BAZOOKA, SNIPER, RAILGUN } //different weapons
     internal enum BufferType { MOVE, SHOT, DESTROY, CREATE } //different buffers for the actions that the grid returns after each loop
     internal enum BlastType { } //different blast effect
-    internal enum ShotType { SIGHT }
+    internal enum ShotType { SIGHT, PISTOL_BULLET }
     internal enum Direction { LEFT, RIGHT, UP, DOWN }
 
     internal struct Area
@@ -98,13 +98,13 @@ namespace Game.Logic
     internal static class Targeters 
     {
 
-        public static Entity threatTargeterHigh(List<Entity> entities)
+        public static Entity threatTargeterHigh(List<Entity> entities, Affiliation loyalty)
         {
             Entity target = null;
             int seenThreat = 0;
             foreach (Entity ent in entities)
             {
-                if (ent.Threat > seenThreat)
+                if ((ent.Threat > seenThreat)  && (ent.Loyalty != loyalty))
                 {
                     seenThreat = ent.Threat;
                     target = ent;
@@ -114,13 +114,13 @@ namespace Game.Logic
             return target;
         }
 
-        public static Entity speedTargeterHigh(List<Entity> entities)
+        public static Entity speedTargeterHigh(List<Entity> entities, Affiliation loyalty)
         {
             Entity target = null;
             int speed = 0;
             foreach (Entity ent in entities)
             {
-                if ((ent is MovingEntity && ((MovingEntity)ent).Speed > speed) || (ent.Type == entityType.BUILDING && target == null))
+                if ((ent is MovingEntity && ((MovingEntity)ent).Speed > speed) || (ent.Type == entityType.BUILDING && target == null) && (ent.Loyalty != loyalty))
                 {
                     speed = ((MovingEntity)ent).Speed;
                     target = ent;
@@ -130,13 +130,13 @@ namespace Game.Logic
             return target;
         }
 
-        public static Entity healthTargeterHigh(List<Entity> entities)
+        public static Entity healthTargeterHigh(List<Entity> entities, Affiliation loyalty)
         {
             Entity target = null;
             int health = 0;
             foreach (Entity ent in entities)
             {
-                if (ent.Health > health)
+                if ((ent.Health > health)  && (ent.Loyalty != loyalty))
                 {
                     health = ent.Health;
                     target = ent;
@@ -146,13 +146,13 @@ namespace Game.Logic
             return target;
         }
 
-        public static Entity threatTargeterLow(List<Entity> entities)
+        public static Entity threatTargeterLow(List<Entity> entities, Affiliation loyalty)
         {
             Entity target = null;
             int seenThreat = 10000;
             foreach (Entity ent in entities)
             {
-                if (ent.Threat < seenThreat)
+                if ((ent.Threat < seenThreat)  && (ent.Loyalty != loyalty))
                 {
                     seenThreat = ent.Threat;
                     target = ent;
@@ -162,13 +162,13 @@ namespace Game.Logic
             return target;
         }
 
-        public static Entity speedTargeterLow(List<Entity> entities)
+        public static Entity speedTargeterLow(List<Entity> entities, Affiliation loyalty)
         {
             Entity target = null;
             int speed = 10000;
             foreach (Entity ent in entities)
             {
-                if ((ent is MovingEntity && ((MovingEntity)ent).Speed < speed) || (ent.Type == entityType.BUILDING && target == null))
+                if ((ent is MovingEntity && ((MovingEntity)ent).Speed < speed) || (ent.Type == entityType.BUILDING && target == null)  && (ent.Loyalty != loyalty))
                 {
                     speed = ((MovingEntity)ent).Speed;
                     target = ent;
@@ -178,13 +178,13 @@ namespace Game.Logic
             return target;
         }
 
-        public static Entity healthTargeterLow(List<Entity> entities)
+        public static Entity healthTargeterLow(List<Entity> entities, Affiliation loyalty)
         {
             Entity target = null;
             int health = 10000;
             foreach (Entity ent in entities)
             {
-                if (ent.Health < health)
+                if ((ent.Health < health) && (ent.Loyalty != loyalty))
                 {
                     health = ent.Health;
                     target = ent;

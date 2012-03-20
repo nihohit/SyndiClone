@@ -20,9 +20,7 @@ namespace Game.Logic.Entities
         Class fields
         ****************/
 
-        private bool newPathFlag;
         private bool fleeing;
-        private int _tryToMove = 0;
         private int timeRunning = 0;
 
         /******************
@@ -32,7 +30,6 @@ namespace Game.Logic.Entities
         internal Civilian() :
             base(CIV_REACTION_TIME, civReact, CIV_HEALTH, Affiliation.CIVILIAN, Sight.instance(SightType.CIV_SIGHT), CIV_SPEED, new LinkedList<Direction>())
         {
-            this.newPathFlag = true;
             this.fleeing = false;
         }
 
@@ -47,10 +44,10 @@ namespace Game.Logic.Entities
 
         public static Reaction civReact(List<Entity> entities)
         {
-            Entity threat = Targeters.threatTargeterHigh(entities);
+            Entity threat = Targeters.threatTargeterHigh(entities, Affiliation.CIVILIAN);
             Reaction react;
 
-            if (threat == null)
+            if (threat == null) //TODO - add ignoring cops
             {
                 react = new Reaction(null, Action.IGNORE);
             }
@@ -63,30 +60,6 @@ namespace Game.Logic.Entities
             return react;
         }
 
-        internal bool needNewPath()
-        {
-            return this.newPathFlag;
-        }
-
-        internal void getNewPath(LinkedList<Direction> path)
-        {
-            this.Path = path;
-            newPathFlag = false;
-        }
-
-        internal override void moveResult(bool result)
-        {
-            base.moveResult(result);
-            if (!result) 
-            {
-                this._tryToMove++;
-            }
-            if (this.Path.Count < 2 || this._tryToMove > 1)
-            {
-                newPathFlag = true;
-                this._tryToMove = 0;
-            }
-        }
 
         internal override bool doesReact()
         {
@@ -105,5 +78,6 @@ namespace Game.Logic.Entities
             }
             return base.doesReact();
         }
+
     }
 }

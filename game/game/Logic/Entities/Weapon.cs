@@ -9,7 +9,11 @@ namespace Game.Logic.Entities
         class consts
         ****************/
         static Dictionary<WeaponType, Weapon> _weapons = new Dictionary<WeaponType, Weapon>();
-        const int timeToNextShot = 100;
+        const int PISTOL_ROF = 100;
+        const int PISTOL_RANGE = 12;
+        const int PISTOL_THREAT = 1;
+        const double PISTOL_ACC = 1.1;
+
 
         /******************
         class fields
@@ -19,12 +23,13 @@ namespace Game.Logic.Entities
         private readonly Shot _shot; //This property represents the shot type of the weapon. notice that different weapons can have the same kind of shot, but with different ranges & rates of fire
         private readonly int _rateOfFire;
         private readonly int _threat;
+        private readonly double _accuracy;
 
         /******************
         constructors
         ****************/
 
-        private Weapon(int range, int ROF, float acc, Shot shot, int threat)
+        private Weapon(int range, int ROF, double acc, Shot shot, int threat)
         {
             this._accuracy = acc;
             this._range = range;
@@ -39,7 +44,8 @@ namespace Game.Logic.Entities
             {
                 switch (type)
                 {
-                    case(WeaponType.ASSAULT):
+                    case(WeaponType.PISTOL):
+                        _weapons.Add(type, new Weapon(PISTOL_RANGE, PISTOL_ROF, PISTOL_ACC, Shot.instance(ShotType.PISTOL_BULLET) , PISTOL_THREAT));
                         break;
                     //TODO - missing types
 
@@ -75,9 +81,7 @@ namespace Game.Logic.Entities
           get { return _rateOfFire; }  
         } 
 
-        private readonly float _accuracy;
-
-        internal float acc
+        internal double Acc
         {
           get { return _accuracy; }  
         }

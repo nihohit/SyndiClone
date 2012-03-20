@@ -1,6 +1,7 @@
 ﻿using Game.Logic.Entities;
 using Game.Buffers;
 using System.Collections.Generic;
+using System;
 
 namespace Game.Logic
 {
@@ -29,6 +30,15 @@ namespace Game.Logic
         /******************
         Constructors
         ****************/
+
+        public void run()
+        {
+            while (true)
+            {
+                Console.Out.WriteLine("logic loop");
+                loop();
+            }
+        }
 
         public GameLogic(DisplayBuffer disp, InputBuffer input, SoundBuffer sound, Game.City_Generator.GameBoard city, int _civAmount)
         {
@@ -65,15 +75,6 @@ namespace Game.Logic
             this.clearData();
         }
 
-        public void miniLoop()
-        {
-            this.handleInput();
-            this.listAdd();
-            this.resolveOrders();
-            this.updateOutput();
-            this.clearData();
-        }
-
         private void handleUnitCreation()
         {
             int civAmountToCreate = this.civAmountGoal - this.civAmount;
@@ -88,9 +89,6 @@ namespace Game.Logic
                             civAmountToCreate--;
                             this.civAmount++;
                         }
-                        break;
-                    case (Affiliation.INDEPENDENT):
-                        //TODO - missing function
                         break;
                     default:
                         this._grid.resolveConstruction(constructor, constructor.getConstruct());
@@ -130,12 +128,13 @@ namespace Game.Logic
 
             }
             //TODO - try smarter threading, with waiting only a limited time on entering. 
-            displayBuffer.getLock();
-            List<ExternalEntity> newList = this._grid.getVisibleEntities();
-            displayBuffer.receiveVisibleEntities(this._grid.getAllEntities());
-            displayBuffer.receiveActions(actions);
-            //TODO - missing function
-            displayBuffer.releaseLock();
+            lock (displayBuffer)
+            {
+                List<ExternalEntity> newList = this._grid.getVisibleEntities();
+                displayBuffer.receiveVisibleEntities(this._grid.getAllEntities());
+                displayBuffer.receiveActions(actions);
+                //TODO - missing function
+            }
             soundBuffer.getLock();
 
             soundBuffer.releaseLock();
@@ -233,7 +232,7 @@ namespace Game.Logic
             }
         }
 
-        //TODO - add blocks, add the whole palyer logic, add research
+        //TODO - add blocks, add the whole player logic, add research
 
     }
 }

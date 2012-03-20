@@ -1,6 +1,7 @@
 ﻿using SFML.Graphics;
 using SFML.Window;
 using System.Collections.Generic;
+using System;
 
 namespace Game.Graphic_Manager
 {
@@ -18,6 +19,7 @@ namespace Game.Graphic_Manager
         {
             this._buffer = buffer;
             this._mainWindow = new RenderWindow(new VideoMode(x, y, bits), "main display");
+            this._mainWindow.SetActive(false);
             back = new Sprite(background);
             displayedSprites = new HashSet<Sprite>();
             removedSprites = new HashSet<Sprite>();
@@ -100,6 +102,15 @@ namespace Game.Graphic_Manager
         public void display()
         {
             _mainWindow.Display();
+        }
+
+        public void run()
+        {
+            while (true)
+            {
+                Console.Out.WriteLine("display loop");
+                loop();
+            }
         }
 
 

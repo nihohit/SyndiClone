@@ -42,6 +42,36 @@ namespace Game.Logic
             this.visible = new UniqueList<ExternalEntity>();
         }
 
+
+        internal void initialiseExitPoints()
+        {
+            foreach (Entity ent in entities.Keys)
+            {
+                ((Building)ent).ExitPoint = this.getExitPoint(ent);
+            }
+        }
+
+        private Vector getExitPoint(Entity ent)
+        {
+            Point center = this.convertToCentralPoint(ent);
+            int x = center.X;
+            int y = center.Y;
+            int i = 1;
+            while (true)
+            {
+                if (x + i < this.gameGrid.GetLength(0) && (this.gameGrid[x + i, y] == null))
+                    return new Vector(i, 0);
+                if (x - i >= 0 && (this.gameGrid[x - i, y] == null))
+                    return new Vector(-i, 0);
+                if (y + i < this.gameGrid.GetLength(1) && (this.gameGrid[x, y + i] == null))
+                    return new Vector(0, i);
+                if (y - i >= 0 && (this.gameGrid[x, y - i] == null))
+                    return new Vector(0, -i);
+                i++;
+
+            }
+        }
+
         /******************
         Methods
         ****************/ 
@@ -63,6 +93,10 @@ namespace Game.Logic
             return new Vector(this.locations[ent].Entry);
         }
 
+        internal List<ExternalEntity> getAllEntities()
+        {
+            return new List<ExternalEntity>(this.entities.Values);
+        }
 
         /*
          * This function returns the list of actions performed in the current round.
@@ -156,17 +190,19 @@ namespace Game.Logic
          */
         private void move(MovingEntity ent)
         {
-            Direction dir = Direction.UP;
-            if (ent.Path.Count > 0)
+            int tries = 0;
+            while (ent.Path.Count == 0)
             {
-                dir = ent.getDirection();
-            }
-            else
-            {
+                if (tries == 5) //just a precaution
+                {
+                    this.destroy(ent);
+                    return;
+                }
                 Point temp = this.convertToCentralPoint(ent);
                 ent.Path = this.getSimplePath(temp, this.generateRandomPoint(temp));
-                dir = ent.getDirection();
+                tries++;
             }
+            Direction dir = ent.getDirection();
             bool result = this.canMove(ent, dir);
             if (result)
             {
@@ -465,11 +501,11 @@ namespace Game.Logic
         {
             //get all relevant variables
             Shot shot = shooter.weapon().Shot;
-            Point currentTargetLocation = shooter.hitFunc()(this.convertToCentralPoint(target));
-            //TODO - If there's a target that I see only parts of it, how do I aim at the visible parts?
             Point exit = this.convertToCentralPoint((Entity)shooter);
-
-
+            Point currentTargetLocation = this.convertToCentralPoint(target);
+            currentTargetLocation = shooter.hitFunc()(currentTargetLocation, this.getDistance(exit, currentTargetLocation), shooter.weapon().Acc);
+            //TODO - If there's a target that I see only parts of it, how do I aim at the visible parts?
+            
             //get the path the bullet is going through, and affect targets
             Point endPoint = this.processPath(exit, currentTargetLocation, shot);
 
@@ -478,6 +514,11 @@ namespace Game.Logic
                 this.areaEffect(endPoint, shot.Blast);
 
             }
+        }
+
+        private int getDistance(Point exit, Point target)
+        {
+            return Convert.ToInt32(Math.Sqrt(Math.Pow(exit.X - target.X, 2) + Math.Pow(exit.Y - target.Y, 2)));  
         }
 
 
@@ -539,9 +580,10 @@ namespace Game.Logic
         private void destroy(Entity ent)
         {
             this.addEvent(new DestroyEvent(this.locations[ent], ent));
+            this.removeFromLocation(ent);
             locations.Remove(ent);
             this.entities.Remove(ent);
-            this.removeFromLocation(ent);
+            ent.destroy();
         }
 
         /**************
@@ -576,13 +618,6 @@ namespace Game.Logic
         {
             return new Area(new Point(this.convertToCentralPoint((Entity)constructor), constructor.exitPoint()), ent.Size);
         }
-
-
-        internal List<ExternalEntity> getAllEntities()
-        {
-            return new List<ExternalEntity>(this.entities.Values);
-        }
-
 
     }
 }

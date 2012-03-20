@@ -8,7 +8,7 @@ namespace Game.Logic.Entities
         class consts
         ****************/        
         
-        const int timeToReact = 100;
+        const int timeToReact = 1000;
 
         /******************
         class fields
@@ -21,7 +21,7 @@ namespace Game.Logic.Entities
         private Affiliation _loyalty;
         private readonly Sight _sight;
         private Visibility _visible;
-        private readonly reactionFunction _howReact;
+        protected reactionFunction _howReact;
         private UniqueList<Entity> _whatSees;
         private int _threat = 0;
         private readonly int _reactionTime;
@@ -48,15 +48,14 @@ namespace Game.Logic.Entities
         Methods
         ****************/
 
-        internal virtual bool hit(int damage)
+        internal virtual void hit(int damage)
         {
             this._health -= damage;
-            return (this._health <= 0);
         }
 
         virtual internal void resolveOrders()
         {
-            this.Reaction = this.HowReact(this.WhatSees);
+            this.Reaction = this.ReactionFunction(this.WhatSees);
         }
 
         internal virtual bool doesReact()
@@ -81,6 +80,10 @@ namespace Game.Logic.Entities
         internal bool destroyed()
         {
             return this._health <= 0;
+        }
+
+        internal virtual void destroy()
+        {
         }
 
         /******************
@@ -109,9 +112,10 @@ namespace Game.Logic.Entities
             get { return _health; }
         }
 
-        internal reactionFunction HowReact
+        internal reactionFunction ReactionFunction
         {
             get { return _howReact; }
+            set { _howReact = value; }
         }
 
         internal UniqueList<Entity> WhatSees
@@ -131,7 +135,6 @@ namespace Game.Logic.Entities
             get { return _visible; }
             set { _visible = value; }
         }
-
 
         internal Sight Sight
         {

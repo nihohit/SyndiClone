@@ -55,9 +55,9 @@ namespace Game.Buffers
 
         internal SpriteFinder()
         {
-            personFinder.Add(Logic.Affiliation.INDEPENDENT, new Bitmap(entity_images.person_black));
+            personFinder.Add(Logic.Affiliation.INDEPENDENT, new Bitmap(entity_images.person_blue));
             personFinder.Add(Logic.Affiliation.CORP1, new Bitmap(entity_images.person_green));
-            personFinder.Add(Logic.Affiliation.CORP2, new Bitmap(entity_images.person_blue));
+            personFinder.Add(Logic.Affiliation.CORP2, new Bitmap(entity_images.person_black));
             personFinder.Add(Logic.Affiliation.CORP3, new Bitmap(entity_images.person_red));
             personFinder.Add(Logic.Affiliation.CORP4, new Bitmap(entity_images.person_purple));
             personFinder.Add(Logic.Affiliation.CIVILIAN, new Bitmap(entity_images.person_yellow));

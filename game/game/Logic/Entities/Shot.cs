@@ -8,9 +8,25 @@ namespace Game.Logic.Entities
     {
 
         /******************
-        class consts
+        class statics
         ****************/
         static Dictionary<ShotType, Shot> _shots = new Dictionary<ShotType, Shot>();
+
+        static bool bulletBlocked(Visibility ent)
+        {
+            return true;
+        }
+
+        static void pistolBulletEffect(Entity ent)
+        {
+            ent.hit(PISTOL_BULLET_DAMAGE);
+        }
+
+        /************
+         * class consts
+         *************/
+
+        const int PISTOL_BULLET_DAMAGE = 3;
 
         /******************
         class fields
@@ -19,8 +35,6 @@ namespace Game.Logic.Entities
         private readonly Effect _effect;
         private readonly wasBlocked _blocked;
         private readonly ShotType _type;
-
-
 
         /******************
         constructors
@@ -33,7 +47,9 @@ namespace Game.Logic.Entities
                 {
                     case(ShotType.SIGHT):
                         break;
-
+                    case(ShotType.PISTOL_BULLET):
+                        _shots.Add(type, new Shot(null, pistolBulletEffect, bulletBlocked, type));
+                        break;
                     //TODO - missing types
 
                 }
