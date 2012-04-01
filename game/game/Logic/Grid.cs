@@ -27,6 +27,7 @@ namespace Game.Logic
         private readonly Entity[,] gameGrid;
         private readonly List<BufferEvent> actionsDone;
         private readonly UniqueList<ExternalEntity> visible;
+        private readonly UniqueList<Entity> destroyed;
         //TODO - add corporations?
 
         /******************
@@ -40,6 +41,7 @@ namespace Game.Logic
             this.locations = new Dictionary<Entity, Area>();
             this.entities = new Dictionary<Entity, ExternalEntity>();
             this.visible = new UniqueList<ExternalEntity>();
+            this.destroyed = new UniqueList<Entity>();
         }
 
 
@@ -83,14 +85,11 @@ namespace Game.Logic
             return this.visible;
         }
 
-        internal void clearVisibleEntities()
+        internal void clear()
         {
             this.visible.Clear();
-        }
-
-        internal Vector getPosition(Entity ent)
-        {
-            return new Vector(this.locations[ent].Entry);
+            this.actionsDone.Clear();
+            destroyed.Clear();
         }
 
         internal List<ExternalEntity> getAllEntities()
@@ -103,9 +102,9 @@ namespace Game.Logic
          */
         internal List<BufferEvent> returnActions()
         {
-            List<BufferEvent> ans = new List<BufferEvent>(this.actionsDone);
-            this.actionsDone.Clear();
-            return ans;
+            foreach (Entity ent in destroyed)
+                this.destroy(ent);
+            return this.actionsDone;
         }
 
         /*
@@ -153,7 +152,14 @@ namespace Game.Logic
 
             BlastEffect blast = BlastEffect.instance(radius, effect, blocked, ShotType.SIGHT);
 
+            this.areaEffect(ent, blast);
+
             ent.WhatSees = ans;
+            foreach (Entity temp in ans)
+            {
+                //TODO - this is wrong. it should only return what the player units see. 
+                this.visible.Add(this.entities[temp]);
+            }
         }
 
         //////////MOVEMENT LOGIC//////////
@@ -195,7 +201,7 @@ namespace Game.Logic
             {
                 if (tries == 5) //just a precaution
                 {
-                    this.destroy(ent);
+                    this.destroyed.Add(ent);
                     return;
                 }
                 Point temp = this.convertToCentralPoint(ent);
@@ -479,19 +485,19 @@ namespace Game.Logic
             int newX, newY;
             //checks in each of the four cardinal directions;
             //TODO - make sure that entities aren't affected more then once? or just reduce the effects to account for that?
-            for (int i = 0; i < radius; i++)
-            {
-                newX = Math.Min(x+i, gameGrid.GetLength(0));
-                newY = Math.Min(y+radius-i,gameGrid.GetLength(1));
+            for (int i = 1; i < radius; i++)
+            { 
+                newX = Math.Min(x+i, gameGrid.GetLength(0)-1);
+                newY = Math.Min(y+radius-i,gameGrid.GetLength(1)-1);
                 processPath(location, new Point(newX,newY), blast);
-
+                
                 newY = newY = Math.Max(y-radius+i,0);
                 processPath(location, new Point(newX,newY), blast);
-
+                
                 newX = Math.Max(x-i, 0);
                 processPath(location, new Point(newX,newY), blast);
-
-                newY = Math.Min(y+radius-i,gameGrid.GetLength(1));
+                
+                newY = Math.Min(y+radius-i,gameGrid.GetLength(1)-1);
                 processPath(location, new Point(newX,newY), blast);
             }
         }
@@ -499,6 +505,7 @@ namespace Game.Logic
         //This function simulates a single shot
         internal void shoot(Shooter shooter, Entity target)
         {
+            if(target.destroyed()) return;
             //get all relevant variables
             Shot shot = shooter.weapon().Shot;
             Point exit = this.convertToCentralPoint((Entity)shooter);
@@ -539,33 +546,30 @@ namespace Game.Logic
             if (x0 < x1) sx = 1; else sx = -1;
             if (y0 < y1) sy = 1; else sy = -1;
             int err = dx-dy;
-
-            while (!(x0 == x1 & y0 == y1))
+            Entity ent = null;
+            while ((!(x0 == x1 & y0 == y1)) && (!shot.Blocked(ent)))
             {
-                Entity ent = gameGrid[x0, y0];
+                ent = gameGrid[x0, y0];
                 if (ent != null)
                 {
                     effect(ent);
                     if (ent.destroyed())
                     {
-                        this.destroy(ent);
+                        this.destroyed.Add(ent);
                     }
-                    if (blocked(ent.Visible)) break;
-                    e2 = 2 * err;
-                    if (e2 > -dy)
-                    {
-                        err = err - dy;
-                        x0 = x0 + sx;
-                    }
-                    if (e2 < dx)
-                    {
-                        err = err + dx;
-                        y0 = y0 + sy;
-                    }
-                    this.visible.Add(this.entities[ent]);
+                }
+                e2 = 2 * err;
+                if (e2 > -dy)
+                {
+                    err = err - dy;
+                    x0 = x0 + sx;
+                }
+                if (e2 < dx)
+                {
+                    err = err + dx;
+                    y0 = y0 + sy;
                 }
             }
-
             Point res = new Point(x0, y0);
 
             if (!(shot.Type == ShotType.SIGHT))
@@ -573,7 +577,6 @@ namespace Game.Logic
                 this.addEvent(new ShotEvent(shot.Type, exit, res));
 
             }
-
             return res;
         }
 

@@ -13,28 +13,27 @@ namespace Game.Logic.Entities
        static Random generator = new Random();
        static Point copHitFunc(Point target, int range, double weaponAcc)
        {
-
            int rangeOfNumbers = Convert.ToInt32(range * weaponAcc / COP_ACC);
            int randX = generator.Next(-rangeOfNumbers, rangeOfNumbers);
            int randY = generator.Next(-rangeOfNumbers, rangeOfNumbers);
            return new Point(target.X + randX, target.Y + randY);
        }
-
+       //TODO - change back to threatTargeterHigh
        static private Reaction copReact(List<Entity> list)
        {
-           Entity temp = Targeters.threatTargeterHigh(list, Affiliation.INDEPENDENT);
-
+           Entity temp = Targeters.simpleTestTargeter(list, Affiliation.INDEPENDENT);
            if (temp == null)
            {
                return new Reaction(null, Action.IGNORE);
+               
            }
            return new Reaction(temp, Action.FIRE_AT);
 
        }
-
+       //TODO - change back to threatTargeterHigh
        static Entity copTargeter(List<Entity> list)
        {
-           return Targeters.threatTargeterHigh(list, Affiliation.INDEPENDENT);
+           return Targeters.threatTargeterLow(list, Affiliation.INDEPENDENT);
        }
 
        private static Weapon copWeapon = Weapon.instance(WeaponType.PISTOL);
@@ -54,12 +53,11 @@ namespace Game.Logic.Entities
          * class fields
          ***********/
        private int timeBeforeShot;
+       private readonly PoliceStation station;
 
        /***********
         * constructor
         ***********/
-
-       private readonly PoliceStation station;
 
        public Cop(PoliceStation station) :
            base(COP_REACTION_TIME, copReact, COP_HEALTH, Affiliation.INDEPENDENT, Sight.instance(SightType.POLICE_SIGHT), COP_SPEED, new LinkedList<Direction>())

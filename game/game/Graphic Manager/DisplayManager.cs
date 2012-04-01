@@ -12,6 +12,7 @@ namespace Game.Graphic_Manager
         HashSet<Sprite> displayedSprites;
         HashSet<Sprite> removedSprites;
         HashSet<Animation> animations;
+        HashSet<Animation> doneAnimations = new HashSet<Animation>();
         Sprite back;
 
 
@@ -40,7 +41,7 @@ namespace Game.Graphic_Manager
 
         private void updateAnimations()
         {
-            //TODO - missing function
+            this.animations.UnionWith(this._buffer.getAnimations());
         }
 
         private void displaySprites()
@@ -74,21 +75,25 @@ namespace Game.Graphic_Manager
 
         private void enterAnimations()
         {
-            HashSet<Animation> done = new HashSet<Animation>();
+            
             foreach (Animation animation in this.animations)
             {
                 this.removedSprites.Remove(animation.current());
-                this.displayedSprites.Add(animation.getNext());
                 if (animation.isDone())
                 {
-                    done.Add(animation);
+                    doneAnimations.Add(animation);
+                }
+                else
+                {
+                    this.displayedSprites.Add(animation.getNext());
                 }
             }
 
-            foreach (Animation animation in done)
+            foreach (Animation animation in doneAnimations)
             {
                 this.animations.Remove(animation);
             }
+            doneAnimations.Clear();
         }
 
         private void removeSprites()
@@ -108,7 +113,7 @@ namespace Game.Graphic_Manager
         {
             while (true)
             {
-                Console.Out.WriteLine("display loop");
+                //Console.Out.WriteLine("display loop");
                 loop();
             }
         }

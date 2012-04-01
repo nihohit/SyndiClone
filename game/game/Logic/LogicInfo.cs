@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Game.Logic.Entities;
+using System;
 
 
 namespace Game.Logic
@@ -7,7 +8,7 @@ namespace Game.Logic
     internal delegate bool EntityChecker(Entity ent); //These functions check basic questions about entities and return a bool
     internal delegate Point HitFunction(Point target, int range, double weaponAcc); //These functions calculate the actual point of impact of a bullet, relative to the target
     internal delegate void Effect(Entity ent); //These functions simulate effects on entities. mostly will be damage
-    internal delegate bool wasBlocked(Visibility ent); //These functions check whether an entitiy blocks a certain effect
+    internal delegate bool wasBlocked(Entity ent); //These functions check whether an entitiy blocks a certain effect
     internal delegate Entity targetChooser(List<Entity> targets); //These functions choose which entity, out of the list of possible entities, to target
     internal delegate Reaction reactionFunction(List<Entity> ent); //These functions set the reaction of entities
 
@@ -152,6 +153,7 @@ namespace Game.Logic
             int seenThreat = 10000;
             foreach (Entity ent in entities)
             {
+
                 if ((ent.Threat < seenThreat)  && (ent.Loyalty != loyalty))
                 {
                     seenThreat = ent.Threat;
@@ -187,6 +189,23 @@ namespace Game.Logic
                 if ((ent.Health < health) && (ent.Loyalty != loyalty))
                 {
                     health = ent.Health;
+                    target = ent;
+                }
+            }
+
+            return target;
+        }
+
+        internal static Entity simpleTestTargeter(List<Entity> list, Affiliation affiliation)
+        {
+            Entity target = null;
+            int seenThreat = 10000;
+            foreach (Entity ent in list)
+            {
+
+                if ((ent.Threat < seenThreat) && (ent.Loyalty != affiliation) && (ent.Type != entityType.BUILDING))
+                {
+                    seenThreat = ent.Threat;
                     target = ent;
                 }
             }

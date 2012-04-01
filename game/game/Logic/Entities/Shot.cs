@@ -12,8 +12,9 @@ namespace Game.Logic.Entities
         ****************/
         static Dictionary<ShotType, Shot> _shots = new Dictionary<ShotType, Shot>();
 
-        static bool bulletBlocked(Visibility ent)
+        static bool bulletBlocked(Entity ent)
         {
+            if (ent == null) return false;
             return true;
         }
 

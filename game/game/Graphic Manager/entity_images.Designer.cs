@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Game.Buffers {
+namespace Game.Graphic_Manager {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace Game.Buffers {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Game.Buffers.entity_images", typeof(entity_images).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Game.Graphic_Manager.entity_images", typeof(entity_images).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;

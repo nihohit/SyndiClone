@@ -1,17 +1,17 @@
 ﻿using System;
 using System.IO;
 using System.Drawing;
-using System.Text;
 using System.Collections.Generic;
 using Game.Logic.Entities;
 using System.Drawing.Imaging;
+using Game.Logic;
 
-namespace Game.Buffers
+namespace Game.Graphic_Manager
 {
     //Just some random stuff for the class
     enum BuildingStyle { BLUE, RED, GREEN, YELLOW }
 
-    internal class Block
+    internal struct Block
     {
         const int TILE_SIZE = 32;
 
@@ -43,6 +43,7 @@ namespace Game.Buffers
     {
         internal abstract SFML.Graphics.Sprite getSprite(ExternalEntity ent);
         internal abstract SFML.Graphics.Sprite getSpriteLoop(ExternalEntity ent);
+        internal abstract SFML.Graphics.Sprite getShot(ShotType shot, bool diagonal);
     }
 
     internal class SpriteFinder : ImageFinder
@@ -51,17 +52,34 @@ namespace Game.Buffers
         private Dictionary<ExternalEntity, SFML.Graphics.Sprite> finder = new Dictionary<ExternalEntity, SFML.Graphics.Sprite>();
         private static Dictionary<ExternalEntity, Image> buildings = new Dictionary<ExternalEntity, Image>(new externalEntityEqualityComparer());
         private static Dictionary<Tuple<Block, BuildingStyle>, Image> templates = new Dictionary<Tuple<Block, BuildingStyle>, Image>(new tupleEqualityComparer());
-        private Dictionary<Logic.Affiliation, Image> personFinder = new Dictionary<Logic.Affiliation, Image>();
+        private static Dictionary<Logic.Affiliation, SFML.Graphics.Image> personFinder = new Dictionary<Logic.Affiliation, SFML.Graphics.Image>
+        {
+            {Logic.Affiliation.INDEPENDENT, new SFML.Graphics.Image("images/personblue.png")},
+            {Logic.Affiliation.CORP1, new SFML.Graphics.Image("images/personpurple.png")},
+            {Logic.Affiliation.CORP2, new SFML.Graphics.Image("images/persongreen.png")},
+            {Logic.Affiliation.CORP4, new SFML.Graphics.Image("images/personblack.png")},
+            {Logic.Affiliation.CORP3, new SFML.Graphics.Image("images/personred.png")},
+            {Logic.Affiliation.CIVILIAN, new SFML.Graphics.Image("images/personyellow.png")}
+        };
+        private static Dictionary<ShotType, SFML.Graphics.Image> straightshots = new Dictionary<ShotType, SFML.Graphics.Image>
+        {
+            { ShotType.PISTOL_BULLET, new SFML.Graphics.Image("images/bulletshotstraight.png")}
+
+        };
+        private static Dictionary<ShotType, SFML.Graphics.Image> diagonalshots = new Dictionary<ShotType, SFML.Graphics.Image>
+        {
+            { ShotType.PISTOL_BULLET, new SFML.Graphics.Image("images/bulletshotdiagonal.png")}
+
+        };
 
         internal SpriteFinder()
         {
-            personFinder.Add(Logic.Affiliation.INDEPENDENT, new Bitmap(entity_images.person_blue));
-            personFinder.Add(Logic.Affiliation.CORP1, new Bitmap(entity_images.person_green));
-            personFinder.Add(Logic.Affiliation.CORP2, new Bitmap(entity_images.person_black));
-            personFinder.Add(Logic.Affiliation.CORP3, new Bitmap(entity_images.person_red));
-            personFinder.Add(Logic.Affiliation.CORP4, new Bitmap(entity_images.person_purple));
-            personFinder.Add(Logic.Affiliation.CIVILIAN, new Bitmap(entity_images.person_yellow));
-            
+        }
+
+        internal override SFML.Graphics.Sprite getShot(ShotType shot, bool diagonal)
+        {
+            if (diagonal) return new SFML.Graphics.Sprite(diagonalshots[shot]);
+            return new SFML.Graphics.Sprite(straightshots[shot]);
         }
 
         internal override SFML.Graphics.Sprite getSprite(ExternalEntity ent)
@@ -90,11 +108,7 @@ namespace Game.Buffers
                     break;
 
                 case(Logic.entityType.PERSON):
-                    Image temp = personFinder[ent.Loyalty];
-                    MemoryStream stream = new MemoryStream();
-                    temp.Save(stream, ImageFormat.Png);
-                    sprite = new SFML.Graphics.Sprite(new SFML.Graphics.Image(stream));
-                    stream.Dispose();
+                    sprite = new SFML.Graphics.Sprite(personFinder[ent.Loyalty]);
                     break;
                 //TODO - cases missing
 

@@ -42,8 +42,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Buffers\Buffer.cs" />
-    <Compile Include="Buffers\ImageFinder.cs" />
-    <Compile Include="Buffers\entity_images.Designer.cs">
+    <Compile Include="Graphic Manager\ImageFinder.cs" />
+    <Compile Include="Graphic Manager\entity_images.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>entity_images.resx</DependentUpon>
@@ -63,11 +63,10 @@
     <Compile Include="City Generator\GameBoard.cs" />
     <Compile Include="City Generator\RoadTile.cs" />
     <Compile Include="City Generator\Tile.cs" />
-    <Compile Include="Buffers\DisplayBuffer.cs" />
+    <Compile Include="Graphic Manager\DisplayBuffer.cs" />
     <Compile Include="Graphic Manager\DisplayManager.cs" />
     <Compile Include="Graphic Manager\GraphicInfo.cs" />
     <Compile Include="Buffers\InputBuffer.cs" />
-    <Compile Include="Buffers\SpriteLoop.cs" />
     <Compile Include="Logic\Entities\Agent.cs" />
     <Compile Include="Logic\Entities\BlastEffect.cs" />
     <Compile Include="Logic\Entities\Building.cs" />
@@ -109,9 +108,10 @@
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Buffers\entity_images.resx">
+    <EmbeddedResource Include="Graphic Manager\entity_images.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>entity_images.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="City Generator\city_images.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -150,16 +150,21 @@
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Buffers\images\9_edge.gif" />
-    <None Include="Buffers\images\0_buildingmiddle.gif" />
-    <None Include="Buffers\images\9_corner.gif" />
-    <None Include="Buffers\images\person yellow.png" />
-    <None Include="Buffers\images\person black.png" />
-    <None Include="Buffers\images\person blue.png" />
-    <None Include="Buffers\images\person green.png" />
-    <None Include="Buffers\images\person purple.png" />
-    <None Include="Buffers\images\person red.png" />
+    <None Include="Graphic Manager\images\9_edge.gif" />
+    <None Include="Graphic Manager\images\0_buildingmiddle.gif" />
+    <None Include="Graphic Manager\images\9_corner.gif" />
+    <None Include="Graphic Manager\images\person yellow.png" />
+    <None Include="Graphic Manager\images\person black.png" />
+    <None Include="Graphic Manager\images\person blue.png" />
+    <None Include="Graphic Manager\images\person green.png" />
+    <None Include="Graphic Manager\images\person purple.png" />
+    <None Include="Graphic Manager\images\person red.png" />
     <None Include="City Generator\images\0.png" />
+    <None Include="Graphic Manager\images\bloodsplatter.png" />
+    <None Include="Graphic Manager\images\shot diagonal.png" />
+    <None Include="Graphic Manager\images\shot straight.png" />
+    <Content Include="bin\Debug\game.exe" />
+    <Content Include="bin\Debug\game.pdb" />
     <Content Include="City Generator\images\0_buildingtemp.jpg" />
     <None Include="City Generator\images\9.png" />
     <None Include="City Generator\images\8.png" />

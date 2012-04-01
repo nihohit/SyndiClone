@@ -35,7 +35,7 @@ namespace Game.Logic
         {
             while (true)
             {
-                Console.Out.WriteLine("logic loop");
+                //Console.Out.WriteLine("logic loop");
                 loop();
             }
         }
@@ -104,7 +104,7 @@ namespace Game.Logic
             this.movers.Clear();
             this.constructors.Clear();
             this.activeEntities.Clear();
-            this._grid.clearVisibleEntities();
+            this._grid.clear();
         }
 
         private void updateOutput()
@@ -165,6 +165,7 @@ namespace Game.Logic
                         this._grid.whatSees(ent);
                     }
                     ent.resolveOrders();
+                    ent.WhatSees = null;
                 }
                 Reaction react = ent.Reaction;
                 Action action = react.ActionChosen;

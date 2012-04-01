@@ -18,11 +18,12 @@ namespace Game.Logic.Entities
         static Dictionary<SightType, Sight> _sights = new Dictionary<SightType, Sight>();
         const int CIV_RANGE = 50, COP_RANGE = 50;
         const bool CIV_CLOAKED = false, COP_CLOAKED = false;
-        static wasBlocked CIV_BLOCKED = civBlocked;
+        static wasBlocked CIV_BLOCKED = civBlockedSight;
         
-        static internal bool civBlocked(Visibility ent)
+        static internal bool civBlockedSight(Entity ent)
         {
-            switch (ent)
+            if (ent == null) return false;
+            switch (ent.Visible)
             {
                 case Visibility.SOLID:
                     return true;
@@ -62,7 +63,7 @@ namespace Game.Logic.Entities
                         _sights.Add(type, new Sight(CIV_RANGE, CIV_BLOCKED, CIV_CLOAKED));
                         break;
                     case(SightType.POLICE_SIGHT):
-                        _sights.Add(type, new Sight(CIV_RANGE, CIV_BLOCKED, CIV_CLOAKED));
+                        _sights.Add(type, new Sight(COP_RANGE, CIV_BLOCKED, CIV_CLOAKED));
                         break;
 
                     //TODO - missing types
