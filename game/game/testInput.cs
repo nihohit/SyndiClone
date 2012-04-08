@@ -1,5 +1,4 @@
 ﻿using System.Threading;
-
 namespace Game
 {
     class main
@@ -14,12 +13,6 @@ namespace Game
             Graphic_Manager.DisplayManager display = new Graphic_Manager.DisplayManager(30 * 32, 20 * 32, 32, disp, city.Img);
             Logic.GameLogic logic = new Logic.GameLogic(disp, input, sound, city, 100);
 
-            /*
-            while (true)
-            {
-                logic.loop();
-                display.loop();
-            }*/
 
             Thread logicThread = new Thread(new ThreadStart(logic.run));
             Thread graphicThread = new Thread(new ThreadStart(display.run));

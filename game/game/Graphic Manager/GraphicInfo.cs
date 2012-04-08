@@ -5,10 +5,6 @@ using System;
 namespace Game.Graphic_Manager
 {
 
-    enum agent
-    {
-
-    }
 
     internal enum DisplayCommand { MOVE_VIEW, ZOOM_VIEW, ADD_ENTITY, MOVE_ENTITY, ADD_SHOT, DESTROY_ENTITY }
     internal enum DecalType { WRECKAGE, BLOOD, RUBBLE } //TODO - different vehicles wreckage?
@@ -21,29 +17,33 @@ namespace Game.Graphic_Manager
                 //{DecalType.EXPLOSION, 
                 {DecalType.BLOOD, new Image("images/bloodsplatter.png")}
                 //{DecalType.RUBBLE, 
-                
             };
 
-        private readonly DecalType _type;
+        private readonly Sprite _sprite;
         private int _stayTime;
 
         internal Decal(DecalType type)
         {
-            this._type = type;
+            this._sprite = new Sprite(decals[type]);
             this._stayTime = DECAL_STAY_TIME;
         }
 
-        bool isDone()
+        internal bool isDone()
         {
             return this._stayTime == 0;
         }
 
-        Image getDecal()
+        internal Sprite getDecal()
         {
             this._stayTime--;
-            return decals[this._type];
+            return this._sprite;
         }
 
+
+        internal void setLocation(Vector vector)
+        {
+            this._sprite.Position= new Vector2(vector.X, vector.Y);
+        }
     }
 
     internal class Animation
@@ -92,13 +92,11 @@ namespace Game.Graphic_Manager
         {
             this._list.next();
             return this.getSprite();
-
         }
 
         internal SFML.Graphics.Sprite getSprite()
         {
             return this._list.getValue();
-
         }
 
     }
@@ -112,7 +110,6 @@ namespace Game.Graphic_Manager
         {
             current = _list.First;
             this.list = _list;
-            this.list.AddLast(list.First);
         }
 
         internal T getValue()
@@ -122,7 +119,10 @@ namespace Game.Graphic_Manager
 
         internal void next()
         {
-            current = current.Next;
+            if (current.Next != null)
+                current = current.Next;
+            else
+                current = list.First;
         }
 
     }

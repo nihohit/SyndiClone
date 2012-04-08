@@ -26,6 +26,8 @@ namespace Game.Graphic_Manager
             removedSprites = new HashSet<Sprite>();
             animations = new HashSet<Animation>();
 
+            this._mainWindow.Closed += new EventHandler(OnClosed);
+            this._mainWindow.KeyPressed += new EventHandler<KeyEventArgs>(OnKeyPressed);
         }
 
         private void findSpritesToDisplay()
@@ -36,7 +38,7 @@ namespace Game.Graphic_Manager
 
         private void findSpritesToRemove()
         {
-            this.removedSprites = new HashSet<Sprite>(this._buffer.spritesToRemove());
+            this.removedSprites.UnionWith(this._buffer.spritesToRemove());
         }
 
         private void updateAnimations()
@@ -85,6 +87,7 @@ namespace Game.Graphic_Manager
                 }
                 else
                 {
+                    this.removedSprites.Add(animation.current());
                     this.displayedSprites.Add(animation.getNext());
                 }
             }
@@ -102,6 +105,7 @@ namespace Game.Graphic_Manager
             {
                 this.displayedSprites.Remove(sprite);
             }
+            this.removedSprites.Clear();
         }
 
         public void display()
@@ -115,9 +119,31 @@ namespace Game.Graphic_Manager
             {
                 //Console.Out.WriteLine("display loop");
                 loop();
+                this._mainWindow.DispatchEvents();
+                
+
             }
         }
 
+        /// <summary>
+        /// Function called when the window is closed
+        /// </summary>
+        static void OnClosed(object sender, EventArgs e)
+        {
+            Window window = (Window)sender;
+            window.Close();
+        }
+
+        /// <summary>
+        /// Function called when a key is pressed
+        /// </summary>
+        static void OnKeyPressed(object sender, KeyEventArgs e)
+        {
+            Window window = (Window)sender;
+            Console.Out.WriteLine("key pressed");
+            if (e.Code == KeyCode.Escape)
+                window.Show(window.IsOpened());
+        }
 
     }
 }

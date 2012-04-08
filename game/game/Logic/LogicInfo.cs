@@ -285,10 +285,10 @@ namespace Game.Logic
         private readonly Area _area;
         private readonly ExternalEntity _ent;
 
-        internal DestroyEvent(Area area, Entity ent)
+        internal DestroyEvent(Area area, ExternalEntity ent)
         {
             this._area = area;
-            this._ent = new ExternalEntity (ent);
+            this._ent = ent;
         }
 
         internal ExternalEntity Ent

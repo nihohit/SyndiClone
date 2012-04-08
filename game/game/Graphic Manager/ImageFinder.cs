@@ -42,14 +42,16 @@ namespace Game.Graphic_Manager
     internal abstract class ImageFinder
     {
         internal abstract SFML.Graphics.Sprite getSprite(ExternalEntity ent);
-        internal abstract SFML.Graphics.Sprite getSpriteLoop(ExternalEntity ent);
         internal abstract SFML.Graphics.Sprite getShot(ShotType shot, bool diagonal);
+        internal abstract SFML.Graphics.Sprite remove(ExternalEntity ent);
+        internal abstract SFML.Graphics.Sprite nextSprite(ExternalEntity mover);
+        internal abstract Animation generateDestoryResults(Area area, entityType entityType);
     }
 
     internal class SpriteFinder : ImageFinder
     {
         const int TILE_SIZE = 32;
-        private Dictionary<ExternalEntity, SFML.Graphics.Sprite> finder = new Dictionary<ExternalEntity, SFML.Graphics.Sprite>();
+        private Dictionary<ExternalEntity, SpriteLoop> spriteLoopFinder = new Dictionary<ExternalEntity, SpriteLoop>();
         private static Dictionary<ExternalEntity, Image> buildings = new Dictionary<ExternalEntity, Image>(new externalEntityEqualityComparer());
         private static Dictionary<Tuple<Block, BuildingStyle>, Image> templates = new Dictionary<Tuple<Block, BuildingStyle>, Image>(new tupleEqualityComparer());
         private static Dictionary<Logic.Affiliation, SFML.Graphics.Image> personFinder = new Dictionary<Logic.Affiliation, SFML.Graphics.Image>
@@ -84,18 +86,32 @@ namespace Game.Graphic_Manager
 
         internal override SFML.Graphics.Sprite getSprite(ExternalEntity ent)
         {
-            SFML.Graphics.Sprite sprite = null;
-            if (finder.ContainsKey(ent))
+            if (!spriteLoopFinder.ContainsKey(ent))
             {
-                sprite = finder[ent];
-                
+                spriteLoopFinder.Add(ent, this.generateNewSpriteLoop(ent));
+            }
+            SFML.Graphics.Sprite sprite = spriteLoopFinder[ent].Next();
+            return sprite;
+        }
+
+        internal override Graphic_Manager.Animation generateDestoryResults(Area area, entityType type)
+        {
+            //TODO - missing function
+            return new Graphic_Manager.Animation(area, type);
+        }
+
+        private SpriteLoop generateNewSpriteLoop(ExternalEntity ent)
+        {
+            LinkedList<SFML.Graphics.Sprite> list = new LinkedList<SFML.Graphics.Sprite>();
+            if (ent.Type == entityType.VEHICLE)
+            {
+                //TODO - missing function
             }
             else
             {
-                sprite = this.generateNewSprite(ent);
-                finder.Add(ent, sprite);
+                list.AddFirst(this.generateNewSprite(ent));
             }
-            return sprite;
+            return new SpriteLoop(list);
         }
 
         private SFML.Graphics.Sprite generateNewSprite(ExternalEntity ent)
@@ -110,17 +126,11 @@ namespace Game.Graphic_Manager
                 case(Logic.entityType.PERSON):
                     sprite = new SFML.Graphics.Sprite(personFinder[ent.Loyalty]);
                     break;
-                //TODO - cases missing
 
             }
             return sprite;
         }
 
-        internal override SFML.Graphics.Sprite getSpriteLoop(ExternalEntity ent)
-        {
-            //TODO - missing function
-            return null;
-        }
 
         private SFML.Graphics.Image getBuildingSFMLImage(ExternalEntity building)
         {
@@ -263,6 +273,18 @@ namespace Game.Graphic_Manager
             //TODO - missing function
             int num = (int)aff;
             return (BuildingStyle)num;
+        }
+
+        internal override SFML.Graphics.Sprite remove(ExternalEntity ent)
+        {
+            SFML.Graphics.Sprite temp = this.spriteLoopFinder[ent].getSprite();
+            this.spriteLoopFinder.Remove(ent);
+            return temp;
+        }
+
+        internal override SFML.Graphics.Sprite nextSprite(ExternalEntity mover)
+        {
+            return this.spriteLoopFinder[mover].Next();
         }
     }
 

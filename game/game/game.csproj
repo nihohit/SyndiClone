@@ -42,6 +42,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Buffers\Buffer.cs" />
+    <Compile Include="Input_Manager\InputManager.cs" />
+    <Compile Include="testInput.cs" />
     <Compile Include="Graphic Manager\ImageFinder.cs" />
     <Compile Include="Graphic Manager\entity_images.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -90,7 +92,6 @@
     <Compile Include="Logic\Entities\Weapon.cs" />
     <Compile Include="Point.cs" />
     <Compile Include="Buffers\SoundBuffer.cs" />
-    <Compile Include="TestLogicScreenCivilians.cs" />
     <Compile Include="Vector.cs" />
   </ItemGroup>
   <ItemGroup>

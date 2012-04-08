@@ -72,7 +72,7 @@ namespace Game.Logic.Entities
             return ans;
         }
 
-        protected bool reachAffect(int topLevel, int currentAcc, int increaseBy)
+        public bool reachAffect(int topLevel, int currentAcc, int increaseBy)
         {
             return (currentAcc + increaseBy >= topLevel); 
         }

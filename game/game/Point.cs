@@ -5,6 +5,8 @@ namespace Game
 {
     public struct Point
     {
+        static Random rand = new Random();
+        
         private readonly int _xLoc, _yLoc;
 
         public int Y
@@ -39,7 +41,6 @@ namespace Game
          */
         internal Point(int minX, int maxX, int minY, int maxY)
         {
-            Random rand = new Random();
             _xLoc = rand.Next(minX, maxX);
             _yLoc = rand.Next(minY, maxY);
         }

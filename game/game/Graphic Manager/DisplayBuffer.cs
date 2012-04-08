@@ -13,7 +13,8 @@ namespace Game.Buffers
         /******************
         Class consts
         ****************/
-        const int amountOfReapeatingSpritesInAnimation = 100;
+        const int amountOfReapeatingSpritesInAnimation = 20;
+        const int amountOfDecals = 10;
 
         /******************
         Class Fields
@@ -21,10 +22,10 @@ namespace Game.Buffers
         
         private HashSet<Sprite> displaySprites;
         private HashSet<Sprite> removedSprites;
-        private HashSet<Sprite> decals;
+        private LinkedList<Decal> decals;
+        private List<Decal> doneDecals = new List<Decal>();
         private HashSet<Game.Graphic_Manager.Animation> newAnimations;
         private ImageFinder finder;
-        private Dictionary<ExternalEntity, SpriteLoop> spriteLoopFinder;
 
         /******************
         Constructors
@@ -32,10 +33,9 @@ namespace Game.Buffers
 
         public DisplayBuffer()
         {
-            this.spriteLoopFinder = new Dictionary<ExternalEntity, SpriteLoop>();
             this.removedSprites = new HashSet<Sprite>();
             this.displaySprites = new HashSet<Sprite>();
-            this.decals = new HashSet<Sprite>();
+            this.decals = new LinkedList<Decal>();
             this.newAnimations = new HashSet<Game.Graphic_Manager.Animation>();
             this.finder = new SpriteFinder();
         }
@@ -81,7 +81,7 @@ namespace Game.Buffers
 
                 temp = this.finder.getShot(shot, (upDown & rightLeft));
                 //TODO - rotate the shot
-                temp.Center = new Vector2(x0, y0);
+                temp.Position = new Vector2(x0, y0);
                 for (int i = 0; i < amountOfReapeatingSpritesInAnimation; i++)
                 {
                     ans.AddLast(temp);
@@ -90,13 +90,6 @@ namespace Game.Buffers
                 upDown = false;
             }
             return new Animation(ans);
-        }
-
-        private Graphic_Manager.Animation generateDestoryResults(Area area, entityType type)
-        {
-            //TODO - decide if & when do decals go away. 
-            //TODO - missing function
-            return new Graphic_Manager.Animation(area, type);
         }
 
         /************
@@ -111,12 +104,12 @@ namespace Game.Buffers
                 {
                     case BufferType.DESTROY:
                         ExternalEntity ent = ((DestroyEvent)action).Ent;
-                        this.spriteLoopFinder.Remove(ent);
-
+                        Sprite temp = this.finder.remove(ent);
+                        this.displaySprites.Remove(temp);
+                        this.removedSprites.Add(temp);
                         if(ent.Type != entityType.PERSON)
-                            this.newAnimations.Add(this.generateDestoryResults(((DestroyEvent)action).Area, ent.Type));
-
-                        Decal decal;
+                            this.newAnimations.Add(this.finder.generateDestoryResults(((DestroyEvent)action).Area, ent.Type));
+                        Decal decal = new Decal();
                         switch (ent.Type)
                         {
                             case (entityType.BUILDING):
@@ -128,27 +121,17 @@ namespace Game.Buffers
                             case (entityType.PERSON):
                                 decal = new Decal(DecalType.BLOOD);
                                 break;
-
                         }
+                        decal.setLocation(ent.Position);
+                        this.addDecal(decal);
                         break;
                     case BufferType.MOVE:
                         ExternalEntity mover = ((MoveEvent)action).Mover;
-                        Sprite movement = null;
-                        if (mover.Type == Logic.entityType.VEHICLE)
-                        {
-                            Sprite toRemove = this.spriteLoopFinder[mover].getSprite();
-                            this.removedSprites.Add(toRemove);
-                            movement = this.spriteLoopFinder[mover].Next();
-                        }
-                        else
-                        {
-                            movement = this.finder.getSprite(mover);
-                        }
+                        Sprite movement = this.finder.getSprite(mover);
                         movement.Rotation = ((MoveEvent)action).Rotation;
                         Vector2 position = new Vector2(mover.Position.X, mover.Position.Y);
                         movement.Position = position;
                         //TODO - generate turning animation
-                        this.displaySprites.Add(movement);
                         break;
                     case BufferType.CREATE:
                         //TODO
@@ -160,9 +143,19 @@ namespace Game.Buffers
             }
         }
 
+        private void addDecal(Decal decal)
+        {
+            this.decals.AddLast(decal);
+            if (decals.Count > amountOfDecals)
+            {
+                Decal removed = decals.First.Value;
+                decals.RemoveFirst();
+                this.removedSprites.Add(removed.getDecal());
+            }
+        }
+
         internal void receiveVisibleEntities(List<ExternalEntity> visibleExternalEntityList)
         {
-            displaySprites.Clear();
             foreach (ExternalEntity ent in visibleExternalEntityList)
             {
                 Sprite temp = finder.getSprite(ent);
@@ -172,12 +165,30 @@ namespace Game.Buffers
             }
         }
 
+        private void displayDecals()
+        {
+            foreach (Decal decal in decals)
+            {
+                if (decal.isDone())
+                {
+                    doneDecals.Add(decal);
+                    this.removedSprites.Add(decal.getDecal());
+                }
+                else
+                    this.displaySprites.Add(decal.getDecal());
+            }
+            foreach (Decal decal in doneDecals)
+                decals.Remove(decal);
+            doneDecals.Clear();
+        }
+
         /************
          * output methods
          ************/
 
         internal HashSet<Sprite> newSpritesToDisplay()
         {
+            displayDecals();
             HashSet<Sprite> ans = new HashSet<Sprite>(displaySprites);
             displaySprites.Clear();
             return ans;

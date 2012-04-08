@@ -80,47 +80,5 @@ namespace Game.Graphic_Manager {
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
-        
-        internal static System.Drawing.Bitmap person_black {
-            get {
-                object obj = ResourceManager.GetObject("person_black", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        internal static System.Drawing.Bitmap person_blue {
-            get {
-                object obj = ResourceManager.GetObject("person_blue", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        internal static System.Drawing.Bitmap person_green {
-            get {
-                object obj = ResourceManager.GetObject("person_green", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        internal static System.Drawing.Bitmap person_purple {
-            get {
-                object obj = ResourceManager.GetObject("person_purple", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        internal static System.Drawing.Bitmap person_red {
-            get {
-                object obj = ResourceManager.GetObject("person_red", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        internal static System.Drawing.Bitmap person_yellow {
-            get {
-                object obj = ResourceManager.GetObject("person_yellow", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
     }
 }

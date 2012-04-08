@@ -11,7 +11,7 @@ namespace Game.Logic
         /******************
         Consts
         ****************/
-
+        const int randomPathLength = 100;
         const int CIV_FLEE_RANGE = 100;
         delegate Effect CurriedEntityListAdd(UniqueList<Entity> list); //These functions curry a list to an effect which will enter entities into the list
         delegate Effect CurriedDirectionListAdd(List<Direction> list); //These functions curry directions to an effect which will put them in lists
@@ -205,7 +205,7 @@ namespace Game.Logic
                     return;
                 }
                 Point temp = this.convertToCentralPoint(ent);
-                ent.Path = this.getSimplePath(temp, this.generateRandomPoint(temp));
+                ent.Path = this.getSimplePath(temp, this.generateRandomPoint(temp, randomPathLength));
                 tries++;
             }
             Direction dir = ent.getDirection();
@@ -217,19 +217,18 @@ namespace Game.Logic
             else
             {
                 Point temp = this.convertToCentralPoint(ent);
-                ent.Path = this.getSimplePath(temp, this.generateRandomPoint(temp));
+                ent.Path = this.getSimplePath(temp, this.generateRandomPoint(temp, randomPathLength));
             }
             ent.moveResult(result);
         }
 
-        private Point generateRandomPoint(Point temp)
+        private Point generateRandomPoint(Point temp, int distance)
         {
-            int maxX = Math.Min(temp.X + 50, this.gameGrid.GetLength(0)-1);
-            int minX = Math.Max(0, temp.X-50);
-            int maxY = Math.Min(temp.Y + 50, this.gameGrid.GetLength(1)-1);
-            int minY = Math.Max(0, temp.Y-50);
+            int maxX = Math.Min(temp.X + distance, this.gameGrid.GetLength(0)-1);
+            int minX = Math.Max(0, temp.X-distance);
+            int maxY = Math.Min(temp.Y + distance, this.gameGrid.GetLength(1)-1);
+            int minY = Math.Max(0, temp.Y-distance);
             return new Point(minX, maxX, minY, maxY);
-
         }
 
 
@@ -549,15 +548,6 @@ namespace Game.Logic
             Entity ent = null;
             while ((!(x0 == x1 & y0 == y1)) && (!shot.Blocked(ent)))
             {
-                ent = gameGrid[x0, y0];
-                if (ent != null)
-                {
-                    effect(ent);
-                    if (ent.destroyed())
-                    {
-                        this.destroyed.Add(ent);
-                    }
-                }
                 e2 = 2 * err;
                 if (e2 > -dy)
                 {
@@ -568,6 +558,17 @@ namespace Game.Logic
                 {
                     err = err + dx;
                     y0 = y0 + sy;
+                }
+                if (x0 >= gameGrid.GetLength(0) || x0 < 0 || y0 < 0 || y0 >= gameGrid.GetLength(1)) 
+                    break;
+                ent = gameGrid[x0, y0];
+                if (ent != null)
+                {
+                    effect(ent);
+                    if (ent.destroyed())
+                    {
+                        this.destroyed.Add(ent);
+                    }
                 }
             }
             Point res = new Point(x0, y0);
@@ -582,7 +583,7 @@ namespace Game.Logic
 
         private void destroy(Entity ent)
         {
-            this.addEvent(new DestroyEvent(this.locations[ent], ent));
+            this.addEvent(new DestroyEvent(this.locations[ent], this.entities[ent]));
             this.removeFromLocation(ent);
             locations.Remove(ent);
             this.entities.Remove(ent);

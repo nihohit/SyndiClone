@@ -117,6 +117,10 @@ namespace Game.Logic
                     case(BufferType.DESTROY):
                         this.alwaysActive.Remove(((DestroyEvent)action).Ent.Ent);
                         this.playerUnits.Remove(((DestroyEvent)action).Ent.Ent);
+                        if ((((DestroyEvent)action).Ent.Type == entityType.PERSON) && ((DestroyEvent)action).Ent.Loyalty == Affiliation.CIVILIAN)
+                        {
+                            this.civAmount--;
+                        }
                         break;
                     case(BufferType.CREATE):
                         //TODO - recreate
@@ -135,9 +139,6 @@ namespace Game.Logic
                 displayBuffer.receiveActions(actions);
                 //TODO - missing function
             }
-            soundBuffer.getLock();
-
-            soundBuffer.releaseLock();
             
         }
 

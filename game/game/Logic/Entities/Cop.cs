@@ -46,8 +46,7 @@ namespace Game.Logic.Entities
        private const int COP_REACTION_TIME = 10;
        private const int COP_HEALTH = 10;
        private const int COP_SPEED = 10;
-       private const int COP_SHOOTING_RATE = 10;
-       private const int COP_SHOOT_TIME = 200;
+       private const int COP_SHOOT_TIME = 2000;
 
        /************
          * class fields
@@ -89,14 +88,14 @@ namespace Game.Logic.Entities
 
        bool Shooter.readyToShoot()
        {
-           bool result = reachAffect(COP_SHOOT_TIME, this.timeBeforeShot, COP_SHOOTING_RATE);
+           bool result = reachAffect(COP_SHOOT_TIME, this.timeBeforeShot, copWeapon.RateOfFire);
            if (result)
            {
                this.timeBeforeShot -= COP_SHOOT_TIME;
            }
            else
            {
-               this.timeBeforeShot += COP_SHOOTING_RATE;
+               this.timeBeforeShot += copWeapon.RateOfFire;
            }
            return result;
        }

@@ -9,7 +9,7 @@ namespace Game.Logic.Entities
         class consts
         ****************/
         static Dictionary<WeaponType, Weapon> _weapons = new Dictionary<WeaponType, Weapon>();
-        const int PISTOL_ROF = 100;
+        const int PISTOL_ROF = 20;
         const int PISTOL_RANGE = 12;
         const int PISTOL_THREAT = 1;
         const double PISTOL_ACC = 1.1;

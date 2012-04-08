@@ -15,12 +15,5 @@ namespace Game.Logic.Entities
 
         targetChooser targeter();
 
-
-        /***********
-         * Interface's methods
-         **********/
-
     }
-
-
 }
