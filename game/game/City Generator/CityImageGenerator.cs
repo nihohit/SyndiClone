@@ -1,10 +1,6 @@
-﻿using System.Drawing;
+﻿using SFML.Graphics;
 using System.Collections.Generic;
-using System.Drawing.Imaging;
 using System;
-using System.IO;
-
-
 
 namespace Game.City_Generator
 {
@@ -13,12 +9,16 @@ namespace Game.City_Generator
     {
 
         
-        static int TILE_SIZE = 32;
+        static uint TILE_SIZE = 32;
         
-        public static SFML.Graphics.Image convert_to_image(GameBoard city){
+        public static SFML.Graphics.Texture convert_to_image(GameBoard city){
+            //TODO - set up all the images ahead of time in a dictionary, so we won't load them all the time.
+
             Tile[,] grid = city.Grid; 
-            //Image img = new Bitmap(TILE_SIZE*grid.GetLength(0),TILE_SIZE*grid.GetLength(1));
-            Image img = new Bitmap(TILE_SIZE * city.Length, TILE_SIZE * city.Depth);
+            //Image img = new Image(TILE_SIZE*grid.GetLength(0),TILE_SIZE*grid.GetLength(1));
+            uint x = Convert.ToUInt16(TILE_SIZE * city.Length);
+            uint y = Convert.ToUInt16(TILE_SIZE * city.Depth);
+            Image img = new Image(x,y);
             List<Image> images = new List<Image>();
             for (int i = 0 ; i < city.Length ; i ++)
             {
@@ -39,70 +39,63 @@ namespace Game.City_Generator
                         //TODO - other tiles?
                         default:
                         {
-                            images.Add(new Bitmap(city_images._0_empty));
+                            images.Add(new Image("images/City/0_empty.jpg"));
                             break;
                         }
                     }
                     
                 }
             }
-            Graphics graphic = Graphics.FromImage(img);
-            graphic.Clear(Color.Gray);
-            int depthOffset = 0;
-            int heightOffset = 0;
+            uint depthOffset = 0;
+            uint heightOffset = 0;
             foreach (Image image in images){
-                graphic.DrawImage(image, new Rectangle(depthOffset,heightOffset,image.Width, image.Height));
+                img.Copy(image, depthOffset,heightOffset);
                 heightOffset +=TILE_SIZE;
-                if (heightOffset == img.Height)
+                if (heightOffset == img.Size.Y)
                 {
                     depthOffset += TILE_SIZE;
                     heightOffset = 0;
                 }
             }
-            //TODO - generate destruction animations for the buildings. 
-            img.Save("test.jpg");
-
-            MemoryStream stream2 = new MemoryStream();
-            img.Save(stream2, ImageFormat.Png);
-            return new SFML.Graphics.Image(stream2);
+            //img.SaveToFile("result.png");
+            return new Texture(img);
         }
 
         private static Image generateBuildingTile(BuildingTile buildingTile)
         {
             int num = buildingTile.Building.Id;
-            Image img = new Bitmap(32, 32);
-            Graphics graphic = Graphics.FromImage(img);
+            Image img = new Image(32, 32);
             switch (num / 10)
             {
                 case(1):
-                    graphic.DrawImage(new Bitmap(city_images._1),0,0,16,32);
+                    img.Copy(new Image("images/City/1.png"),0,0);
                     break;
                 case (2):
-                    graphic.DrawImage(new Bitmap(city_images._2), 0, 0, 16, 32);
+                    img.Copy(new Image("images/City/2.png"), 0, 0);
                     break;
                 case (3):
-                    graphic.DrawImage(new Bitmap(city_images._3), 0, 0, 16, 32);
+                    img.Copy(new Image("images/City/3.png"), 0, 0);
                     break;
                 case (4):
-                    graphic.DrawImage(new Bitmap(city_images._4), 0, 0, 16, 32);
+                    img.Copy(new Image("images/City/4.png"), 0, 0);
                     break;
                 case (5):
-                    graphic.DrawImage(new Bitmap(city_images._5), 0, 0, 16, 32);
+                    img.Copy(new Image("images/City/5.png"), 0, 0);
                     break;
                 case (6):
-                    graphic.DrawImage(new Bitmap(city_images._6), 0, 0, 16, 32);
+                    img.Copy(new Image("images/City/6.png"), 0, 0);
                     break;
                 case (7):
-                    graphic.DrawImage(new Bitmap(city_images._7), 0, 0, 16, 32);
+                    img.Copy(new Image("images/City/7.png"), 0, 0);
                     break;
                 case (8):
-                    graphic.DrawImage(new Bitmap(city_images._8), 0, 0, 16, 32);
+                    img.Copy(new Image("images/City/8.png"), 0, 0);
                     break;
                 case (9):
-                    graphic.DrawImage(new Bitmap(city_images._9), 0, 0, 16, 32);
+                    img.Copy(new Image("images/City/9.png"), 0, 0);
                     break;
                 case (0):
-                    graphic.DrawImage(new Bitmap(city_images._0), 0, 0, 16, 32);
+                    img.Copy(new Image("images/City/0.png"), 0, 0);
                     break;
                 default:
                     break;
@@ -111,34 +104,34 @@ namespace Game.City_Generator
             switch (num % 10)
             {
                 case (1):
-                    graphic.DrawImage(new Bitmap(city_images._1), 16, 0, 16, 32);
+                    img.Copy(new Image("images/City/1.png"), 16, 0);
                     break;
                 case (2):
-                    graphic.DrawImage(new Bitmap(city_images._2), 16, 0, 16, 32);
+                    img.Copy(new Image("images/City/2.png"), 16, 0);
                     break;
                 case (3):
-                    graphic.DrawImage(new Bitmap(city_images._3), 16, 0, 16, 32);
+                    img.Copy(new Image("images/City/3.png"), 16, 0);
                     break;
                 case (4):
-                    graphic.DrawImage(new Bitmap(city_images._4), 16, 0, 16, 32);
+                    img.Copy(new Image("images/City/4.png"), 16, 0);
                     break;
                 case (5):
-                    graphic.DrawImage(new Bitmap(city_images._5), 16, 0, 16, 32);
+                    img.Copy(new Image("images/City/5.png"), 16, 0);
                     break;
                 case (6):
-                    graphic.DrawImage(new Bitmap(city_images._6), 16, 0, 16, 32);
+                    img.Copy(new Image("images/City/6.png"), 16, 0);
                     break;
                 case (7):
-                    graphic.DrawImage(new Bitmap(city_images._7), 16, 0, 16, 32);
+                    img.Copy(new Image("images/City/7.png"), 16, 0);
                     break;
                 case (8):
-                    graphic.DrawImage(new Bitmap(city_images._8), 16, 0, 16, 32);
+                    img.Copy(new Image("images/City/8.png"), 16, 0);
                     break;
                 case (9):
-                    graphic.DrawImage(new Bitmap(city_images._9), 16, 0, 16, 32);
+                    img.Copy(new Image("images/City/9.png"), 16, 0);
                     break;
                 case (0):
-                    graphic.DrawImage(new Bitmap(city_images._0), 16, 0, 16, 32);
+                    img.Copy(new Image("images/City/0.png"), 16, 0);
                     break;
                 default:
                     break;
@@ -157,32 +150,36 @@ namespace Game.City_Generator
                     if ((tile.Rotate == 1)||(tile.Rotate==3))
                     { //Horizontal road
                         if (tile.HDepth == 1)
-                            img = new Bitmap(city_images._1_road1);
+                            img = new Image("images/City/1_road1.jpg");
                         else
                         {
-                            if ((tile.HOffset == 0) || (tile.HOffset == tile.HDepth - 1)){
-                                img = new Bitmap(city_images._5_road2side);
+                            if ((tile.HOffset == 0) || (tile.HOffset == tile.HDepth - 1))
+                            {
+                                img = new Image("images/City/5_road2side.jpg");
                                 if (tile.HOffset != 0)
-                                    img.RotateFlip(RotateFlipType.Rotate180FlipNone);
-                                }
+                                    //img.RotateFlip(RotateFlipType.Rotate180FlipNone);
+                                    img.FlipHorizontally();
+                            }
                             else
-                                img = img = new Bitmap(city_images._7_road3middle);
+                                img = img = new Image("images/City/7_road3middle.jpg");
                         }
-                        img.RotateFlip(RotateFlipType.Rotate90FlipNone);
+                        img = rotate90(img);
                     }
                     else { //Vertical road
                         if (tile.VDepth == 1)
                         {
-                            img = new Bitmap(city_images._1_road1);
+                            img = new Image("images/City/1_road1.jpg");
 
                         }
                         else {
-                            if ((tile.VOffset == 0) || (tile.VOffset == tile.VDepth - 1)) {
-                                img = new Bitmap(city_images._5_road2side);
+                            if ((tile.VOffset == 0) || (tile.VOffset == tile.VDepth - 1)) 
+                            {
+                                img = new Image("images/City/5_road2side.jpg");
                                 if (tile.VOffset == tile.VDepth - 1)
-                                    img.RotateFlip(RotateFlipType.Rotate180FlipNone);
+                                    //img.RotateFlip(RotateFlipType.Rotate180FlipNone);
+                                    img.FlipHorizontally();
                             }
-                            else img = new Bitmap(city_images._7_road3middle);
+                            else img = new Image("images/City/7_road3middle.jpg");
                         }
                             
                     }
@@ -194,17 +191,18 @@ namespace Game.City_Generator
                     {
                         case 0: //road connect on east
                             if (tile.VDepth == 1)
-                                img = new Bitmap(city_images._2_road1intersect);
+                                img = new Image("images/City/2_road1intersect.jpg");
                             else {
                               //  System.Console.WriteLine("rotate is 0!");
                                 if (tile.VOffset == 0)
-                                    img = new Bitmap(city_images._4_road2intersect);
+                                    img = new Image("images/City/4_road2intersect.jpg");
                                 else if (tile.VOffset == tile.VDepth - 1)
                                 {
-                                    img = new Bitmap(city_images._5_road2side);
-                                    img.RotateFlip(RotateFlipType.Rotate180FlipNone);
+                                    img = new Image("images/City/5_road2side.jpg");
+                                    //img.RotateFlip(RotateFlipType.Rotate180FlipNone);
+                                    img.FlipHorizontally();
                                 }
-                                else img = new Bitmap(city_images._7_road3middle);                               
+                                else img = new Image("images/City/7_road3middle.jpg");                               
                             }
                             break;
 
@@ -212,25 +210,29 @@ namespace Game.City_Generator
                         case 1: //road on north
                             if (tile.HDepth == 1)
                             {
-                                img = new Bitmap(city_images._2_road1intersect);
-                                img.RotateFlip(RotateFlipType.Rotate90FlipNone);
+                                img = new Image("images/City/2_road1intersect.jpg");
+
+                                //img.RotateFlip(RotateFlipType.Rotate90FlipNone);
+                                img = rotate90(img);
                             }
 
                             else
                             {
                                 //System.Console.WriteLine("rotate is 1!");
                                 if (tile.HOffset == 0) {
-                                    img = new Bitmap(city_images._4_road2intersect);
-                                    img.RotateFlip(RotateFlipType.Rotate90FlipNone);
+                                    img = new Image("images/City/4_road2intersect.jpg");
+                                    img = rotate90(img);
                                 }
                                 else if (tile.HOffset == tile.HDepth - 1)
                                 {
-                                    img = new Bitmap(city_images._5_road2side);
-                                    img.RotateFlip(RotateFlipType.Rotate270FlipNone);
+                                    img = new Image("images/City/5_road2side.jpg");
+                                    //img.RotateFlip(RotateFlipType.Rotate270FlipNone);
+                                    img = rotate270(img);
                                 }
                                 else {
-                                    img = new Bitmap(city_images._7_road3middle);
-                                    img.RotateFlip(RotateFlipType.Rotate90FlipNone);
+                                    img = new Image("images/City/7_road3middle.jpg");
+                                    //img.RotateFlip(RotateFlipType.Rotate90FlipNone);
+                                    img = rotate90(img);
                                 }
                             }
                             break;
@@ -239,81 +241,116 @@ namespace Game.City_Generator
                         case 2: //road connects on west side
                             if (tile.VDepth == 1)
                             {
-                                img = new Bitmap(city_images._2_road1intersect);
-                                img.RotateFlip(RotateFlipType.Rotate180FlipNone);
+                                img = new Image("images/City/2_road1intersect.jpg");
+                                img.FlipHorizontally();
                             }
                             else
                             {
                                 //System.Console.WriteLine("rotate is 2!");
                                 if (tile.VOffset == tile.VDepth - 1)
                                 {
-                                    img = new Bitmap(city_images._4_road2intersect);
-                                    img.RotateFlip(RotateFlipType.Rotate180FlipNone);
+                                    img = new Image("images/City/4_road2intersect.jpg");
+                                    img.FlipHorizontally();
                                 }
                                 else if (tile.VOffset == 0)
                                 {
-                                    img = new Bitmap(city_images._5_road2side);
+                                    img = new Image("images/City/5_road2side.jpg");
                                 }
-                                else img = new Bitmap(city_images._7_road3middle);
+                                else img = new Image("images/City/7_road3middle.jpg");
                             }
                             break;
                         case 3: //road connects on south
                             if (tile.HDepth == 1)
                             {
-                                img = new Bitmap(city_images._2_road1intersect);
-                                img.RotateFlip(RotateFlipType.Rotate270FlipNone);
+                                img = new Image("images/City/2_road1intersect.jpg");
+                                //img.RotateFlip(RotateFlipType.Rotate270FlipNone);
+                                img = rotate270(img);
                             }
                             else {
                                 //System.Console.WriteLine("rotate is 3!");
                                 if (tile.HOffset == tile.HDepth - 1)
                                 {
-                                    img = new Bitmap(city_images._4_road2intersect);
-                                    img.RotateFlip(RotateFlipType.Rotate270FlipNone);
+                                    img = new Image("images/City/4_road2intersect.jpg");
+                                    //img.RotateFlip(RotateFlipType.Rotate270FlipNone);
+                                    img = rotate270(img);
                                 }
                                 else if (tile.HOffset == 0)
                                 {
-                                    img = new Bitmap(city_images._5_road2side);
-                                    img.RotateFlip(RotateFlipType.Rotate90FlipNone); 
+                                    img = new Image("images/City/5_road2side.jpg");
+                                    //img.RotateFlip(RotateFlipType.Rotate90FlipNone); 
+                                    img = rotate90(img);
                                 }
                                 else
                                 {
-                                    img = new Bitmap(city_images._7_road3middle);
-                                    img.RotateFlip(RotateFlipType.Rotate270FlipNone);
+                                    img = new Image("images/City/7_road3middle.jpg");
+                                    //img.RotateFlip(RotateFlipType.Rotate270FlipNone);
+                                    img = rotate270(img);
                                 }
                             }
                             break;
-                        default: img = new Bitmap(city_images._0_empty); break;
+                        default: img = new Image("images/City/0_empty.jpg"); break;
                     }
 
                     
                     break;
                 case Images.R_CORNER: 
-                    img = new Bitmap(city_images._0_buildingTemp1);//TODO: draw corners and fix this.
+                    img = new Image("images/City/0_buildingTemp1.jpg");//TODO: draw corners and fix this.
                     break;
                 case Images.R_FOURWAY:
-                    img = new Bitmap(city_images._3_road1mid);//TODO: test. I think we need to draw another 4way images with other sidewalk formations.
+                    img = new Image("images/City/3_road1mid.jpg");//TODO: test. I think we need to draw another 4way images with other sidewalk formations.
                     break;
-               
                
                 default:
-                    img = new Bitmap(city_images._0_empty);
+                    img = new Image("images/City/0_empty.jpg");
                     break;
             }
-            
-            /*switch (tile.Flip)
-            {
-                case 1:
-                    img.RotateFlip(RotateFlipType.RotateNoneFlipX);
-                    break;
-                case 2:
-                    img.RotateFlip(RotateFlipType.RotateNoneFlipY);
-                    break;
-                case 3:
-                    img.RotateFlip(RotateFlipType.RotateNoneFlipXY);
-                    break;
-            }*/
 
             return img;
+        }
+
+        private static Image rotate270(Image temp)
+        {
+            uint maxY = temp.Size.Y;
+            uint maxX = temp.Size.X;
+            Image val = new Image(maxY, maxX);
+            for (uint x = 0; x < maxX; x++)
+            {
+                for (uint y = 0; y < maxY; y++)
+                {
+                    val.SetPixel(y, maxX - 1 - x, temp.GetPixel(x, y));
+                }
+            }
+            return val;
+        }
+
+        private static Image rotate90(Image temp)
+        {
+            uint maxY = temp.Size.Y;
+            uint maxX = temp.Size.X;
+            Image val = new Image(maxY, maxX);
+            for (uint x = 0; x < maxX; x++)
+            {
+                for (uint y = 0; y < maxY; y++)
+                {
+                    val.SetPixel(maxY - 1 - y, x, temp.GetPixel(x, y));
+                }
+            }
+            return val;
+        }
+
+        private static Image rotate180(Image temp)
+        {
+            uint maxY = temp.Size.Y;
+            uint maxX = temp.Size.X;
+            Image val = new Image(maxX, maxY);
+            for (uint x = 0; x < maxX; x++)
+            {
+                for (uint y = 0; y < maxY; y++)
+                {
+                    val.SetPixel(maxX - 1 - x, maxY - 1 - y, temp.GetPixel(x, y));
+                }
+            }
+            return val;
         }
 
     }

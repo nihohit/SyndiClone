@@ -1,4 +1,5 @@
 ﻿using SFML.Graphics;
+using SFML.Window;
 using System.Collections.Generic;
 using Game.Logic;
 using Game.Logic.Entities;
@@ -25,7 +26,7 @@ namespace Game.Buffers
         private LinkedList<Decal> decals;
         private List<Decal> doneDecals = new List<Decal>();
         private HashSet<Game.Graphic_Manager.Animation> newAnimations;
-        private ImageFinder finder;
+        private TextureFinder finder;
 
         /******************
         Constructors
@@ -81,7 +82,7 @@ namespace Game.Buffers
 
                 temp = this.finder.getShot(shot, (upDown & rightLeft));
                 //TODO - rotate the shot
-                temp.Position = new Vector2(x0, y0);
+                temp.Position = new Vector2f(x0, y0);
                 for (int i = 0; i < amountOfReapeatingSpritesInAnimation; i++)
                 {
                     ans.AddLast(temp);
@@ -120,8 +121,10 @@ namespace Game.Buffers
                                 break;
                             case (entityType.PERSON):
                                 decal = new Decal(DecalType.BLOOD);
+                                
                                 break;
                         }
+                        
                         decal.setLocation(ent.Position);
                         this.addDecal(decal);
                         break;
@@ -129,7 +132,7 @@ namespace Game.Buffers
                         ExternalEntity mover = ((MoveEvent)action).Mover;
                         Sprite movement = this.finder.getSprite(mover);
                         movement.Rotation = ((MoveEvent)action).Rotation;
-                        Vector2 position = new Vector2(mover.Position.X, mover.Position.Y);
+                        Vector2f position = new Vector2f(mover.Position.X, mover.Position.Y);
                         movement.Position = position;
                         //TODO - generate turning animation
                         break;
@@ -159,7 +162,7 @@ namespace Game.Buffers
             foreach (ExternalEntity ent in visibleExternalEntityList)
             {
                 Sprite temp = finder.getSprite(ent);
-                temp.Position = new Vector2(ent.Position.X, ent.Position.Y);
+                temp.Position = new Vector2f(ent.Position.X, ent.Position.Y);
                 //TODO - find a way to make sure that the sprite's position is correct.
                 displaySprites.Add(temp);
             }

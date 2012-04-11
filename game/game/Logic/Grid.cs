@@ -25,7 +25,7 @@ namespace Game.Logic
         private readonly Dictionary<Entity, ExternalEntity> entities;
         private readonly Dictionary<Entity, Area> locations;
         private readonly Entity[,] gameGrid;
-        private readonly List<BufferEvent> actionsDone;
+        private readonly List<Buffers.BufferEvent> actionsDone;
         private readonly UniqueList<ExternalEntity> visible;
         private readonly UniqueList<Entity> destroyed;
         //TODO - add corporations?
@@ -37,7 +37,7 @@ namespace Game.Logic
         internal Grid(Entity[,] grid)
         {
             this.gameGrid = grid;
-            this.actionsDone = new List<BufferEvent>();
+            this.actionsDone = new List<Buffers.BufferEvent>();
             this.locations = new Dictionary<Entity, Area>();
             this.entities = new Dictionary<Entity, ExternalEntity>();
             this.visible = new UniqueList<ExternalEntity>();
@@ -100,7 +100,7 @@ namespace Game.Logic
         /*
          * This function returns the list of actions performed in the current round.
          */
-        internal List<BufferEvent> returnActions()
+        internal List<Buffers.BufferEvent> returnActions()
         {
             foreach (Entity ent in destroyed)
                 this.destroy(ent);
@@ -124,7 +124,7 @@ namespace Game.Logic
         /*
          * This function adds events to be reported to future buffers
          */
-        private void addEvent(BufferEvent action)
+        private void addEvent(Buffers.BufferEvent action)
         {
             this.actionsDone.Add(action);
         }
@@ -385,12 +385,12 @@ namespace Game.Logic
             {
                 ExternalEntity newEnt = this.entities[ent];
                 newEnt.Position = new Vector(location.Entry);
-                this.addEvent(new MoveEvent(toSwitch, newEnt, rotation));
+                this.addEvent(new Buffers.MoveEvent(toSwitch, newEnt, rotation));
             }
             else
             {
                 ExternalEntity newEnt = new ExternalEntity(ent, new Vector(location.Entry));
-                this.addEvent(new MoveEvent(toSwitch, newEnt, rotation));
+                this.addEvent(new Buffers.MoveEvent(toSwitch, newEnt, rotation));
                 this.entities.Add(ent, newEnt);
 
             }
@@ -509,6 +509,7 @@ namespace Game.Logic
             Shot shot = shooter.weapon().Shot;
             Point exit = this.convertToCentralPoint((Entity)shooter);
             Point currentTargetLocation = this.convertToCentralPoint(target);
+            //TODO - change the hit functions so they'll compute only angle of shot, so the shot will go for its full range
             currentTargetLocation = shooter.hitFunc()(currentTargetLocation, this.getDistance(exit, currentTargetLocation), shooter.weapon().Acc);
             //TODO - If there's a target that I see only parts of it, how do I aim at the visible parts?
             
@@ -575,7 +576,7 @@ namespace Game.Logic
 
             if (!(shot.Type == ShotType.SIGHT))
             {
-                this.addEvent(new ShotEvent(shot.Type, exit, res));
+                this.addEvent(new Buffers.ShotEvent(shot.Type, exit, res));
 
             }
             return res;
@@ -583,7 +584,7 @@ namespace Game.Logic
 
         private void destroy(Entity ent)
         {
-            this.addEvent(new DestroyEvent(this.locations[ent], this.entities[ent]));
+            this.addEvent(new Buffers.DestroyEvent(this.locations[ent], this.entities[ent]));
             this.removeFromLocation(ent);
             locations.Remove(ent);
             this.entities.Remove(ent);
@@ -609,7 +610,7 @@ namespace Game.Logic
             }
             ExternalEntity temp = new ExternalEntity(ent, new Vector(area.Entry.X, area.Entry.Y));
             this.entities.Add(ent, temp);
-            this.addEvent(new CreateEvent(temp, area));
+            this.addEvent(new Buffers.CreateEvent(temp, area));
         }
 
         internal void resolveConstruction(Constructor constructor, MovingEntity entity)

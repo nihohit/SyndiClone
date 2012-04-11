@@ -13,21 +13,20 @@ namespace Game.Graphic_Manager
         HashSet<Sprite> removedSprites;
         HashSet<Animation> animations;
         HashSet<Animation> doneAnimations = new HashSet<Animation>();
-        Sprite back;
+        Sprite background;
+        uint x, y, bits;
 
 
-        public DisplayManager(uint x, uint y, uint bits, Game.Buffers.DisplayBuffer buffer, Image background)
+        public DisplayManager(uint x, uint y, uint bits, Game.Buffers.DisplayBuffer buffer, Texture _background)
         {
             this._buffer = buffer;
-            this._mainWindow = new RenderWindow(new VideoMode(x, y, bits), "main display");
-            this._mainWindow.SetActive(false);
-            back = new Sprite(background);
+            this.x = x;
+            this.y = y;
+            this.bits = bits;
+            background = new Sprite(_background);
             displayedSprites = new HashSet<Sprite>();
             removedSprites = new HashSet<Sprite>();
             animations = new HashSet<Animation>();
-
-            this._mainWindow.Closed += new EventHandler(OnClosed);
-            this._mainWindow.KeyPressed += new EventHandler<KeyEventArgs>(OnKeyPressed);
         }
 
         private void findSpritesToDisplay()
@@ -57,7 +56,8 @@ namespace Game.Graphic_Manager
         public void loop()
         {
             this._mainWindow.Clear();
-            this._mainWindow.Draw(back);
+            this._mainWindow.DispatchEvents();
+            this._mainWindow.Draw(background);
             this.updateInfo();
             this.display();
         }
@@ -115,13 +115,17 @@ namespace Game.Graphic_Manager
 
         public void run()
         {
+            this._mainWindow = new RenderWindow(new VideoMode(x, y, bits), "main display");
+            this._mainWindow.SetActive(false);
+            this._mainWindow.Closed += new EventHandler(OnClosed);
+            this._mainWindow.KeyPressed += new EventHandler<KeyEventArgs>(OnKeyPressed);
+            this._mainWindow.GainedFocus += new EventHandler(OnGainingFocus);
+            this._mainWindow.LostFocus += new EventHandler(OnLosingFocus);
+
             while (true)
             {
                 //Console.Out.WriteLine("display loop");
                 loop();
-                this._mainWindow.DispatchEvents();
-                
-
             }
         }
 
@@ -141,8 +145,16 @@ namespace Game.Graphic_Manager
         {
             Window window = (Window)sender;
             Console.Out.WriteLine("key pressed");
-            if (e.Code == KeyCode.Escape)
-                window.Show(window.IsOpened());
+        }
+
+        static void OnLosingFocus(object sender, EventArgs e)
+        {
+            Console.Out.WriteLine("lost focus");
+        }
+
+        static void OnGainingFocus(object sender, EventArgs e)
+        {
+            Console.Out.WriteLine("gain focus");
         }
 
     }

@@ -16,7 +16,7 @@ namespace Game.City_Generator
 
         protected List<Building> _buildings;
         protected Corporate[,] _corpList;
-        protected Image _img;
+        protected Texture _img;
         protected int _len, _dep;
 
         /********************************Properties***************************************/
@@ -35,7 +35,7 @@ namespace Game.City_Generator
             get { return _dep; }
         }
 
-        internal Image Img
+        internal Texture Img
         {
             get { return _img; }
             set { _img = value; }

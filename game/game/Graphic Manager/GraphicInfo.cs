@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using SFML.Graphics;
+using SFML.Window;
 using System;
 
 namespace Game.Graphic_Manager
@@ -12,10 +13,10 @@ namespace Game.Graphic_Manager
     internal struct Decal
     {
         const int DECAL_STAY_TIME = 3000;
-        static Dictionary<DecalType, Image> decals = new Dictionary<DecalType,Image>
+        static Dictionary<DecalType, Texture> decals = new Dictionary<DecalType,Texture>
             {
                 //{DecalType.EXPLOSION, 
-                {DecalType.BLOOD, new Image("images/bloodsplatter.png")}
+                {DecalType.BLOOD, new Texture("images/Decals/bloodsplatter.png")}
                 //{DecalType.RUBBLE, 
             };
 
@@ -42,7 +43,7 @@ namespace Game.Graphic_Manager
 
         internal void setLocation(Vector vector)
         {
-            this._sprite.Position= new Vector2(vector.X, vector.Y);
+            this._sprite.Position= new Vector2f(vector.X, vector.Y);
         }
     }
 
