@@ -16,10 +16,17 @@ namespace Game.Logic.Entities
          * constructor
          **********/
         internal CivilianBuilding(Game.Vector realSize, int sizeModifier, Vector exit)
-            : base(BASE_BUILD_REACTION_TIME / sizeModifier, civBuildReact, BASE_BUILD_HEALTH * sizeModifier, realSize, Affiliation.CIVILIAN, Sight.instance(SightType.CIV_SIGHT))
+            : base(sizeModifier, Entity.reactionPlaceHolder, sizeModifier, realSize, Affiliation.CIVILIAN, Sight.instance(SightType.CIV_SIGHT))
         {
             base.ExitPoint = exit;
             this._sizeModifier = sizeModifier;
+            reactionFunction react = delegate(List<Entity> ent)
+            {
+                Civilian temp = new Civilian();
+                this._readyToBuild = true;
+                return new Reaction(temp, Action.CREATE_ENTITY);
+            };
+            this.ReactionFunction = react;
         }
 
         /******************
@@ -29,9 +36,10 @@ namespace Game.Logic.Entities
         /*
          * This function is just the basic reaction function for the basic civic buildings.
          */
-        public static Reaction civBuildReact(List<Entity> ent)
+        public Reaction civBuildReact(List<Entity> ent)
         {
             Civilian temp = new Civilian();
+            this._readyToBuild = true;
             return new Reaction(temp, Action.CREATE_ENTITY);
         }
 
@@ -42,8 +50,7 @@ namespace Game.Logic.Entities
 
         bool Constructor.readyToConstruct()
         {
-            //TODO - problem?
-            return true;
+            return base.readyToConstruct();
         }
 
         public Vector exitPoint()

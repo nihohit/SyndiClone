@@ -2,32 +2,89 @@
 using SFML.Window;
 using System.Collections.Generic;
 using System;
+using Game.Buffers;
 
 namespace Game.Graphic_Manager
 {
-    class DisplayManager
+    class Game_Screen
     {
-        RenderWindow _mainWindow;
-        Game.Buffers.DisplayBuffer _buffer;
-        HashSet<Sprite> displayedSprites;
-        HashSet<Sprite> removedSprites;
-        HashSet<Animation> animations;
-        HashSet<Animation> doneAnimations = new HashSet<Animation>();
-        Sprite background;
-        uint x, y, bits;
+        /************
+         * class fields
+         ***************/
+        private RenderWindow _mainWindow;
+        private Game.Buffers.DisplayBuffer _buffer;
+        private InputBuffer input;
+        private HashSet<Sprite> displayedSprites;
+        private HashSet<Sprite> removedSprites;
+        private HashSet<Animation> animations;
+        private HashSet<Animation> doneAnimations;
+        private Sprite background;
+        private Sprite crosshair;
+        private View UIview;
 
 
-        public DisplayManager(uint x, uint y, uint bits, Game.Buffers.DisplayBuffer buffer, Texture _background)
+        /************
+         * constructor
+         ***************/
+        public Game_Screen(Game.Buffers.DisplayBuffer buffer, Texture _background, RenderWindow window, InputBuffer _input)
         {
             this._buffer = buffer;
-            this.x = x;
-            this.y = y;
-            this.bits = bits;
+            this.input = _input;
             background = new Sprite(_background);
             displayedSprites = new HashSet<Sprite>();
             removedSprites = new HashSet<Sprite>();
             animations = new HashSet<Animation>();
+            doneAnimations = new HashSet<Animation>();
+            this._mainWindow = window;
+            this.crosshair = new Sprite(new Texture("images/UI/crosshairs.png"));
+            this.crosshair.Origin = new Vector2f(this.crosshair.Texture.Size.X / 2, this.crosshair.Texture.Size.Y / 2);
+            this.UIview = new View(new Vector2f(_background.Size.X/2, _background.Size.Y/2), new Vector2f(_background.Size.X, _background.Size.Y));
         }
+
+        /************
+         * Class methods
+         *************/
+
+        /***********
+         * communication
+         ************/
+
+        private void updateInfo()
+        {
+            if (input.GraphicInput)
+            {
+                List<BufferEvent> list = input.graphicEvents();
+                foreach (BufferEvent action in list)
+                {
+                    switch (action.type())
+                    {
+                        case BufferType.MOUSEMOVE:
+                            this.crosshair.Position = ((BufferMouseMoveEvent)action).Coords;
+                            //Console.Out.WriteLine(((BufferMouseMoveEvent)action).X + " " + ((BufferMouseMoveEvent)action).Y);
+                            break;
+                    }
+                }
+                
+            }
+            lock (this._buffer)
+            {
+                findSpritesToRemove();
+                findSpritesToDisplay();
+                updateAnimations();
+            }
+            removeSprites();
+            enterAnimations();
+            displaySprites();
+            drawUI();
+        }
+
+        private void drawUI()
+        {
+            crosshair.Position = _mainWindow.ConvertCoords(Mouse.GetPosition(_mainWindow));
+            this._mainWindow.Draw(crosshair);
+        }
+
+
 
         private void findSpritesToDisplay()
         {
@@ -45,34 +102,38 @@ namespace Game.Graphic_Manager
             this.animations.UnionWith(this._buffer.getAnimations());
         }
 
+
+        /***********
+         * main loop
+         ***********/
+        /*
+        public void run()
+        {
+            while (active)
+            {
+                loop();
+            }
+        }*/
+
+        public void loop()
+        {
+            this._mainWindow.Clear();
+            this._mainWindow.Draw(background);
+            this.updateInfo();
+            this.display();
+        }
+
+
+        /***********
+         * info handling
+         ***********/
+
         private void displaySprites()
         {
             foreach (Sprite sprite in this.displayedSprites)
             {
                 this._mainWindow.Draw(sprite);
             }
-        }
-
-        public void loop()
-        {
-            this._mainWindow.Clear();
-            this._mainWindow.DispatchEvents();
-            this._mainWindow.Draw(background);
-            this.updateInfo();
-            this.display();
-        }
-
-        private void updateInfo()
-        {
-            lock (this._buffer)
-            {
-                findSpritesToRemove();
-                findSpritesToDisplay();
-                updateAnimations();
-            }
-            removeSprites();
-            enterAnimations();
-            displaySprites();
         }
 
         private void enterAnimations()
@@ -111,50 +172,6 @@ namespace Game.Graphic_Manager
         public void display()
         {
             _mainWindow.Display();
-        }
-
-        public void run()
-        {
-            this._mainWindow = new RenderWindow(new VideoMode(x, y, bits), "main display");
-            this._mainWindow.SetActive(false);
-            this._mainWindow.Closed += new EventHandler(OnClosed);
-            this._mainWindow.KeyPressed += new EventHandler<KeyEventArgs>(OnKeyPressed);
-            this._mainWindow.GainedFocus += new EventHandler(OnGainingFocus);
-            this._mainWindow.LostFocus += new EventHandler(OnLosingFocus);
-
-            while (true)
-            {
-                //Console.Out.WriteLine("display loop");
-                loop();
-            }
-        }
-
-        /// <summary>
-        /// Function called when the window is closed
-        /// </summary>
-        static void OnClosed(object sender, EventArgs e)
-        {
-            Window window = (Window)sender;
-            window.Close();
-        }
-
-        /// <summary>
-        /// Function called when a key is pressed
-        /// </summary>
-        static void OnKeyPressed(object sender, KeyEventArgs e)
-        {
-            Window window = (Window)sender;
-            Console.Out.WriteLine("key pressed");
-        }
-
-        static void OnLosingFocus(object sender, EventArgs e)
-        {
-            Console.Out.WriteLine("lost focus");
-        }
-
-        static void OnGainingFocus(object sender, EventArgs e)
-        {
-            Console.Out.WriteLine("gain focus");
         }
 
     }

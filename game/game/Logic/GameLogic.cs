@@ -26,14 +26,15 @@ namespace Game.Logic
         private readonly DisplayBuffer displayBuffer;
         private readonly InputBuffer inputBuffer;
         private readonly SoundBuffer soundBuffer;
-
+        private bool active;
+        private bool gameRunning;
         /******************
         Constructors
         ****************/
 
         public void run()
         {
-            while (true)
+            while (gameRunning)
             {
                 //Console.Out.WriteLine("logic loop");
                 loop();
@@ -54,6 +55,8 @@ namespace Game.Logic
             this.civAmountGoal = _civAmount;
             this.civAmount = 0;
             this._grid = GameBoardToGameGridConverter.convert(city);
+            this.active = true;
+            this.gameRunning = true;
         }
 
         /******************
@@ -66,13 +69,16 @@ namespace Game.Logic
         public void loop()
         {
             this.handleInput();
-            this.listAdd();
-            this.resolveOrders();
-            this.handleMovement();
-            this.handleShooting();
-            this.handleUnitCreation();
-            this.updateOutput();
-            this.clearData();
+            if (active)
+            {
+                this.populateActionLists();
+                this.resolveOrders();
+                this.handleMovement();
+                this.handleShooting();
+                this.handleUnitCreation();
+                this.updateOutput();
+                this.clearData();
+            }
         }
 
         private void handleUnitCreation()
@@ -93,7 +99,6 @@ namespace Game.Logic
                     default:
                         this._grid.resolveConstruction(constructor, constructor.getConstruct());
                         break;
-
                 }
             }
         }
@@ -144,9 +149,26 @@ namespace Game.Logic
 
         private void handleInput()
         {
-            lock (inputBuffer)
+            if (inputBuffer.LogicInput)
             {
-                //TODO - missing function
+                List<BufferEvent> events = inputBuffer.logicEvents();
+                foreach(BufferEvent action in events)
+                {
+                    switch (action.type())
+                    {
+                        case BufferType.PAUSE:
+                            this.active = false;
+                            break;
+                        case BufferType.UNPAUSE:
+                            this.active = true;
+                            break;
+                        case BufferType.ENDGAME:
+                            this.active = false;
+                            this.gameRunning = false;
+                            break;
+
+                    }
+                }
             }
         }
 
@@ -157,10 +179,8 @@ namespace Game.Logic
         {
             foreach (Entity ent in activeEntities)
             {
-                bool currentlyActed = false;
                 if (ent.doesReact())
                 {
-                    currentlyActed = true;
                     if (ent.WhatSees == null)
                     {
                         this._grid.whatSees(ent);
@@ -193,7 +213,7 @@ namespace Game.Logic
                 if (action == Action.CREATE_ENTITY)
                 {
                     Constructor temp = (Constructor)ent;
-                    if (temp.readyToConstruct() && currentlyActed) //TODO - for structures, to make sure they update their building order. other solution?
+                    if (temp.readyToConstruct()) //TODO - for structures, to make sure they update their building order. other solution?
                     {
                         this.constructors.Add(temp);
                     }
@@ -220,7 +240,7 @@ namespace Game.Logic
         /*
          * This function populates the active entities for this round, by the logic of - all player units, and every entity they see 
          */
-        private void listAdd()
+        private void populateActionLists()
         {
             activeEntities.listAdd(alwaysActive);
             foreach (Entity t in playerUnits)

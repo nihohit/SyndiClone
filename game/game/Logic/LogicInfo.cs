@@ -91,8 +91,6 @@ namespace Game.Logic
             this._actionChosen = action;
             this._focus = ent;
         }
-
-
     }
 
     internal static class Targeters 
@@ -110,7 +108,6 @@ namespace Game.Logic
                     target = ent;
                 }
             }
-
             return target;
         }
 

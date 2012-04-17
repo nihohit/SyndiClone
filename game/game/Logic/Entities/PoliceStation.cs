@@ -24,8 +24,8 @@ namespace Game.Logic.Entities
          * constructor
          **********/
         internal PoliceStation(Game.Vector realSize, int sizeModifier, Vector exit)
-            : base(BASE_BUILD_REACTION_TIME / sizeModifier, 
-            policeBuildReact, BASE_BUILD_HEALTH * sizeModifier, realSize, Affiliation.INDEPENDENT, Sight.instance(SightType.POLICE_SIGHT))
+            : base(sizeModifier,
+            Entity.reactionPlaceHolder, sizeModifier, realSize, Affiliation.INDEPENDENT, Sight.instance(SightType.POLICE_SIGHT))
         {
             
             base.ExitPoint = exit;
@@ -36,6 +36,7 @@ namespace Game.Logic.Entities
                 {
                     Cop temp = new Cop(this);
                     this.amountOfPolicemen++;
+                    this._readyToBuild = true;
                     return new Reaction(temp, Action.CREATE_ENTITY);
                 };
             this.ReactionFunction = react;
@@ -44,15 +45,6 @@ namespace Game.Logic.Entities
         /******************
         Methods
         ****************/
-
-        /*
-         * This function is just a placeholder.
-         */
-        public static Reaction policeBuildReact(List<Entity> ent)
-        {
-            Cop temp = null;
-            return new Reaction(temp, Action.CREATE_ENTITY);
-        }
 
         public MovingEntity getConstruct()
         {
@@ -64,7 +56,9 @@ namespace Game.Logic.Entities
             if (onAlert)
             {
                 if (this.amountOfPolicemen < this.policemenCap * 3)
-                    return true;
+                {
+                    return base.readyToConstruct();
+                }
                 else //TODO - this is the only place where we remove the policestation's alert. should this be so?
                 {
                     this.onAlert = false;
@@ -72,7 +66,7 @@ namespace Game.Logic.Entities
                 }
             }
             else
-                return this.amountOfPolicemen <= this.policemenCap;
+                return base.readyToConstruct() && (this.amountOfPolicemen <= this.policemenCap);
         }
 
         public Vector exitPoint()

@@ -3,11 +3,68 @@ using Game.Logic.Entities;
 
 namespace Game.Buffers
 {
-    internal enum BufferType { MOVE, SHOT, DESTROY, CREATE, PAUSE } //different buffers for the actions that the grid returns after each loop
+    internal enum BufferType { MOVE, SHOT, DESTROY, CREATE, PAUSE, CLICK, UNPAUSE, ENDGAME, MOUSEMOVE } //different buffers for the actions that the grid returns after each loop
 
     internal interface BufferEvent
     {
         BufferType type();
+    }
+
+    internal struct PauseEvent : BufferEvent
+    {
+        BufferType BufferEvent.type()
+        {
+            return BufferType.PAUSE;
+        }
+    }
+
+    internal struct BufferMouseMoveEvent : BufferEvent
+    {
+        private readonly SFML.Window.Vector2f coords;
+        
+        BufferType BufferEvent.type()
+        {
+            return BufferType.MOUSEMOVE;
+        }
+
+        public BufferMouseMoveEvent(float _x, float _y)
+        {
+            coords = new SFML.Window.Vector2f(_x, _y);
+        }
+
+        public BufferMouseMoveEvent(SFML.Window.Vector2f vec)
+        {
+            coords = vec;
+        }
+        /*
+        public float X
+        {
+            get { return coords.X; }
+        }
+
+        public float Y
+        {
+            get { return coords.Y; }
+        } */
+
+
+        public SFML.Window.Vector2f Coords { get { return this.coords ;}}
+    }
+
+    internal struct EndGameEvent : BufferEvent
+    {
+        BufferType BufferEvent.type()
+        {
+            return BufferType.ENDGAME;
+        }
+    }
+
+    internal struct UnPauseEvent : BufferEvent
+    {
+        BufferType BufferEvent.type()
+        {
+            return BufferType.UNPAUSE;
+        }
     }
 
     internal struct ShotEvent : BufferEvent

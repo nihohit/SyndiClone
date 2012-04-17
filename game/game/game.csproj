@@ -53,14 +53,14 @@
   </PropertyGroup>
   <ItemGroup>
     <Folder Include="Audio Manager\" />
-    <Folder Include="Screen Manager\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Buffers\Buffer.cs" />
     <Compile Include="Buffers\BuffersInfo.cs" />
     <Compile Include="Graphic Manager\BuildingImageGenerator.cs" />
-    <Compile Include="Input_Manager\InputBuffer.cs" />
-    <Compile Include="Input_Manager\InputManager.cs" />
+    <Compile Include="Screen Manager\FileReader.cs" />
+    <Compile Include="Screen Manager\InputBuffer.cs" />
+    <Compile Include="Screen Manager\ScreenManager.cs" />
     <Compile Include="testInput.cs" />
     <Compile Include="Graphic Manager\ImageFinder.cs" />
     <Compile Include="City Generator\Block.cs" />
@@ -76,7 +76,6 @@
     <Compile Include="Graphic Manager\DisplayBuffer.cs" />
     <Compile Include="Graphic Manager\DisplayManager.cs" />
     <Compile Include="Graphic Manager\GraphicInfo.cs" />
-    <Compile Include="Buffers\InputBuffer.cs" />
     <Compile Include="Logic\Entities\Agent.cs" />
     <Compile Include="Logic\Entities\BlastEffect.cs" />
     <Compile Include="Logic\Entities\Building.cs" />
@@ -149,19 +148,7 @@
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Graphic Manager\images\9_edge.gif" />
-    <None Include="Graphic Manager\images\0_buildingmiddle.gif" />
-    <None Include="Graphic Manager\images\9_corner.gif" />
-    <None Include="Graphic Manager\images\person yellow.png" />
-    <None Include="Graphic Manager\images\person black.png" />
-    <None Include="Graphic Manager\images\person blue.png" />
-    <None Include="Graphic Manager\images\person green.png" />
-    <None Include="Graphic Manager\images\person purple.png" />
-    <None Include="Graphic Manager\images\person red.png" />
     <None Include="City Generator\images\0.png" />
-    <None Include="Graphic Manager\images\bloodsplatter.png" />
-    <None Include="Graphic Manager\images\shot diagonal.png" />
-    <None Include="Graphic Manager\images\shot straight.png" />
     <Content Include="bin\Debug\game.exe" />
     <Content Include="bin\Debug\game.pdb" />
     <Content Include="City Generator\images\0_buildingtemp.jpg" />

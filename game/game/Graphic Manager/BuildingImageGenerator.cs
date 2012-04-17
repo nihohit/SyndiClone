@@ -40,7 +40,6 @@ namespace Game.Graphic_Manager
 
     internal static class BuildingImageGenerator
     {
-
         const uint TILE_SIZE = 32;
         private static Dictionary<ExternalEntity, Texture> buildings = new Dictionary<ExternalEntity, Texture>(new externalEntityEqualityComparer());
         private static Dictionary<Tuple<Block, BuildingStyle>, Texture> templates = new Dictionary<Tuple<Block, BuildingStyle>, Texture>(new tupleEqualityComparer());
@@ -64,6 +63,7 @@ namespace Game.Graphic_Manager
 
         private static Image generateBuildingImage(Tuple<Block, BuildingStyle> temp)
         {
+            //TODO - if too heavy for realtime computing, try instead of generating an image, generating a rendertexture.
             uint depth = Convert.ToUInt16(temp.Item1.X);
             uint height = Convert.ToUInt16(temp.Item1.Y);
             BuildingStyle style = temp.Item2;

@@ -86,6 +86,11 @@ namespace Game.Logic.Entities
         {
         }
 
+        protected static Reaction reactionPlaceHolder(System.Collections.Generic.List<Entity> list)
+        {
+            return new Reaction();
+        }
+
         /******************
         Getters & setters
         ****************/
