@@ -139,7 +139,6 @@ namespace Game.Logic
         {
             //TODO - look into Sight simply having a list and the given blast, instead of craeating a new list & blast for every iteration
             //Get all the relevant variables
-            UniqueList<Entity> ans = new UniqueList<Entity>();
             Point location = this.convertToCentralPoint(ent);
             Sight sight = ent.Sight;
             int radius = sight.Range;
@@ -153,14 +152,13 @@ namespace Game.Logic
                 };
             };
 
-            Effect effect = listAdd(ans);
+            Effect effect = listAdd(ent.WhatSees);
 
             BlastEffect blast = BlastEffect.instance(radius, effect, blocked, ShotType.SIGHT);
 
             this.areaEffect(ent, blast);
 
-            ent.WhatSees = ans;
-            foreach (Entity temp in ans)
+            foreach (Entity temp in ent.WhatSees)
             {
                 //TODO - this is wrong. it should only return what the player units see. 
                 this.visible.Add(this.entities[temp]);

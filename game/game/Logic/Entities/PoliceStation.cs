@@ -8,7 +8,7 @@ namespace Game.Logic.Entities
         /******************
         class consts
         ****************/
-        const int POLICE_SIZE_MODIFIER = 1;
+        const int POLICE_SIZE_MODIFIER = 3;
 
         /******************
         class members
@@ -17,6 +17,7 @@ namespace Game.Logic.Entities
         private readonly int policemenCap;
         private int amountOfPolicemen;
         private bool onAlert;
+        private Cop toConstruct;
 
         //TODO - set the whole alert operation. another idea - after alert wanes, begin "destroying" cops?
 
@@ -33,10 +34,9 @@ namespace Game.Logic.Entities
             this.onAlert = false;
             reactionFunction react = delegate(List<Entity> ent)
                 {
-                    Cop temp = new Cop(this);
-                    this.amountOfPolicemen++;
+                    if (toConstruct == null) toConstruct = new Cop(this);
                     this._readyToBuild = true;
-                    return new Reaction(temp, Action.CREATE_ENTITY);
+                    return new Reaction(toConstruct, Action.CREATE_ENTITY);
                 };
             this.ReactionFunction = react;
         }
@@ -47,6 +47,8 @@ namespace Game.Logic.Entities
 
         public MovingEntity getConstruct()
         {
+            this.toConstruct = new Cop(this);
+            this.amountOfPolicemen++;
             return (MovingEntity)this.Reaction.Focus;
         }
 
@@ -65,7 +67,9 @@ namespace Game.Logic.Entities
                 }
             }
             else
-                return base.readyToConstruct() && (this.amountOfPolicemen <= this.policemenCap);
+            {
+                return (base.readyToConstruct() && (this.amountOfPolicemen <= this.policemenCap));
+            }
         }
 
         public Vector exitPoint()

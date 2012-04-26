@@ -27,6 +27,7 @@ namespace Game.Graphic_Manager
         System.Diagnostics.Stopwatch synch = new System.Diagnostics.Stopwatch();
         System.Diagnostics.Stopwatch update = new System.Diagnostics.Stopwatch();
         System.Diagnostics.Stopwatch other = new System.Diagnostics.Stopwatch();
+        int runs = 0;
 
         /************
          * constructor
@@ -44,6 +45,7 @@ namespace Game.Graphic_Manager
             this.crosshair = new Sprite(new Texture("images/UI/crosshairs.png"));
             this.crosshair.Origin = new Vector2f(this.crosshair.Texture.Size.X / 2, this.crosshair.Texture.Size.Y / 2);
             this.UIview = new View(new Vector2f(_background.Size.X/2, _background.Size.Y/2), new Vector2f(_background.Size.X, _background.Size.Y));
+            this.displayWatch.Start();
         }
 
         /************
@@ -138,6 +140,7 @@ namespace Game.Graphic_Manager
             this.displayWatch.Start();
             this.display();
             this.displayWatch.Stop();
+            runs++;
         }
 
 
@@ -192,7 +195,9 @@ namespace Game.Graphic_Manager
 
         internal void displayStats()
         {
+            this.displayWatch.Stop();
             Console.Out.WriteLine("synch was " + this.synch.Elapsed + " , display was " + this.displayWatch.Elapsed + " , update was " + this.update.Elapsed + " , remove was " + this.remove.Elapsed + " , other was " + other.Elapsed);
+            Console.Out.WriteLine("amount of graphic loops: " + runs + " average milliseconds per frame: " + this.displayWatch.ElapsedMilliseconds/runs);
         }
     }
 }

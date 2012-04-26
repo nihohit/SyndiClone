@@ -42,6 +42,7 @@ namespace Game.Logic.Entities
             this._visible = Visibility.REVEALED;
             this._howReact = reaction;
             this._reactionTime = reactionTime;
+            this.WhatSees = new UniqueList<Entity>();
         }
 
         /******************

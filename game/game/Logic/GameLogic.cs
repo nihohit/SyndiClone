@@ -12,12 +12,14 @@ namespace Game.Logic
         /******************
         Class members
         ****************/
+        const int FRAMES_PER_SECOND = 120; //determines the amount of repeats the system can have in a second
+        const int MIN_MILLISECONDS_PER_FRAME = 1000 / FRAMES_PER_SECOND;
 
-        private List<Entity> activeEntities; //TODO - readonly uniquelist?
-        private readonly UniqueList<MovingEntity> movers;
-        private readonly UniqueList<Entity> playerUnits;
-        private readonly UniqueList<Shooter> shooters;
-        private readonly UniqueList<Constructor> constructors;
+        private List<Entity> activeEntities = new List<Entity>(); //TODO - readonly uniquelist?
+        private readonly UniqueList<MovingEntity> movers = new UniqueList<MovingEntity>();
+        private readonly UniqueList<Entity> playerUnits = new UniqueList<Entity>();
+        private readonly UniqueList<Shooter> shooters = new UniqueList<Shooter>();
+        private readonly UniqueList<Constructor> constructors = new UniqueList<Constructor>();
         private readonly UniqueList<Entity> alwaysActive;
 
         private readonly int civAmountGoal;
@@ -28,7 +30,9 @@ namespace Game.Logic
         private readonly SoundBuffer soundBuffer;
         private bool active;
         private bool gameRunning;
+        System.Diagnostics.Stopwatch frameTester = new System.Diagnostics.Stopwatch();
 
+        int runs = 0;
         System.Diagnostics.Stopwatch synch = new System.Diagnostics.Stopwatch();
         System.Diagnostics.Stopwatch move = new System.Diagnostics.Stopwatch();
         System.Diagnostics.Stopwatch shoot = new System.Diagnostics.Stopwatch();
@@ -36,6 +40,7 @@ namespace Game.Logic
         System.Diagnostics.Stopwatch other = new System.Diagnostics.Stopwatch();
         System.Diagnostics.Stopwatch orders = new System.Diagnostics.Stopwatch();
         System.Diagnostics.Stopwatch sight = new System.Diagnostics.Stopwatch();
+        System.Diagnostics.Stopwatch totalWatch = new System.Diagnostics.Stopwatch();
         /******************
         Constructors
         ****************/
@@ -51,12 +56,6 @@ namespace Game.Logic
 
         public GameLogic(DisplayBuffer disp, InputBuffer input, SoundBuffer sound, Game.City_Generator.GameBoard city, int _civAmount)
         {
-            this.activeEntities = new UniqueList<Entity>(); 
-            this.movers = new UniqueList<MovingEntity>();
-            
-            this.playerUnits = new UniqueList<Entity>();
-            this.shooters = new UniqueList<Shooter>();
-            this.constructors = new UniqueList<Constructor>();
             this.displayBuffer = disp;
             this.inputBuffer = input;
             this.soundBuffer = sound;
@@ -66,6 +65,8 @@ namespace Game.Logic
             this.alwaysActive = new UniqueList<Entity>(this._grid.getAllRealEntities());
             this.active = true;
             this.gameRunning = true;
+            this.totalWatch.Start();
+            this.frameTester.Start();
         }
 
         /******************
@@ -77,10 +78,22 @@ namespace Game.Logic
          */
         public void loop()
         {
+            
+
             this.synch.Start();
             this.handleInput();
             this.synch.Stop();
-            if (!gameRunning) Console.Out.WriteLine("other was " + other.Elapsed + " orders time was " + orders.Elapsed + " sight time was " + sight.Elapsed);
+            if (!gameRunning)
+            {
+                this.totalWatch.Stop();
+                Console.Out.WriteLine("synch was " + synch.Elapsed);
+                Console.Out.WriteLine("move was " + other.Elapsed);
+                Console.Out.WriteLine("shoot was " + shoot.Elapsed);
+                Console.Out.WriteLine("construct was " + construct.Elapsed);
+                Console.Out.WriteLine("orders was " + orders.Elapsed);
+                Console.Out.WriteLine("sight was " + sight.Elapsed);
+                Console.Out.WriteLine("amount of graphic loops: " + runs + " average milliseconds per frame: " + this.totalWatch.ElapsedMilliseconds / runs);
+            }
             if (active)
             {
                 this.other.Start();
@@ -101,6 +114,14 @@ namespace Game.Logic
                 this.updateOutput();
                 this.synch.Stop();
             }
+            this.frameLimit();
+            runs++;
+        }
+
+        private void frameLimit()
+        {
+            while (frameTester.ElapsedMilliseconds < MIN_MILLISECONDS_PER_FRAME) { }
+            this.frameTester.Restart();
         }
 
         private void handleUnitCreation()
@@ -214,7 +235,7 @@ namespace Game.Logic
                 this.orders.Start();
                 if (ent.doesReact())
                 {
-                    if (ent.WhatSees == null)
+                    if (ent.WhatSees.Count == 0)
                     {
                         this.orders.Stop();
                         this.sight.Start();
@@ -223,7 +244,7 @@ namespace Game.Logic
                     }
                     this.orders.Start();
                     ent.resolveOrders();
-                    ent.WhatSees = null;
+                    ent.WhatSees.Clear();
                 }
                 Reaction react = ent.Reaction;
                 Action action = react.ActionChosen;
@@ -250,7 +271,8 @@ namespace Game.Logic
                 if (action == Action.CREATE_ENTITY)
                 {
                     Constructor temp = (Constructor)ent;
-                    if (temp.readyToConstruct()) //TODO - for structures, to make sure they update their building order. other solution?
+                    bool check = temp.readyToConstruct();
+                    if (check) //TODO - for structures, to make sure they update their building order. other solution?
                     {
                         this.constructors.Add(temp);
                     }
