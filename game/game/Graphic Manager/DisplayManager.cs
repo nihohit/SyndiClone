@@ -9,7 +9,7 @@ namespace Game.Graphic_Manager
     class Game_Screen
     {
         /************
-         * class fields
+         * class members
          ***************/
         private RenderWindow _mainWindow;
         private Game.Buffers.DisplayBuffer _buffer;
@@ -22,6 +22,11 @@ namespace Game.Graphic_Manager
         private Sprite crosshair;
         private View UIview;
 
+        System.Diagnostics.Stopwatch remove = new System.Diagnostics.Stopwatch();
+        System.Diagnostics.Stopwatch displayWatch = new System.Diagnostics.Stopwatch();
+        System.Diagnostics.Stopwatch synch = new System.Diagnostics.Stopwatch();
+        System.Diagnostics.Stopwatch update = new System.Diagnostics.Stopwatch();
+        System.Diagnostics.Stopwatch other = new System.Diagnostics.Stopwatch();
 
         /************
          * constructor
@@ -51,31 +56,40 @@ namespace Game.Graphic_Manager
 
         private void updateInfo()
         {
-            if (input.GraphicInput)
+            lock (input)
             {
-                List<BufferEvent> list = input.graphicEvents();
-                foreach (BufferEvent action in list)
+                if (input.GraphicInput)
                 {
-                    switch (action.type())
+                    List<BufferEvent> list = input.graphicEvents();
+                    foreach (BufferEvent action in list)
                     {
-                        case BufferType.MOUSEMOVE:
-                            this.crosshair.Position = ((BufferMouseMoveEvent)action).Coords;
-                            //Console.Out.WriteLine(((BufferMouseMoveEvent)action).X + " " + ((BufferMouseMoveEvent)action).Y);
-                            break;
+                        if (action.type() == BufferType.ENDGAME)
+                            displayStats();
                     }
+
                 }
-                
             }
-            lock (this._buffer)
+            this.synch.Start();
+            if (this._buffer.Updated)
             {
-                findSpritesToRemove();
-                findSpritesToDisplay();
-                updateAnimations();
+                lock (this._buffer)
+                {
+                    this._buffer.analyzeData();
+                    this.findSpritesToRemove();
+                    this.findSpritesToDisplay();
+                    this.updateAnimations();
+                    this._buffer.Updated = false;
+                }
             }
+            this.synch.Stop();
+            this.remove.Start();
             removeSprites();
+            this.remove.Stop();
+            this.update.Start();
             enterAnimations();
             displaySprites();
             drawUI();
+            this.update.Stop();
         }
 
         private void drawUI()
@@ -89,7 +103,6 @@ namespace Game.Graphic_Manager
         private void findSpritesToDisplay()
         {
             this.displayedSprites.UnionWith(this._buffer.newSpritesToDisplay());
-            //TODO - see if we need to convert the sprite's position according to view
         }
 
         private void findSpritesToRemove()
@@ -117,10 +130,14 @@ namespace Game.Graphic_Manager
 
         public void loop()
         {
+            this.other.Start();
             this._mainWindow.Clear();
             this._mainWindow.Draw(background);
+            this.other.Stop();
             this.updateInfo();
+            this.displayWatch.Start();
             this.display();
+            this.displayWatch.Stop();
         }
 
 
@@ -141,14 +158,13 @@ namespace Game.Graphic_Manager
             
             foreach (Animation animation in this.animations)
             {
-                this.removedSprites.Remove(animation.current());
+                this.removedSprites.Add(animation.current());
                 if (animation.isDone())
                 {
                     doneAnimations.Add(animation);
                 }
                 else
                 {
-                    this.removedSprites.Add(animation.current());
                     this.displayedSprites.Add(animation.getNext());
                 }
             }
@@ -174,5 +190,9 @@ namespace Game.Graphic_Manager
             _mainWindow.Display();
         }
 
+        internal void displayStats()
+        {
+            Console.Out.WriteLine("synch was " + this.synch.Elapsed + " , display was " + this.displayWatch.Elapsed + " , update was " + this.update.Elapsed + " , remove was " + this.remove.Elapsed + " , other was " + other.Elapsed);
+        }
     }
 }

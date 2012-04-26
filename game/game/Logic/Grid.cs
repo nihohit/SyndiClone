@@ -19,7 +19,7 @@ namespace Game.Logic
         delegate boolPointOperator CurriedPointOperator(Entity entity); //These are the curried version, which curry and entity for the question
 
         /******************
-        Fields
+        members
         ****************/
 
         private readonly Dictionary<Entity, ExternalEntity> entities;
@@ -83,6 +83,11 @@ namespace Game.Logic
         internal List<ExternalEntity> getVisibleEntities()
         {
             return this.visible;
+        }
+
+        internal List<Entity> getAllRealEntities()
+        {
+            return new List<Entity>(this.entities.Keys);
         }
 
         internal void clear()
@@ -301,7 +306,8 @@ namespace Game.Logic
             return ans;
         }
 
-        private Entity getEntityInPoint(Point point)
+        //TODO - return to private
+        public Entity getEntityInPoint(Point point)
         {
             return this.gameGrid[point.X, point.Y];
         }
@@ -380,7 +386,6 @@ namespace Game.Logic
             };
 
             iterateOverArea(toSwitch, putEntityInArea(ent));
-            //TODO - remove redundat creation of external entities
             if (this.entities.ContainsKey(ent))
             {
                 ExternalEntity newEnt = this.entities[ent];
@@ -453,7 +458,6 @@ namespace Game.Logic
                 for (int j = 0; j < area.Size.Y; j++)
                 {
                     ans = ans & op(new Point(entry, new Vector(i, j)));
-                    //TODO - check if this is the correct way to do AND
                 }
 
             }
@@ -506,15 +510,17 @@ namespace Game.Logic
         {
             if(target.destroyed()) return;
             //get all relevant variables
-            Shot shot = shooter.weapon().Shot;
+            Weapon weapon = shooter.weapon();
+            Shot shot = weapon.Shot;
             Point exit = this.convertToCentralPoint((Entity)shooter);
             Point currentTargetLocation = this.convertToCentralPoint(target);
-            //TODO - change the hit functions so they'll compute only angle of shot, so the shot will go for its full range
-            currentTargetLocation = shooter.hitFunc()(currentTargetLocation, this.getDistance(exit, currentTargetLocation), shooter.weapon().Acc);
+            Vector direction = new Vector(exit, currentTargetLocation);
+            direction.normalProbability(direction.length() / weapon.Acc);
+            direction.completeToDistance(weapon.Range);
             //TODO - If there's a target that I see only parts of it, how do I aim at the visible parts?
             
             //get the path the bullet is going through, and affect targets
-            Point endPoint = this.processPath(exit, currentTargetLocation, shot);
+            Point endPoint = this.processPath(exit, new Point(exit, direction), shot);
 
             if (shot.Blast != null){
 
@@ -586,7 +592,7 @@ namespace Game.Logic
         {
             this.addEvent(new Buffers.DestroyEvent(this.locations[ent], this.entities[ent]));
             this.removeFromLocation(ent);
-            locations.Remove(ent);
+            this.locations.Remove(ent);
             this.entities.Remove(ent);
             ent.destroy();
         }

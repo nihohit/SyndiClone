@@ -14,7 +14,7 @@ namespace Game.City_Generator
         static int counter = 0;
         static Random rand = new Random();
 
-        /********************************Fields***************************************/
+        /********************************members***************************************/
         private List<Building> _buildings;
         private int _id;
         private CorporateNames _type;

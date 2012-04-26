@@ -30,7 +30,7 @@ namespace Game.Logic.Entities
         const int PISTOL_BULLET_DAMAGE = 3;
 
         /******************
-        class fields
+        class members
         ****************/
         private readonly BlastEffect _blast;
         private readonly Effect _effect;

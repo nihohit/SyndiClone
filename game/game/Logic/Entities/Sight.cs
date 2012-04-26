@@ -16,11 +16,11 @@ namespace Game.Logic.Entities
         ****************/
 
         static Dictionary<SightType, Sight> _sights = new Dictionary<SightType, Sight>();
-        const int CIV_RANGE = 50, COP_RANGE = 50;
-        const bool CIV_CLOAKED = false, COP_CLOAKED = false;
-        static wasBlocked CIV_BLOCKED = civBlockedSight;
+        const int DEFAULT_RANGE = 25;
+        const bool DEFAULT_CLOAKED = false;
+        static wasBlocked DEFAULT_BLOCKED = defaultBlockedSight;
         
-        static internal bool civBlockedSight(Entity ent)
+        static internal bool defaultBlockedSight(Entity ent)
         {
             if (ent == null) return false;
             switch (ent.Visible)
@@ -33,7 +33,7 @@ namespace Game.Logic.Entities
         }
 
         /******************
-        class fields
+        class members
         ****************/
 
         private readonly int _range;
@@ -59,11 +59,11 @@ namespace Game.Logic.Entities
                 switch (type)
                 {
 
-                    case (SightType.CIV_SIGHT):
-                        _sights.Add(type, new Sight(CIV_RANGE, CIV_BLOCKED, CIV_CLOAKED));
+                    case (SightType.DEFAULT_SIGHT):
+                        _sights.Add(type, new Sight(DEFAULT_RANGE, DEFAULT_BLOCKED, DEFAULT_CLOAKED));
                         break;
-                    case(SightType.POLICE_SIGHT):
-                        _sights.Add(type, new Sight(COP_RANGE, CIV_BLOCKED, CIV_CLOAKED));
+                    case(SightType.BLIND):
+                        _sights.Add(type, new Sight(0, DEFAULT_BLOCKED, false));
                         break;
 
                     //TODO - missing types

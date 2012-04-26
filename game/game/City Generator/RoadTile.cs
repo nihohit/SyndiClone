@@ -18,7 +18,7 @@ namespace Game.City_Generator
         /********************************Constants***************************************/
         internal const int WEST = 0, NORTH = 1, EAST = 2, SOUTH = 3;
 
-        /********************************Fields***************************************/
+        /********************************members***************************************/
         //Point _loc;
         int _vDepth,_hDepth;
         int _vOffset,_hOffset; //how many steps till getting to either the north or west corner, depending on direction.

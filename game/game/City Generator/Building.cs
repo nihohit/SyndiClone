@@ -12,7 +12,7 @@ namespace Game.City_Generator
 {
     class Building
     {
-        //fields:
+        //members:
         Block _dimensions; //holding the location and dimensions of the building in the already existing block type;
         Corporate _corp;
         int _owner;

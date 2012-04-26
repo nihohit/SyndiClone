@@ -13,7 +13,7 @@ namespace Game.City_Generator
     internal enum Images {EMPTY,R_DEAD_END,R_CORNER, R_LINE,R_3WAY,R_FOURWAY,B_INNER,B_OUTER};//R means "road", B is building.
     class Tile
     {
-        /********************************Fields***************************************/
+        /********************************members***************************************/
         protected ContentType _type;
         protected int _rotate;
         protected Building _building;
@@ -44,10 +44,6 @@ namespace Game.City_Generator
         internal int Rotate {
             set { _rotate = value; }
             get { return _rotate; }
-        }
-
-        internal virtual Block Flip {
-            get { return null; }//TODO: if this will be required, make something real here.
         }
 
         internal Images Image {

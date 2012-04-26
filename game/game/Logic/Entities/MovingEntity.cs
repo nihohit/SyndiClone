@@ -10,7 +10,7 @@ namespace Game.Logic.Entities
         const int AMOUNT_OF_MOVES_FOR_STEP = 100;
 
         /******************
-        class fields
+        class members
         ****************/
 
         private readonly int _speed;
@@ -23,7 +23,7 @@ namespace Game.Logic.Entities
         ****************/
 
         protected MovingEntity(int reactionTime, reactionFunction reaction, int health, entityType type, Vector size, Affiliation loyalty, Visibility visibility, Sight sight, int speed, LinkedList<Direction> path)
-            : base(reactionTime, reaction, health, type, size, loyalty, sight, visibility)
+            : base(reactionTime, reaction, health, type, size, loyalty)
         {
             this._speed = speed;
             this._path = path;

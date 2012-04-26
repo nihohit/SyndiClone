@@ -11,7 +11,7 @@ namespace Game.Logic.Entities
         const int timeToReact = 1000;
 
         /******************
-        class fields
+        class members
         ****************/        
         
         private int _health;
@@ -19,7 +19,7 @@ namespace Game.Logic.Entities
         private readonly entityType _type;
         private Reaction _reaction;
         private Affiliation _loyalty;
-        private readonly Sight _sight;
+        private Sight _sight;
         private Visibility _visible;
         protected reactionFunction _howReact;
         private UniqueList<Entity> _whatSees;
@@ -31,15 +31,15 @@ namespace Game.Logic.Entities
         constructors
         ****************/
 
-        protected Entity(int reactionTime, reactionFunction reaction, int health,entityType type, Vector size, Affiliation loyalty, Sight sight, Visibility visibility)
+        protected Entity(int reactionTime, reactionFunction reaction, int health,entityType type, Vector size, Affiliation loyalty)
         {
             this._health = health;
             this._size = size;
             this._type = type;
             this._loyalty = loyalty;
-            this._sight = sight;
+            this._sight = Sight.instance(SightType.DEFAULT_SIGHT);
             this._reaction = new Reaction (null, Action.IGNORE);
-            this._visible = visibility;
+            this._visible = Visibility.REVEALED;
             this._howReact = reaction;
             this._reactionTime = reactionTime;
         }
@@ -89,6 +89,27 @@ namespace Game.Logic.Entities
         protected static Reaction reactionPlaceHolder(System.Collections.Generic.List<Entity> list)
         {
             return new Reaction();
+        }
+
+        protected virtual void upgrade(System.Collections.Generic.List<Upgrades> list)
+        {
+            foreach (Upgrades upgrade in list)
+            {
+                switch (upgrade)
+                {
+                    case(Upgrades.BULLETPROOF_VEST):
+                        this._health += 7;
+                        break;
+                    case(Upgrades.VISIBILITY_SOLID):
+                        this._visible = Visibility.SOLID;
+                        break;
+                    case(Upgrades.BUILDING_BLIND):
+                        this._sight = Sight.instance(SightType.BLIND);
+                        break;
+
+                }
+
+            }
         }
 
         /******************
@@ -156,7 +177,10 @@ namespace Game.Logic.Entities
             get { return _size; }
         }
 
-
+        public override string ToString()
+        {
+            return "Health: " + this._health + " size: " + this.Size.ToString();
+        }
 
     }
 }

@@ -1,30 +1,44 @@
-﻿using System;
+﻿
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Game.Logic.Entities
 {
-    /*TODO -class Agent  :  Person, Shooter
+    /*class Agent :  Person, Shooter
     {
+        private Weapon weapon;
+        private HitFunction hitFunc;
 
-        Weapon weapon;
-        HitFunction hitFunc;
+        internal void setup(List<Effect> changes)
+        {
+            foreach (Effect effect in changes)
+                effect(this);
+        }
 
         Weapon Shooter.weapon()
         {
-            throw new NotImplementedException();
+            return this.weapon;
         }
 
         HitFunction Shooter.hitFunc()
         {
-            throw new NotImplementedException();
+            return this.hitFunc;
         }
 
-        Sight Shooter.sight()
+        bool Shooter.readyToShoot()
         {
             throw new NotImplementedException();
         }
+
+        Entity Shooter.target()
+        {
+            throw new NotImplementedException();
+        }
+
+        targetChooser Shooter.targeter()
+        {
+            throw new NotImplementedException();
+        }
+
     }
-     * */
+    */
 }

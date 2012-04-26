@@ -3,7 +3,7 @@ using Game.Logic.Entities;
 
 namespace Game.Buffers
 {
-    internal enum BufferType { MOVE, SHOT, DESTROY, CREATE, PAUSE, CLICK, UNPAUSE, ENDGAME, MOUSEMOVE } //different buffers for the actions that the grid returns after each loop
+    internal enum BufferType { MOVE, SHOT, DESTROY, CREATE, PAUSE, SELECT, DESELECT, UNPAUSE, ENDGAME, MOUSEMOVE } //different buffers for the actions that the grid returns after each loop
 
     internal interface BufferEvent
     {
@@ -16,6 +16,36 @@ namespace Game.Buffers
         {
             return BufferType.PAUSE;
         }
+    }
+
+    internal struct BufferCancelActionEvent : BufferEvent
+    {
+        BufferType BufferEvent.type()
+        {
+            return BufferType.DESELECT;
+        }
+    }
+
+    internal struct BufferMouseSelectEvent : BufferEvent
+    {
+        private readonly Vector coords;
+
+        internal Vector Coords
+        {
+            get { return coords; }
+        } 
+
+        internal BufferMouseSelectEvent(Vector _coords)
+        {
+            this.coords = _coords;
+        }
+        
+        BufferType BufferEvent.type()
+        {
+            return BufferType.SELECT;
+        }
+
+
     }
 
     internal struct BufferMouseMoveEvent : BufferEvent

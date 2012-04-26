@@ -6,7 +6,7 @@ namespace Game.Buffers
     public abstract class Buffer
     {
         /******************
-        Class Fields
+        Class members
         ****************/
 
         /******************

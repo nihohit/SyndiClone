@@ -14,11 +14,11 @@ namespace Game.Buffers
         /******************
         Class consts
         ****************/
-        const int amountOfReapeatingSpritesInAnimation = 20;
+        const int amountOfReapeatingSpritesInAnimation = 1;
         const int amountOfDecals = 10;
 
         /******************
-        Class Fields
+        Class members
         ****************/
         
         private HashSet<Sprite> displaySprites;
@@ -27,6 +27,9 @@ namespace Game.Buffers
         private List<Decal> doneDecals = new List<Decal>();
         private HashSet<Game.Graphic_Manager.Animation> newAnimations;
         private TextureFinder finder;
+        private HashSet<BufferEvent> actions;
+        private List<ExternalEntity> visibleEntities;
+        private bool updated;
 
         /******************
         Constructors
@@ -39,6 +42,9 @@ namespace Game.Buffers
             this.decals = new LinkedList<Decal>();
             this.newAnimations = new HashSet<Game.Graphic_Manager.Animation>();
             this.finder = new SpriteFinder();
+            this.actions = new HashSet<BufferEvent>();
+            this.visibleEntities = new List<ExternalEntity>();
+            this.updated = false;
         }
 
         /******************
@@ -93,57 +99,19 @@ namespace Game.Buffers
             return new Animation(ans);
         }
 
+        public bool Updated
+        {
+            get { return updated; }
+            set { updated = value; }
+        }
+
         /************
          * input methods
          ************/
 
-        internal void receiveActions(List<BufferEvent> actions)
+        internal void receiveActions(List<BufferEvent> _actions)
         {
-            foreach (BufferEvent action in actions)
-            {
-                switch (action.type())
-                {
-                    case BufferType.DESTROY:
-                        ExternalEntity ent = ((DestroyEvent)action).Ent;
-                        Sprite temp = this.finder.remove(ent);
-                        this.displaySprites.Remove(temp);
-                        this.removedSprites.Add(temp);
-                        if(ent.Type != entityType.PERSON)
-                            this.newAnimations.Add(this.finder.generateDestoryResults(((DestroyEvent)action).Area, ent.Type));
-                        Decal decal = new Decal();
-                        switch (ent.Type)
-                        {
-                            case (entityType.BUILDING):
-                                decal = new Decal(DecalType.RUBBLE);
-                                break;
-                            case (entityType.VEHICLE):
-                                decal = new Decal(DecalType.WRECKAGE);
-                                break;
-                            case (entityType.PERSON):
-                                decal = new Decal(DecalType.BLOOD);
-                                
-                                break;
-                        }
-                        
-                        decal.setLocation(ent.Position);
-                        this.addDecal(decal);
-                        break;
-                    case BufferType.MOVE:
-                        ExternalEntity mover = ((MoveEvent)action).Mover;
-                        Sprite movement = this.finder.getSprite(mover);
-                        movement.Rotation = ((MoveEvent)action).Rotation;
-                        Vector2f position = new Vector2f(mover.Position.X, mover.Position.Y);
-                        movement.Position = position;
-                        //TODO - generate turning animation
-                        break;
-                    case BufferType.CREATE:
-                        //TODO
-                        break;
-                    case BufferType.SHOT:
-                        this.newAnimations.Add(this.createNewShot(((ShotEvent)action).Shot, ((ShotEvent)action).Exit, ((ShotEvent)action).Target));
-                        break;
-                }
-            }
+            this.actions.UnionWith(_actions);
         }
 
         private void addDecal(Decal decal)
@@ -159,13 +127,7 @@ namespace Game.Buffers
 
         internal void receiveVisibleEntities(List<ExternalEntity> visibleExternalEntityList)
         {
-            foreach (ExternalEntity ent in visibleExternalEntityList)
-            {
-                Sprite temp = finder.getSprite(ent);
-                temp.Position = new Vector2f(ent.Position.X, ent.Position.Y);
-                //TODO - find a way to make sure that the sprite's position is correct.
-                displaySprites.Add(temp);
-            }
+            this.visibleEntities = visibleExternalEntityList;
         }
 
         private void displayDecals()
@@ -189,27 +151,103 @@ namespace Game.Buffers
          * output methods
          ************/
 
-        internal HashSet<Sprite> newSpritesToDisplay()
+        internal void analyzeData()
         {
+            clearInfo();
+            analyzeEntities();
+            analyzeActions();
             displayDecals();
-            HashSet<Sprite> ans = new HashSet<Sprite>(displaySprites);
-            displaySprites.Clear();
-            return ans;
+            removeSprites();
         }
 
-        internal List<Sprite> spritesToRemove()
+        private void removeSprites()
         {
-            List<Sprite> ans = new List<Sprite>(removedSprites);
-            removedSprites.Clear();
-            return ans;
+            foreach (Sprite temp in this.removedSprites)
+                this.displaySprites.Remove(temp);
+        }
+
+        private void analyzeActions()
+        {
+            foreach (BufferEvent action in actions)
+            {
+                switch (action.type())
+                {
+                    case BufferType.DESTROY:
+                        ExternalEntity ent = ((DestroyEvent)action).Ent;
+                        Sprite temp = this.finder.remove(ent);
+                        this.removedSprites.Add(temp);
+                        if (ent.Type != entityType.PERSON)
+                            this.newAnimations.Add(this.finder.generateDestoryResults(((DestroyEvent)action).Area, ent.Type));
+                        Decal decal = new Decal();
+                        switch (ent.Type)
+                        {
+                            case (entityType.BUILDING):
+                                decal = new Decal(DecalType.RUBBLE);
+                                break;
+                            case (entityType.VEHICLE):
+                                decal = new Decal(DecalType.WRECKAGE);
+                                break;
+                            case (entityType.PERSON):
+                                decal = new Decal(DecalType.BLOOD);
+                                break;
+                        }
+
+                        decal.setLocation(ent.Position);
+                        this.addDecal(decal);
+                        break;
+                    case BufferType.MOVE:
+                        ExternalEntity mover = ((MoveEvent)action).Mover;
+                        Sprite movement = this.finder.getSprite(mover);
+                        movement.Rotation = ((MoveEvent)action).Rotation;
+                        Vector2f position = new Vector2f(mover.Position.X, mover.Position.Y);
+                        movement.Position = position;
+                        //TODO - generate turning animation
+                        break;
+                    case BufferType.CREATE:
+                        //TODO
+                        break;
+                    case BufferType.SHOT:
+                        this.newAnimations.Add(this.createNewShot(((ShotEvent)action).Shot, ((ShotEvent)action).Exit, ((ShotEvent)action).Target));
+                        break;
+                }
+            }
+            actions.Clear();
+        }
+
+        private void analyzeEntities()
+        {
+            foreach (ExternalEntity ent in visibleEntities)
+            {
+                Sprite temp = finder.getSprite(ent);
+                temp.Position = new Vector2f(ent.Position.X, ent.Position.Y);
+                displaySprites.Add(temp);
+            }
+            visibleEntities.Clear();
+        }
+
+
+        internal HashSet<Sprite> newSpritesToDisplay()
+        {
+            return displaySprites;
+        }
+
+        internal HashSet<Sprite> spritesToRemove()
+        {
+            return this.removedSprites;
         }
 
         internal IEnumerable<Animation> getAnimations()
         {
-            HashSet<Animation> ans = new HashSet<Animation>(newAnimations);
-            newAnimations.Clear();
-            return ans; 
+            return newAnimations; 
         }
+
+        internal void clearInfo()
+        {
+            newAnimations.Clear();
+            this.removedSprites.Clear();
+            this.displaySprites.Clear();
+        }
+
     }
 
 

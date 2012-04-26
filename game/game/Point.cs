@@ -33,7 +33,6 @@ namespace Game
         {
             this._xLoc = origin.X + transfer.X;
             this._yLoc = origin.Y + transfer.Y;
-
         }
 
         /** 

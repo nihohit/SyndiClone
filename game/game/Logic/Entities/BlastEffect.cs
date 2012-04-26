@@ -13,7 +13,7 @@ namespace Game.Logic.Entities
         static Dictionary<BlastType, BlastEffect> _blasts = new Dictionary<BlastType, BlastEffect>();
 
         /******************
-        class fields
+        class members
         ****************/
         private readonly int _radius;
 

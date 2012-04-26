@@ -1,8 +1,0 @@
-obj/
-lib/
-examples/*/*.dll
-doc/build/*xml
-*.exe
-*.manifest
-*.pdb
-*.suo

@@ -6,6 +6,8 @@ namespace Game
     {
         private int _x, _y;
 
+        static private Random rand = new Random();
+
         public int Y
         {
             get { return _y; }
@@ -14,6 +16,26 @@ namespace Game
         public Vector addVector(Vector add)
         {
             return new Vector(this._x + add.X, this._y + add.Y);
+        }
+
+        public void normalProbability(double deviation)
+        {
+            this._x = computeNormalProbablity(this._x, deviation);
+            this._y = computeNormalProbablity(this._y, deviation);
+        }
+
+        public double length()
+        {
+            return Math.Sqrt(Math.Pow(this._x, 2) + Math.Pow(this._y, 2));
+        }
+
+        private int computeNormalProbablity(double mean, double deviation)
+        {
+            double u1 = rand.NextDouble(); //these are uniform(0,1) random doubles
+            double u2 = rand.NextDouble();
+            double randStdNormal = Math.Sqrt(-2.0 * Math.Log(u1)) *Math.Sin(2.0 * Math.PI * u2); //random normal(0,1)
+            double randNormal = mean + deviation * randStdNormal; //random normal(mean,stdDev^2)
+            return Convert.ToInt16(randNormal);
         }
 
         public int X
@@ -26,11 +48,12 @@ namespace Game
             this._y = y;
         }
 
-        public Vector(Point a, Point b)
+        public Vector(Point b, Point a)
         {
             this._x = a.X - b.X;
             this._y = a.Y - b.Y;
         }
+
 
         public Vector(Point a)
         {
@@ -47,9 +70,10 @@ namespace Game
 
         public void completeToDistance(int dist)
         {
-            int total = this.length();
+            int total = Convert.ToInt16(this.length());
             dist = dist - total;
-            if (dist > 0)
+            total = _x + _y;
+            if (dist > 0 && total > 0)
             {
                 _x += dist*_x / total;
                 _y += dist*_y / total;
@@ -61,11 +85,10 @@ namespace Game
             if (a > 0) return a; else return -a;
         }
 
-        public int length()
+        public Point toPoint()
         {
-            return abs(_x) + abs(_y);
+            return new Point(this._x, this._y);
         }
-
 
         internal void normalise()
         {

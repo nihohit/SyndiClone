@@ -11,7 +11,7 @@ namespace Game.City_Generator
      * */
     abstract class GameBoard
     {
-        /********************************Fields***************************************/
+        /********************************members***************************************/
         protected Tile[,] _grid2; // this is the initial grid. TODO: after we'll have a graphical interface, change this to "_grid" and remove the textual one.
 
         protected List<Building> _buildings;

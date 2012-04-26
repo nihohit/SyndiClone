@@ -66,30 +66,26 @@ namespace Game.Buffers
                         this.setAllFlags();
                         break;
                 }*/
+                
             }
         }
 
         public List<BufferEvent> logicEvents()
         {
-            lock (this)
-            {
-                List<BufferEvent> temp = new List<BufferEvent>(this._logicEvents);
-                this._logicEvents.Clear();
-                this.LogicInput = false;
-                return temp;
-            }
+            List<BufferEvent> temp = new List<BufferEvent>(this._logicEvents);
+            this._logicEvents.Clear();
+            this.LogicInput = false;
+            return temp;
+            
         }
 
 
         internal List<BufferEvent> graphicEvents()
         {
-            lock (this)
-            {
-                List<BufferEvent> temp = new List<BufferEvent>(this._graphicEvents);
-                this._graphicEvents.Clear();
-                this.GraphicInput = false;
-                return temp;
-            }
+            List<BufferEvent> temp = new List<BufferEvent>(this._graphicEvents);
+            this._graphicEvents.Clear();
+            this.GraphicInput = false;
+            return temp;
         }
     }
 }

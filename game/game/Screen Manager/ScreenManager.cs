@@ -8,35 +8,39 @@ namespace Game.Screen_Manager
 {
     static class ScreenManager
     {
-        /***************
-         * class consts
-         **************/
-        const float AMOUNT_OF_PIXEL_ALLOWED_OFFSCREEN = 30;
-        const int SCREEN_EDGE_WIDTH_FOR_MOUSE_SCROLLING = 30;
-        const int SCREEN_EDGE_MOUSE_SCROLL_RELATION = 4;
-        const int SPEED_OF_MOUSE_SCROLL = 30;
 
         /**************
-         * class fields
+         * class members
          *************/
-
-        static private float minX = 400F, minY, topY, topX; //tthese represent the bounds on the size of the view
+        static private FileHandler reader = new FileHandler("screen");
         static private float backgroundX, backgroundY;
         static private RenderWindow mainWindow;
         static private Buffers.InputBuffer input;
         static private Graphic_Manager.Game_Screen gameScreen;
         static private bool active = false, inGame = false, activeGame = false;
-        static private FileReader reader = new FileReader();
         static private float xMove, yMove;
         static private float mouseX, mouseY;
         static Thread logicThread = null;
         static int mouseScrollAmount = 0;
 
+        /***************
+         * class consts
+         **************/
+        static float AMOUNT_OF_PIXEL_ALLOWED_OFFSCREEN = reader.getFloatProperty("pixels allowed off background");
+        static uint SCREEN_EDGE_WIDTH_FOR_MOUSE_SCROLLING = reader.getUintProperty("mouse scroll range");
+        static uint SCREEN_EDGE_MOUSE_SCROLL_RELATION = reader.getUintProperty("mouse scroll relation");
+        static uint SPEED_OF_MOUSE_SCROLL = reader.getUintProperty("mouse scroll speed");
+        static uint screenWidth = reader.getUintProperty("screen width");
+        static uint screenHeight = reader.getUintProperty("screen height");
+        static uint bits = reader.getUintProperty("bits");
+        static uint frameRates = reader.getUintProperty("frame rates");
+        static private float minX = reader.getFloatProperty("minimal view size"), minY, topY, topX; //these represent the bounds on the size of the view
+
         private static void initialise()
         {
-            mainWindow = new RenderWindow(new VideoMode(reader.getScreenWidth(), reader.GetScreenHeight(), reader.getBits()), "main display");
-
-            minY = minX * reader.GetScreenHeight() / reader.getScreenWidth();
+            mainWindow = new RenderWindow(new VideoMode(screenWidth, screenHeight, bits), "main display");
+            mainWindow.SetFramerateLimit(frameRates);
+            minY = minX * screenHeight / screenWidth;
             mainWindow.SetActive(false);
             mainWindow.Closed += new EventHandler(OnClosed);
             mainWindow.KeyPressed += new EventHandler<KeyEventArgs>(OnKeyPressed);
@@ -47,6 +51,7 @@ namespace Game.Screen_Manager
             mainWindow.MouseMoved += new EventHandler<MouseMoveEventArgs>(MouseMoved);
             mainWindow.SetMouseCursorVisible(false);
             mainWindow.MouseButtonPressed += new EventHandler<MouseButtonEventArgs>(MouseButtonPressed);
+            mainWindow.Resized += new EventHandler<SizeEventArgs>(resizing);
             active = true;
         }
 
@@ -61,7 +66,7 @@ namespace Game.Screen_Manager
             Texture background = city.Img;
             gameScreen = new Graphic_Manager.Game_Screen(disp, background, mainWindow, input);
             topX = background.Size.X;
-            topY = background.Size.X * reader.GetScreenHeight() / reader.getScreenWidth();
+            topY = background.Size.X * screenHeight / screenWidth;
             backgroundX = background.Size.X;
             backgroundY = background.Size.Y;
             inGame = true;
@@ -73,7 +78,7 @@ namespace Game.Screen_Manager
         public static void run()
         {
             initialise();
-            startNewGame(40, 30, 100);
+            startNewGame(40, 30, 200);
             while(active)
             {
                 mainWindow.DispatchEvents();
@@ -103,7 +108,6 @@ namespace Game.Screen_Manager
 
         static void OnKeyPressed(object sender, KeyEventArgs e)
         {
-            View currentView = ((RenderWindow)sender).GetView();
             if (e.Code == Keyboard.Key.Left)
             {
                 centerNew( - 10, 0);
@@ -144,9 +148,15 @@ namespace Game.Screen_Manager
             }
             if (e.Code == Keyboard.Key.Return)
             {
-                startNewGame(40, 30, 100);
+                startNewGame(40, 30, 200);
                 return;
             }
+        }
+
+        static void resizing(object sender, SizeEventArgs e)
+        {
+            View temp = mainWindow.GetView();
+            temp.Size = new Vector2f(e.Width, e.Height);
         }
 
         static void Zooming(object sender, MouseWheelEventArgs e)
@@ -179,14 +189,14 @@ namespace Game.Screen_Manager
                     if (down > topY)
                         newY = down - topY;
                 currentView.Center = new Vector2f(currentView.Center.X - newX, currentView.Center.Y - newY);
-                ((RenderWindow)sender).SetView(currentView);
+                //((RenderWindow)sender).SetView(currentView);
             }
         }
 
         static void OnLosingFocus(object sender, EventArgs e)
         {
-            input.enterEvent(new PauseEvent());
-            activeGame = false;
+            //input.enterEvent(new PauseEvent());
+            //activeGame = false;
         }
 
         /// <summary>
@@ -209,7 +219,13 @@ namespace Game.Screen_Manager
 
         static void MouseClick(object sender, MouseButtonEventArgs e)
         {
-            //TODO - missing function
+            if (e.Button == Mouse.Button.Left) {
+                Vector2f temp = mainWindow.ConvertCoords(new Vector2i(e.X, e.Y));
+                Vector result = new Vector(Convert.ToInt16(temp.X), Convert.ToInt16(temp.Y));
+                Console.Out.WriteLine("clicked on " + result.X + " , " + result.Y);
+                input.enterEvent(new BufferMouseSelectEvent(result)); 
+                return; }
+            if (e.Button == Mouse.Button.Right) { input.enterEvent(new BufferCancelActionEvent()); }
         }
 
         static void MouseMoved(object sender, MouseMoveEventArgs e)

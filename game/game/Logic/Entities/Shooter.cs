@@ -7,8 +7,6 @@ namespace Game.Logic.Entities
 
         Weapon weapon();
 
-        HitFunction hitFunc();
-
         bool readyToShoot();
 
         Entity target();

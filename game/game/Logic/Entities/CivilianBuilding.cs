@@ -7,7 +7,7 @@ namespace Game.Logic.Entities
     {
 
         /******************
-        class fields
+        class members
         ****************/
 
         private readonly int _sizeModifier;
@@ -16,7 +16,7 @@ namespace Game.Logic.Entities
          * constructor
          **********/
         internal CivilianBuilding(Game.Vector realSize, int sizeModifier, Vector exit)
-            : base(sizeModifier, Entity.reactionPlaceHolder, sizeModifier, realSize, Affiliation.CIVILIAN, Sight.instance(SightType.CIV_SIGHT))
+            : base(sizeModifier, Entity.reactionPlaceHolder, realSize, Affiliation.CIVILIAN)
         {
             base.ExitPoint = exit;
             this._sizeModifier = sizeModifier;
@@ -56,6 +56,11 @@ namespace Game.Logic.Entities
         public Vector exitPoint()
         {
             return base.ExitPoint;
+        }
+
+        public override string ToString()
+        {
+            return "Civilian Building, " + base.ToString();
         }
     }
 

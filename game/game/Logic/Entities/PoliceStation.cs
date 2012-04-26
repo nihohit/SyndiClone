@@ -8,10 +8,10 @@ namespace Game.Logic.Entities
         /******************
         class consts
         ****************/
-        const int POLICE_SIZE_MODIFIER = 3;
+        const int POLICE_SIZE_MODIFIER = 1;
 
         /******************
-        class fields
+        class members
         ****************/
 
         private readonly int policemenCap;
@@ -24,8 +24,7 @@ namespace Game.Logic.Entities
          * constructor
          **********/
         internal PoliceStation(Game.Vector realSize, int sizeModifier, Vector exit)
-            : base(sizeModifier,
-            Entity.reactionPlaceHolder, sizeModifier, realSize, Affiliation.INDEPENDENT, Sight.instance(SightType.POLICE_SIGHT))
+            : base(sizeModifier, Entity.reactionPlaceHolder, realSize, Affiliation.INDEPENDENT)
         {
             
             base.ExitPoint = exit;
@@ -86,6 +85,9 @@ namespace Game.Logic.Entities
             this.Alert = true;
         }
 
-    
+        public override string ToString()
+        {
+            return "Police station, " + base.ToString();
+        }
 }
 }

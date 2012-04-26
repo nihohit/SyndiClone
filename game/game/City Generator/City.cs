@@ -27,7 +27,7 @@ namespace Game.City_Generator
         private static readonly Random _rand = new Random();
 
 
-        /********************************Fields***************************************/
+        /********************************members***************************************/
         private char[,] _grid;
         private BuildingPlacer _bp;
         
@@ -46,7 +46,7 @@ namespace Game.City_Generator
             /********************************Constants***************************************/
             private const double DECREASE_FACTOR = 0.01,LOWER_HALF_PROB = 0.25;
             private const int ARR_SIZE=12;
-            /********************************Fields***************************************/
+            /********************************members***************************************/
             private double[] _hPlaces,_vPlaces;
 
             /********************************Constructor***************************************/

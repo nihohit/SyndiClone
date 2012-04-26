@@ -11,13 +11,10 @@ namespace Game.Logic.Entities
         Class consts
         ****************/
 
-        const int CIV_HEALTH = 3;
-        const int CIV_SPEED = 10;
-        const int CIV_REACTION_TIME = 10;
         const int CIV_RUNNING_TIME = 100;
 
         /******************
-        Class fields
+        Class members
         ****************/
 
         private bool fleeing;
@@ -28,7 +25,7 @@ namespace Game.Logic.Entities
         ****************/
 
         internal Civilian() :
-            base(CIV_REACTION_TIME, civReact, CIV_HEALTH, Affiliation.CIVILIAN, Sight.instance(SightType.CIV_SIGHT), CIV_SPEED, new LinkedList<Direction>())
+            base(civReact, Affiliation.CIVILIAN, new LinkedList<Direction>())
         {
             this.fleeing = false;
         }
@@ -67,7 +64,7 @@ namespace Game.Logic.Entities
             {
                 if (this.timeRunning < CIV_RUNNING_TIME)
                 {
-                    this.timeRunning += CIV_REACTION_TIME;
+                    this.timeRunning += this.ReactionTime;
                     return false;
                 }
                 else
@@ -79,5 +76,9 @@ namespace Game.Logic.Entities
             return base.doesReact();
         }
 
+        public override string ToString()
+        {
+            return "Civilian, " + base.ToString();
+        }
     }
 }

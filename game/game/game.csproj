@@ -58,7 +58,7 @@
     <Compile Include="Buffers\Buffer.cs" />
     <Compile Include="Buffers\BuffersInfo.cs" />
     <Compile Include="Graphic Manager\BuildingImageGenerator.cs" />
-    <Compile Include="Screen Manager\FileReader.cs" />
+    <Compile Include="FileReader.cs" />
     <Compile Include="Screen Manager\InputBuffer.cs" />
     <Compile Include="Screen Manager\ScreenManager.cs" />
     <Compile Include="testInput.cs" />
@@ -102,17 +102,14 @@
     <Compile Include="Vector.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="sfmlnet-audio-2, Version=0.0.0.0, Culture=neutral, processorArchitecture=AMD64">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\SFML\lib\x86\sfmlnet-audio-2.dll</HintPath>
+    <Reference Include="sfmlnet-audio-2">
+      <HintPath>..\..\SFML.Net-2.0-rc\lib\x86\sfmlnet-audio-2.dll</HintPath>
     </Reference>
-    <Reference Include="sfmlnet-graphics-2, Version=0.0.0.0, Culture=neutral, processorArchitecture=AMD64">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\SFML\lib\x86\sfmlnet-graphics-2.dll</HintPath>
+    <Reference Include="sfmlnet-graphics-2">
+      <HintPath>..\..\SFML.Net-2.0-rc\lib\x86\sfmlnet-graphics-2.dll</HintPath>
     </Reference>
-    <Reference Include="sfmlnet-window-2, Version=0.0.0.0, Culture=neutral, processorArchitecture=AMD64">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\SFML\lib\x86\sfmlnet-window-2.dll</HintPath>
+    <Reference Include="sfmlnet-window-2">
+      <HintPath>..\..\SFML.Net-2.0-rc\lib\x86\sfmlnet-window-2.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Drawing" />

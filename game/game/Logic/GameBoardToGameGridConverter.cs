@@ -29,7 +29,7 @@ namespace Game.Logic
             Entity[,] gameGrid = intiateGrid(y,x);
 
             Grid grid = new Grid(gameGrid);
-            int amountOfPoliceBuildings = Convert .ToInt32( System.Math.Log(board.Buildings.Count, 2));
+            int amountOfPoliceBuildings = Convert.ToInt32( System.Math.Log(board.Buildings.Count, 2));
             int ratio = board.Buildings.Count / amountOfPoliceBuildings;
             int i = 0;
             foreach(Game.City_Generator.Building origin in board.Buildings)
@@ -69,7 +69,7 @@ namespace Game.Logic
             Vector realSize = new Vector(build.Depth * TILE_SIZE_CONVERSION, build.Length * TILE_SIZE_CONVERSION);
             int sizeModifier = (build.Depth * build.Length);
             //TODO - why do I need to flip x & y?!
-            return new Game.Logic.Entities.CivilianBuilding(realSize,sizeModifier, getExitVector(build));
+            return new Game.Logic.Entities.CivilianBuilding(realSize, sizeModifier, getExitVector(build));
         }
 
         private static Vector getExitVector(City_Generator.Building build)

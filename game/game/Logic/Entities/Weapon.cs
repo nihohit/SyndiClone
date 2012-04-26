@@ -12,11 +12,11 @@ namespace Game.Logic.Entities
         const int PISTOL_ROF = 20;
         const int PISTOL_RANGE = 12;
         const int PISTOL_THREAT = 1;
-        const double PISTOL_ACC = 1.1;
+        const double PISTOL_ACC = 8;
 
 
         /******************
-        class fields
+        class members
         ****************/
 
         private readonly int _range;

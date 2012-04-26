@@ -11,9 +11,9 @@ namespace Game.Logic.Entities
         class consts
         ****************/
 
-        protected const int BASE_BUILD_REACTION_TIME = 200;
+        protected const int BASE_BUILD_REACTION_TIME = 10;
         protected const int BASE_BUILD_HEALTH = 10;
-        protected const int AMOUNT_OF_STEPS_BEFORE_BUILDING = 1000;
+        protected const int AMOUNT_OF_STEPS_BEFORE_BUILDING = 2000;
 
         private int _sizeModifier;
         private int _timeToConstruct;
@@ -21,12 +21,16 @@ namespace Game.Logic.Entities
         protected bool _readyToBuild;
         
 
-        public Building(int reactionTime, reactionFunction reaction, int health, Vector size, Affiliation loyalty, Sight sight)
-            : base(BASE_BUILD_REACTION_TIME/reactionTime, reaction, BASE_BUILD_HEALTH*health, entityType.BUILDING, size, loyalty, sight, Visibility.SOLID)
+        public Building(int sizeModifier, reactionFunction reaction, Vector size, Affiliation loyalty)
+            : base(BASE_BUILD_REACTION_TIME*sizeModifier, reaction, BASE_BUILD_HEALTH*sizeModifier, entityType.BUILDING, size, loyalty)
         {
-            this._sizeModifier = size.X * size.Y / 300;
+            this._sizeModifier = sizeModifier;
             this._timeToConstruct = 0;
             _readyToBuild = true;
+            List<Upgrades> list = new List<Upgrades>();
+            list.Add(Upgrades.VISIBILITY_SOLID);
+            list.Add(Upgrades.BUILDING_BLIND);
+            base.upgrade(list);
         }
 
         internal Vector ExitPoint
@@ -37,7 +41,6 @@ namespace Game.Logic.Entities
 
         internal override void destroy()
         {
-            System.Console.Out.WriteLine("building destroyed");
             base.destroy();
         }
     
