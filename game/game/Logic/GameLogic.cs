@@ -97,21 +97,35 @@ namespace Game.Logic
             if (active)
             {
                 this.other.Start();
-                this.clearData();
-                this.populateActionLists();
-                this.resolveOrders();
+
+                    this.clearData();
+                    this.populateActionLists();
+                    this.resolveOrders();
+
                 this.other.Stop();
+
                 this.move.Start();
-                this.handleMovement();
+
+                    this.handleMovement();
+
                 this.move.Stop();
+
                 this.shoot.Start();
-                this.handleShooting();
+
+                    this.handleShooting();
+
                 this.shoot.Stop();
+
                 this.construct.Start();
-                this.handleUnitCreation();
+
+                    this.handleUnitCreation();
+
                 this.construct.Stop();
+
                 this.synch.Start();
-                this.updateOutput();
+
+                    this.updateOutput();
+
                 this.synch.Stop();
             }
             this.frameLimit();
@@ -182,7 +196,7 @@ namespace Game.Logic
             //TODO - try smarter threading, with waiting only a limited time on entering. 
             lock (displayBuffer)
             {
-                //List<ExternalEntity> newList = this._grid.getVisibleEntities();
+                //List<ExternalEntity> newPath = this._grid.getVisibleEntities();
                 List<ExternalEntity> newList = new List<ExternalEntity>(this._grid.getAllEntities());
                 List<BufferEvent> actionList = new List<BufferEvent>(actions);
                 displayBuffer.receiveVisibleEntities(newList);

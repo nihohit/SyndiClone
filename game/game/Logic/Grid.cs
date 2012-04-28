@@ -11,8 +11,8 @@ namespace Game.Logic
         /******************
         Consts
         ****************/
-        const int randomPathLength = 100;
-        const int CIV_FLEE_RANGE = 100;
+        const int randomPathLength = 1000;
+        const int CIV_FLEE_RANGE = 1000;
         delegate Effect CurriedEntityListAdd(UniqueList<Entity> list); //These functions curry a list to an effect which will enter entities into the list
         delegate Effect CurriedDirectionListAdd(List<Direction> list); //These functions curry directions to an effect which will put them in lists
         delegate bool boolPointOperator(Point point); //These functions as a binary question on a Point
@@ -28,7 +28,10 @@ namespace Game.Logic
         private readonly List<Buffers.BufferEvent> actionsDone;
         private readonly UniqueList<ExternalEntity> visible;
         private readonly UniqueList<Entity> destroyed;
+        private readonly byte[,] pathFindingGrid;
         //TODO - add corporations?
+
+        private Pathfinding.PathFinderFast pathfinder;
 
         /******************
         Constructors
@@ -42,6 +45,16 @@ namespace Game.Logic
             this.entities = new Dictionary<Entity, ExternalEntity>();
             this.visible = new UniqueList<ExternalEntity>();
             this.destroyed = new UniqueList<Entity>();
+            this.pathFindingGrid = new byte[grid.GetLength(0), grid.GetLength(1)];
+            for (int i = 0; i < grid.GetLength(0); i++)
+            {
+                for (int j = 0; j < grid.GetLength(1); j++)
+                {
+                    if(grid[i,j] == null) this.pathFindingGrid[i,j] =1;
+                    else this.pathFindingGrid[i, j] = Convert.ToByte(Math.Min(grid[i,j].Health+1, byte.MaxValue));
+                }
+            }
+            pathfinder = new Pathfinding.PathFinderFast(this.pathFindingGrid);
         }
 
 
@@ -225,6 +238,7 @@ namespace Game.Logic
             ent.moveResult(result);
         }
 
+        //TODO - problematic, could lead into a building
         private Point generateRandomPoint(Point temp, int distance)
         {
             int maxX = Math.Min(temp.X + distance, this.gameGrid.GetLength(0)-1);
@@ -242,7 +256,8 @@ namespace Game.Logic
         private LinkedList<Direction> getSimplePath(Point entry, Point target)
         {
             LinkedList<Direction> ans = new LinkedList<Direction>();
-            ans = processWalkingPath(entry, target);
+
+            ans = Pathfinding.PathFinding.convertToDirection(pathfinder.FindPath(entry, target));
             if (!(ans.Count == entry.getDiffVector(target).length())){
                 //TODO - probably continue from there.
             }
@@ -276,26 +291,56 @@ namespace Game.Logic
                     x0 = x0 + sx;
                     if (sx > 0)
                     {
-                        ans.AddLast(Direction.RIGHT);
+                        if (e2 < dx)
+                        {
+                            err = err + dx;
+                            y0 = y0 + sy;
+                            if (sy > 0)
+                            {
+                                ans.AddLast(Direction.DOWNRIGHT);
+                            }
+                            else
+                            {
+                                ans.AddLast(Direction.UPRIGHT);
+                            }
+                        }
+                        else ans.AddLast(Direction.RIGHT);
                     }
                     else
                     {
-                        ans.AddLast(Direction.LEFT);
+                        if (e2 < dx)
+                        {
+                            err = err + dx;
+                            y0 = y0 + sy;
+                            if (sy > 0)
+                            {
+                                ans.AddLast(Direction.DOWNLEFT);
+                            }
+                            else
+                            {
+                                ans.AddLast(Direction.UPLEFT);
+                            }
+                        }
+                        else ans.AddLast(Direction.LEFT);
                     }
                 }
-                if (e2 < dx)
+                else
                 {
-                    err = err + dx;
-                    y0 = y0 + sy;
-                    if (sy > 0)
+                    if (e2 < dx)
                     {
-                        ans.AddLast(Direction.DOWN);
-                    }
-                    else
-                    {
-                        ans.AddLast(Direction.UP);
+                        err = err + dx;
+                        y0 = y0 + sy;
+                        if (sy > 0)
+                        {
+                            ans.AddLast(Direction.DOWN);
+                        }
+                        else
+                        {
+                            ans.AddLast(Direction.UP);
+                        }
                     }
                 }
+
                 if ((y0 < 0) ||(x0 < 0) || (x0 >= this.gameGrid.GetLength(0)) || (y0 >= this.gameGrid.GetLength(1)))
                 {
                     throw new IndexOutOfRangeException();
@@ -318,7 +363,7 @@ namespace Game.Logic
             Area location = this.locations[ent];
             if(ent.needFlip())
             {
-                location.flip();
+                location = location.flip();
             }
 
             Area areaToCheck = new Area(location, this.directionToVector(direction));
@@ -369,7 +414,7 @@ namespace Game.Logic
             Area location = this.locations[ent];
             if (ent.needFlip())
             {
-                location.flip();
+                location = location.flip();
             }
 
             Area toSwitch = new Area(location, this.directionToVector(dir));
@@ -414,7 +459,7 @@ namespace Game.Logic
 
         private Direction vectorToDirection(Vector vector)
         {
-            vector.normalise();
+            vector = vector.normalise();
             if (vector.Equals(new Vector(0, -1))) return Direction.UP;
             if (vector.Equals(new Vector(0, 1))) return Direction.DOWN;
             if (vector.Equals(new Vector(-1, 0))) return Direction.LEFT;
@@ -438,6 +483,18 @@ namespace Game.Logic
 
                 case(Direction.RIGHT):
                     return new Vector(1, 0);
+
+                case (Direction.UPRIGHT):
+                    return new Vector(1, -1);
+
+                case (Direction.DOWNRIGHT):
+                    return new Vector(1, 1);
+
+                case (Direction.UPLEFT):
+                    return new Vector(-1, -1);
+
+                case (Direction.DOWNLEFT):
+                    return new Vector(-1, 1);
                 
                 default:
                     throw new Exception("not valid direction found");
@@ -513,8 +570,8 @@ namespace Game.Logic
             Point exit = this.convertToCentralPoint((Entity)shooter);
             Point currentTargetLocation = this.convertToCentralPoint(target);
             Vector direction = new Vector(exit, currentTargetLocation);
-            direction.normalProbability(direction.length() / weapon.Acc);
-            direction.completeToDistance(weapon.Range);
+            direction = direction.normalProbability(direction.length() / weapon.Acc);
+            direction = direction.completeToDistance(weapon.Range);
             //TODO - If there's a target that I see only parts of it, how do I aim at the visible parts?
             
             //get the path the bullet is going through, and affect targets
@@ -588,11 +645,23 @@ namespace Game.Logic
 
         private void destroy(Entity ent)
         {
+
+            if (ent.Type == entityType.BUILDING)
+            {
+                Area area = this.locations[ent];
+                foreach (Point point in area.getPointArea())
+                {
+                    this.pathFindingGrid[point.X, point.Y] = 1;
+                }
+            }
+            pathfinder = new Pathfinding.PathFinderFast(this.pathFindingGrid);
+
             this.addEvent(new Buffers.DestroyEvent(this.locations[ent], this.entities[ent]));
             this.removeFromLocation(ent);
             this.locations.Remove(ent);
             this.entities.Remove(ent);
             ent.destroy();
+
         }
 
         /**************

@@ -78,7 +78,7 @@ namespace Game.Screen_Manager
         public static void run()
         {
             initialise();
-            startNewGame(40, 30, 200);
+            startNewGame(32, 32, 200);
             while(active)
             {
                 mainWindow.DispatchEvents();

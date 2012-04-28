@@ -90,21 +90,7 @@ namespace Game.Logic.Entities
 
         internal bool needFlip()
         {
-            if (this._path.Count > 0)
-            {
-                switch (this._headed)
-                {
-                    case Direction.DOWN:
-                        return ((this.getDirection() == Direction.LEFT) || (this.getDirection() == Direction.RIGHT));
-                    case Direction.UP:
-                        return ((this.getDirection() == Direction.LEFT) || (this.getDirection() == Direction.RIGHT));
-                    case Direction.RIGHT:
-                        return ((this.getDirection() == Direction.UP) || (this.getDirection() == Direction.DOWN));
-                    case Direction.LEFT:
-                        return ((this.getDirection() == Direction.UP) || (this.getDirection() == Direction.DOWN));
-                }
-            }
-            return false;
+            return this._headed != this.getDirection();
         }
 
         internal void flip()

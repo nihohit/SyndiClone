@@ -19,18 +19,18 @@ namespace Game.Logic
     internal enum WeaponType { PISTOL, ASSAULT, BAZOOKA, SNIPER, RAILGUN } //different weapons
     internal enum BlastType { } //different blast effect
     internal enum ShotType { SIGHT, PISTOL_BULLET }
-    internal enum Direction { LEFT, RIGHT, UP, DOWN }
+    internal enum Direction { LEFT, RIGHT, UP, DOWN, UPLEFT, UPRIGHT, DOWNLEFT, DOWNRIGHT }
     internal enum Corporations { BIOTECH, STEALTH, ARMS, VEHICLES, VISION }
     internal enum Upgrades { BULLETPROOF_VEST, VISIBILITY_SOLID, BUILDING_BLIND } 
 
     internal struct Area
     {
         private readonly Point _entry; //the top left of the shape
-        private readonly Vector _size;
+        private Vector _size;
 
-        internal void flip()
+        internal Area flip()
         {
-            this._size.flip();
+            return new Area(this._entry, this._size.flip());
         }
 
         internal Area(Point entry, Vector size)

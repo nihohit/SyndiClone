@@ -18,10 +18,11 @@ namespace Game
             return new Vector(this._x + add.X, this._y + add.Y);
         }
 
-        public void normalProbability(double deviation)
+        public Vector normalProbability(double deviation)
         {
-            this._x = computeNormalProbablity(this._x, deviation);
-            this._y = computeNormalProbablity(this._y, deviation);
+            int x = computeNormalProbablity(this._x, deviation);
+            int y = computeNormalProbablity(this._y, deviation);
+            return new Vector(x, y);
         }
 
         public double length()
@@ -61,23 +62,25 @@ namespace Game
             this._y = a.Y;
         }
 
-        public void flip()
+        public Vector flip()
         {
-            int temp = this._x;
-            this._x = this._y;
-            this._y = temp;
+            int x = this._y;
+            int y = this._x;
+            return new Vector(x, y);
         }
 
-        public void completeToDistance(int dist)
+        public Vector completeToDistance(int dist)
         {
             int total = Convert.ToInt16(this.length());
             dist = dist - total;
             total = _x + _y;
             if (dist > 0 && total > 0)
             {
-                _x += dist*_x / total;
-                _y += dist*_y / total;
+                int x = dist*_x / total + this._x;
+                int y = dist*_y / total + this._y;
+                return new Vector(x,y);
             }
+            return this;
         }
 
         public static int abs(int a)
@@ -90,21 +93,23 @@ namespace Game
             return new Point(this._x, this._y);
         }
 
-        internal void normalise()
+        internal Vector normalise()
         {
+            int x, y;
             if(abs(_x) > abs(_y)) {
-                _y = 0;
-                _x = _x / abs(_x);
+                y = 0;
+                x = _x / abs(_x);
             }
             else 
             {
                 if (abs(_x) < abs(_y))
                 {
-                    _x = 0;
-                    _y = _y / abs(_y);
+                    x = 0;
+                    y = _y / abs(_y);
                 }
                 else throw new Exception ("Vector is equal");
             }
+            return new Vector(x, y);
         }
 
         public override bool Equals(object obj)
