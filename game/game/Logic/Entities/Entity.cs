@@ -107,6 +107,15 @@ namespace Game.Logic.Entities
                     case(Upgrades.BUILDING_BLIND):
                         this._sight = Sight.instance(SightType.BLIND);
                         break;
+                    case(Upgrades.FLYER):
+                        ((MovingEntity)this).WayToMove = MovementType.FLYER;
+                        break;
+                    case (Upgrades.HOVER):
+                        ((MovingEntity)this).WayToMove = MovementType.HOVER;
+                        break;
+                    case (Upgrades.CRUSHER):
+                        ((MovingEntity)this).WayToMove = MovementType.CRUSHER;
+                        break;
 
                 }
 

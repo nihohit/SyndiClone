@@ -56,7 +56,7 @@ namespace Game.Graphic_Manager
             this.order = new LinkedList<Sprite>(_list);
         }
 
-        internal Animation(Logic.Area area, Logic.entityType type)
+        internal Animation(Area area, Logic.entityType type)
         {
             // TODO - missing function. The basic idea is to generate an explosion sprite based on size, and whether it's a person, building or vehicle
         }

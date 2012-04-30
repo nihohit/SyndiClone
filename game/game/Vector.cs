@@ -49,7 +49,7 @@ namespace Game
             this._y = y;
         }
 
-        public Vector(Point b, Point a)
+        public Vector(Point a, Point b)
         {
             this._x = a.X - b.X;
             this._y = a.Y - b.Y;
@@ -95,20 +95,9 @@ namespace Game
 
         internal Vector normalise()
         {
-            int x, y;
-            if(abs(_x) > abs(_y)) {
-                y = 0;
-                x = _x / abs(_x);
-            }
-            else 
-            {
-                if (abs(_x) < abs(_y))
-                {
-                    x = 0;
-                    y = _y / abs(_y);
-                }
-                else throw new Exception ("Vector is equal");
-            }
+            int x = 0, y = 0;
+            if (_x != 0) x = _x / abs(_x);
+            if (_y != 0 ) y = _y / abs(_y);
             return new Vector(x, y);
         }
 
@@ -127,5 +116,79 @@ namespace Game
         {
             return "Vector " + this.X + " , " + this.Y;
         }
+
+        //Always presume that the vector is new point - old point;
+        public Game.Logic.Direction vectorToDirection()
+        {
+            if (this.X > 0)
+            {
+                if (this.Y > 0) return Game.Logic.Direction.DOWNRIGHT;
+                if (this.Y < 0) return Game.Logic.Direction.UPRIGHT;
+                return Logic.Direction.RIGHT;
+            }
+            if (this.X < 0) 
+            {
+                if (this.Y > 0) return Game.Logic.Direction.DOWNLEFT;
+                if (this.Y < 0) return Game.Logic.Direction.UPLEFT;
+                return Logic.Direction.LEFT;
+            }
+            if (this.Y > 0) return Game.Logic.Direction.DOWN;
+            if (this.Y < 0) return Game.Logic.Direction.UP;
+            throw new Exception("same points");
+        }
+    }
+
+    internal struct Area
+    {
+        private readonly Point _entry; //the top left of the shape
+        private Vector _size;
+
+        internal Area flip()
+        {
+            return new Area(this._entry, this._size.flip());
+        }
+
+        internal Area(Point entry, Vector size)
+        {
+            this._entry = entry;
+            this._size = size;
+        }
+
+        internal Area(Area location, Vector vector)
+        {
+            this._entry = new Point(location.Entry, vector);
+            this._size = location.Size;
+        }
+
+        internal Vector Size
+        {
+            get { return _size; }
+        }
+
+        public Point Entry
+        {
+            get { return _entry; }
+        }
+
+        internal Point[,] getPointArea()
+        {
+            Point[,] area = new Point[this._size.X, this._size.Y];
+
+            for (int i = 0; i < this._size.X; i++)
+            {
+                for (int j = 0; j < this._size.Y; j++)
+                {
+                    area[i, j] = new Point(this._entry, new Vector(i, j));
+                }
+            }
+
+            return area;
+        }
+
+        public override string ToString()
+        {
+            return "Area: entry - " + this._entry + " size - " + this._size;
+        }
+
     }
 }

@@ -60,12 +60,7 @@
     <Compile Include="Buffers\BuffersInfo.cs" />
     <Compile Include="Graphic Manager\BuildingImageGenerator.cs" />
     <Compile Include="FileReader.cs" />
-    <Compile Include="Logic\Pathfinding\AuthorAttributes.cs" />
-    <Compile Include="Logic\Pathfinding\HighResolutionTime.cs" />
-    <Compile Include="Logic\Pathfinding\IPathFinder.cs" />
-    <Compile Include="Logic\Pathfinding\PathFinder.cs" />
-    <Compile Include="Logic\Pathfinding\PathFinderSlow.cs" />
-    <Compile Include="Logic\Pathfinding\PathFinding.cs" />
+    <Compile Include="Logic\Pathfinding\MyAStar.cs" />
     <Compile Include="Logic\Pathfinding\PriorityQueueB.cs" />
     <Compile Include="Screen Manager\InputBuffer.cs" />
     <Compile Include="Screen Manager\ScreenManager.cs" />

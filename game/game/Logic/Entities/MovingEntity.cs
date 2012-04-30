@@ -17,6 +17,7 @@ namespace Game.Logic.Entities
         private int _steps = 0;
         private LinkedList<Direction> _path;
         private Direction _headed;
+        private MovementType _wayToMove = MovementType.GROUND;
 
         /******************
         constructors
@@ -27,10 +28,7 @@ namespace Game.Logic.Entities
         {
             this._speed = speed;
             this._path = path;
-            if (path != null && path.Count !=0)
-                this._headed = path.First.Value;
-            else
-                this._headed = Direction.DOWN;
+            this._headed = Direction.DOWN;
         }
 
         /******************
@@ -67,9 +65,11 @@ namespace Game.Logic.Entities
             return ans;
         }
 
+        //TODO - incorrect
         internal virtual Direction getDirection()
         {
-            return Path.First.Value;
+            if (this.Path.Count > 0 ) return this.Path.First.Value;
+            return this._headed;
         }
 
         internal virtual void moveResult(bool result)
@@ -79,7 +79,6 @@ namespace Game.Logic.Entities
                 _steps -= AMOUNT_OF_MOVES_FOR_STEP;
                 this._headed = this.getDirection();
                 Path.RemoveFirst();
-                
             }
             else
             {
@@ -96,6 +95,12 @@ namespace Game.Logic.Entities
         internal void flip()
         {
             this._size = new Vector(this._size.Y, this._size.X);
+        }
+
+        internal MovementType WayToMove
+        {
+            get { return _wayToMove; }
+            set { _wayToMove = value; }
         }
 
     }

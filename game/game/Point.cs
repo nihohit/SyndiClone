@@ -54,6 +54,24 @@ namespace Game
             return new Vector(this.X - point.X, this.Y - point.Y);
         }
 
+        public static bool operator == (Point a, Point b)
+        {
+            return (a.X == b.X && (a.Y == b.Y));
+        }
 
+        public static bool operator !=(Point a, Point b)
+        {
+            return (a.X != b.X || (a.Y != b.Y));
+        }
+
+        public override bool Equals(object obj)
+        {
+            return ((obj is Point) && ((Point)obj == this));
+        }
+
+        public override int GetHashCode()
+        {
+            return this._xLoc.GetHashCode() + this._yLoc.GetHashCode();
+        }
     }
 }

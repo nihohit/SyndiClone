@@ -17,65 +17,13 @@ namespace Game.Logic
     internal enum Affiliation { INDEPENDENT, CORP1, CORP2, CORP3, CORP4, CIVILIAN } //to which player each entity belongs
     internal enum SightType { DEFAULT_SIGHT, BLIND } //different sights
     internal enum WeaponType { PISTOL, ASSAULT, BAZOOKA, SNIPER, RAILGUN } //different weapons
+    internal enum MovementType { GROUND, HOVER, FLYER, CRUSHER }
+    internal enum TerrainType { ROAD, WATER, BUILDING, ROUGH } 
     internal enum BlastType { } //different blast effect
     internal enum ShotType { SIGHT, PISTOL_BULLET }
     internal enum Direction { LEFT, RIGHT, UP, DOWN, UPLEFT, UPRIGHT, DOWNLEFT, DOWNRIGHT }
     internal enum Corporations { BIOTECH, STEALTH, ARMS, VEHICLES, VISION }
-    internal enum Upgrades { BULLETPROOF_VEST, VISIBILITY_SOLID, BUILDING_BLIND } 
-
-    internal struct Area
-    {
-        private readonly Point _entry; //the top left of the shape
-        private Vector _size;
-
-        internal Area flip()
-        {
-            return new Area(this._entry, this._size.flip());
-        }
-
-        internal Area(Point entry, Vector size)
-        {
-            this._entry = entry;
-            this._size = size;
-        }
-
-        internal Area(Area location, Vector vector)
-        {
-            this._entry = new Point(location.Entry, vector);
-            this._size = location.Size;
-        }
-
-        internal Vector Size
-        {
-            get { return _size; }
-        }
-
-        public Point Entry
-        {
-            get { return _entry; }
-        }
-
-        internal Point[,] getPointArea()
-        {
-            Point[,] area = new Point[this._size.X, this._size.Y];
-
-            for (int i = 0; i < this._size.X; i++)
-            {
-                for (int j = 0; j < this._size.Y; j++)
-                {
-                    area[i, j] = new Point(this._entry, new Vector(i, j));
-                }
-            }
-
-            return area;
-        }
-
-        public override string ToString()
-        {
-            return "Area: entry - " + this._entry + " size - " + this._size;
-        }
-
-    }
+    internal enum Upgrades { BULLETPROOF_VEST, VISIBILITY_SOLID, BUILDING_BLIND, FLYER, HOVER, CRUSHER } 
 
     internal struct Reaction{
 

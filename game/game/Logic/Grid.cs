@@ -28,10 +28,8 @@ namespace Game.Logic
         private readonly List<Buffers.BufferEvent> actionsDone;
         private readonly UniqueList<ExternalEntity> visible;
         private readonly UniqueList<Entity> destroyed;
-        private readonly byte[,] pathFindingGrid;
+        private readonly TerrainType[,] pathFindingGrid;
         //TODO - add corporations?
-
-        private Pathfinding.PathFinderFast pathfinder;
 
         /******************
         Constructors
@@ -45,16 +43,15 @@ namespace Game.Logic
             this.entities = new Dictionary<Entity, ExternalEntity>();
             this.visible = new UniqueList<ExternalEntity>();
             this.destroyed = new UniqueList<Entity>();
-            this.pathFindingGrid = new byte[grid.GetLength(0), grid.GetLength(1)];
+            this.pathFindingGrid = new TerrainType[grid.GetLength(0), grid.GetLength(1)];
             for (int i = 0; i < grid.GetLength(0); i++)
             {
                 for (int j = 0; j < grid.GetLength(1); j++)
                 {
-                    if(grid[i,j] == null) this.pathFindingGrid[i,j] =1;
-                    else this.pathFindingGrid[i, j] = Convert.ToByte(Math.Min(grid[i,j].Health+1, byte.MaxValue));
+                    if(grid[i,j] == null) this.pathFindingGrid[i,j] = TerrainType.ROAD;
+                    else this.pathFindingGrid[i, j] = TerrainType.BUILDING;
                 }
             }
-            pathfinder = new Pathfinding.PathFinderFast(this.pathFindingGrid);
         }
 
 
@@ -197,7 +194,7 @@ namespace Game.Logic
                     Point from = this.convertToCentralPoint(ent.Reaction.Focus);
                     Point currentLocation = this.convertToCentralPoint(ent);
                     Point runTo = getOppositePoint(from, currentLocation, CIV_FLEE_RANGE);
-                    ent.Path = getSimplePath(currentLocation, runTo);
+                    ent.Path = getSimplePath(currentLocation, runTo, ent);
                     ((Civilian)ent).runningAway();
                     this.move(ent);
                     break;
@@ -221,7 +218,7 @@ namespace Game.Logic
                     return;
                 }
                 Point temp = this.convertToCentralPoint(ent);
-                ent.Path = this.getSimplePath(temp, this.generateRandomPoint(temp, randomPathLength));
+                ent.Path = this.getSimplePath(temp, this.generateRandomPoint(temp, randomPathLength), ent);
                 tries++;
             }
             Direction dir = ent.getDirection();
@@ -233,7 +230,7 @@ namespace Game.Logic
             else
             {
                 Point temp = this.convertToCentralPoint(ent);
-                ent.Path = this.getSimplePath(temp, this.generateRandomPoint(temp, randomPathLength));
+                ent.Path = this.getSimplePath(temp, this.generateRandomPoint(temp, randomPathLength), ent);
             }
             ent.moveResult(result);
         }
@@ -253,12 +250,28 @@ namespace Game.Logic
          * This function is used mainly to generate the simple walking path for civilians. 
          * Will probably need to make it better in future, it'll probably serve other functions.
          */
-        private LinkedList<Direction> getSimplePath(Point entry, Point target)
+        private LinkedList<Direction> getSimplePath(Point entry, Point target, MovingEntity ent)
         {
             LinkedList<Direction> ans = new LinkedList<Direction>();
 
-            ans = Pathfinding.PathFinding.convertToDirection(pathfinder.FindPath(entry, target));
+            ans = processWalkingPath(entry, target);
             if (!(ans.Count == entry.getDiffVector(target).length())){
+                //TODO - probably continue from there.
+            }
+            return ans;
+        }
+
+        /*
+         * This function will be used for player units, taht need complex routes.
+         */
+        
+        private LinkedList<Direction> getComplexPath(Point entry, Point target, MovingEntity ent)
+        {
+            LinkedList<Direction> ans = new LinkedList<Direction>();
+
+            ans = Pathfinding.Astar.findPath(entry, target, ent.Size, pathFindingGrid, ent.WayToMove, Pathfinding.Astar.diagonalTo(target), ent.getDirection());
+            if (!(ans.Count == entry.getDiffVector(target).length()))
+            {
                 //TODO - probably continue from there.
             }
             return ans;
@@ -457,16 +470,6 @@ namespace Game.Logic
             this.iterateOverArea(area, removeEntityFromPoint);
         }
 
-        private Direction vectorToDirection(Vector vector)
-        {
-            vector = vector.normalise();
-            if (vector.Equals(new Vector(0, -1))) return Direction.UP;
-            if (vector.Equals(new Vector(0, 1))) return Direction.DOWN;
-            if (vector.Equals(new Vector(-1, 0))) return Direction.LEFT;
-            if (vector.Equals(new Vector(1, 0))) return Direction.RIGHT;
-            throw new Exception("not valid direction found");
-        }
-
         private Vector directionToVector(Direction direction)
         {
 
@@ -569,7 +572,7 @@ namespace Game.Logic
             Shot shot = weapon.Shot;
             Point exit = this.convertToCentralPoint((Entity)shooter);
             Point currentTargetLocation = this.convertToCentralPoint(target);
-            Vector direction = new Vector(exit, currentTargetLocation);
+            Vector direction = new Vector(currentTargetLocation, exit);
             direction = direction.normalProbability(direction.length() / weapon.Acc);
             direction = direction.completeToDistance(weapon.Range);
             //TODO - If there's a target that I see only parts of it, how do I aim at the visible parts?
@@ -651,10 +654,9 @@ namespace Game.Logic
                 Area area = this.locations[ent];
                 foreach (Point point in area.getPointArea())
                 {
-                    this.pathFindingGrid[point.X, point.Y] = 1;
+                    this.pathFindingGrid[point.X, point.Y] = TerrainType.ROUGH;
                 }
             }
-            pathfinder = new Pathfinding.PathFinderFast(this.pathFindingGrid);
 
             this.addEvent(new Buffers.DestroyEvent(this.locations[ent], this.entities[ent]));
             this.removeFromLocation(ent);
