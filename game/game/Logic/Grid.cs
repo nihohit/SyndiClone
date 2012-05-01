@@ -654,7 +654,7 @@ namespace Game.Logic
                 Area area = this.locations[ent];
                 foreach (Point point in area.getPointArea())
                 {
-                    this.pathFindingGrid[point.X, point.Y] = TerrainType.ROUGH;
+                    this.pathFindingGrid[point.X, point.Y] = TerrainType.ROAD;
                 }
             }
 

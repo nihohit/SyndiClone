@@ -18,7 +18,7 @@ namespace Game.Logic
     internal enum SightType { DEFAULT_SIGHT, BLIND } //different sights
     internal enum WeaponType { PISTOL, ASSAULT, BAZOOKA, SNIPER, RAILGUN } //different weapons
     internal enum MovementType { GROUND, HOVER, FLYER, CRUSHER }
-    internal enum TerrainType { ROAD, WATER, BUILDING, ROUGH } 
+    internal enum TerrainType { ROAD, WATER, BUILDING } 
     internal enum BlastType { } //different blast effect
     internal enum ShotType { SIGHT, PISTOL_BULLET }
     internal enum Direction { LEFT, RIGHT, UP, DOWN, UPLEFT, UPRIGHT, DOWNLEFT, DOWNRIGHT }

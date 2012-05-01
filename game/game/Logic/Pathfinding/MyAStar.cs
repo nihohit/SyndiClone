@@ -211,13 +211,11 @@ namespace Game.Logic.Pathfinding
                 case TerrainType.ROAD:
                     return 1;
                 case TerrainType.BUILDING:
-                    if (traversalMethod == MovementType.CRUSHER) return 2;
+                    if (traversalMethod == MovementType.CRUSHER) return 1;
                     return -1;
                 case TerrainType.WATER:
                     if (traversalMethod == MovementType.HOVER) return 1;
                     return -1;
-                case TerrainType.ROUGH:
-                    if (traversalMethod == MovementType.HOVER) return 1;
                     return 2;
                 default:
                     return -1;
