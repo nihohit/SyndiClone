@@ -98,7 +98,7 @@ namespace Game.Logic
             {
                 this.other.Start();
 
-                    this.clearData();
+                    
                     this.populateActionLists();
                     this.resolveOrders();
 
@@ -127,6 +127,8 @@ namespace Game.Logic
                     this.updateOutput();
 
                 this.synch.Stop();
+
+                this.clearData();
             }
             this.frameLimit();
             runs++;
@@ -198,9 +200,12 @@ namespace Game.Logic
             {
                 //List<ExternalEntity> newPath = this._grid.getVisibleEntities();
                 List<ExternalEntity> newList = new List<ExternalEntity>(this._grid.getAllEntities());
-                List<BufferEvent> actionList = new List<BufferEvent>(actions);
                 displayBuffer.receiveVisibleEntities(newList);
-                displayBuffer.receiveActions(actionList);
+                if (actions.Count > 0)
+                {
+                    List<BufferEvent> actionList = new List<BufferEvent>(actions);
+                    displayBuffer.receiveActions(actionList);
+                }
                 displayBuffer.Updated = true;
             }
             
@@ -228,9 +233,7 @@ namespace Game.Logic
                                 this.gameRunning = false;
                                 break;
                             case BufferType.SELECT:
-                                Entity temp = this._grid.getEntityInPoint(((BufferMouseSelectEvent)action).Coords.toPoint());
-                                if (temp != null)
-                                    Console.Out.WriteLine(temp.ToString());
+                                this._grid.select(((BufferMouseSelectEvent)action).Coords.toPoint());
                                 break;
                         }
                     }

@@ -36,7 +36,7 @@ namespace Game.Screen_Manager
         static uint frameRates = reader.getUintProperty("frame rates");
         static private float minX = reader.getFloatProperty("minimal view size"), minY, topY, topX; //these represent the bounds on the size of the view
 
-        private static void initialise()
+        public static void initialise()
         {
             mainWindow = new RenderWindow(new VideoMode(screenWidth, screenHeight, bits), "main display");
             mainWindow.SetFramerateLimit(frameRates);
@@ -75,18 +75,43 @@ namespace Game.Screen_Manager
             logicThread.Start();
         }
 
+        //TODO - remove, this is a debug tool
+        public static Logic.GameLogic startNewGameThreadless(int mapX, int mapY, int civAmount)
+        {
+            City_Generator.GameBoard city = City_Generator.CityFactory.createCity(mapX, mapY);
+            Buffers.DisplayBuffer disp = new Buffers.DisplayBuffer();
+            input = new Buffers.InputBuffer();
+            Buffers.SoundBuffer sound = new Buffers.SoundBuffer();
+            Logic.GameLogic logic = new Logic.GameLogic(disp, input, sound, city, civAmount);
+            Texture background = city.Img;
+            gameScreen = new Graphic_Manager.Game_Screen(disp, background, mainWindow, input);
+            topX = background.Size.X;
+            topY = background.Size.X * screenHeight / screenWidth;
+            backgroundX = background.Size.X;
+            backgroundY = background.Size.Y;
+            inGame = true;
+            activeGame = true;
+            Game.Logic.Pathfinding.MyVisibleAStar.setup(mainWindow);
+            return logic;
+        }
+
         public static void run()
         {
             initialise();
-            startNewGame(32, 32, 200);
+            startNewGame(40, 30, 200);
             while(active)
             {
-                mainWindow.DispatchEvents();
-                scrollScreen();
-                if(inGame)
-                {
-                    gameScreen.loop();
-                }
+                loop();
+            }
+        }
+
+        public static void loop()
+        {
+            mainWindow.DispatchEvents();
+            scrollScreen();
+            if (inGame)
+            {
+                gameScreen.loop();
             }
         }
 
@@ -146,11 +171,12 @@ namespace Game.Screen_Manager
                 OnClosed(sender, e);
                 return;
             }
+            /*
             if (e.Code == Keyboard.Key.Return)
             {
                 startNewGame(40, 30, 200);
                 return;
-            }
+            }*/
         }
 
         static void resizing(object sender, SizeEventArgs e)

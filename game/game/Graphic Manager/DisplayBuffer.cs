@@ -23,13 +23,16 @@ namespace Game.Buffers
         
         private HashSet<Sprite> displaySprites;
         private HashSet<Sprite> removedSprites;
-        private LinkedList<Decal> decals;
+        private List<Decal> decals;
         private List<Decal> doneDecals = new List<Decal>();
         private HashSet<Game.Graphic_Manager.Animation> newAnimations;
         private TextureFinder finder;
         private HashSet<BufferEvent> actions;
         private List<ExternalEntity> visibleEntities;
         private bool updated;
+        private bool selected = false;
+        private bool deselected = false;
+        private readonly Sprite selection = new Sprite(new Texture("images/UI/selection.png"));
 
         /******************
         Constructors
@@ -37,9 +40,10 @@ namespace Game.Buffers
 
         public DisplayBuffer()
         {
+            selection.Origin = new Vector2f(selection.Texture.Size.X/2, selection.Texture.Size.Y/2);
             this.removedSprites = new HashSet<Sprite>();
             this.displaySprites = new HashSet<Sprite>();
-            this.decals = new LinkedList<Decal>();
+            this.decals = new List<Decal>();
             this.newAnimations = new HashSet<Game.Graphic_Manager.Animation>();
             this.finder = new SpriteFinder();
             this.actions = new HashSet<BufferEvent>();
@@ -56,13 +60,13 @@ namespace Game.Buffers
          *********/
         private Animation createNewShot(ShotType shot, Point exit, Point target)
         {
-            LinkedList<Sprite> ans = new LinkedList<Sprite>();
+            List<Sprite> ans = new List<Sprite>();
             int x0 = exit.X;
             int y0 = exit.Y;
             int x1 = target.X;
             int y1 = target.Y;
-            int dx = Vector.abs(x1 - x0);
-            int dy = Vector.abs(y1 - y0);
+            int dx = System.Math.Abs(x1 - x0);
+            int dy = System.Math.Abs(y1 - y0);
             int sx, sy, e2;
             if (x0 < x1) sx = 1; else sx = -1;
             if (y0 < y1) sy = 1; else sy = -1;
@@ -91,7 +95,7 @@ namespace Game.Buffers
                 temp.Position = new Vector2f(x0, y0);
                 for (int i = 0; i < amountOfReapeatingSpritesInAnimation; i++)
                 {
-                    ans.AddLast(temp);
+                    ans.Add(temp);
                 }
                 rightLeft = false;
                 upDown = false;
@@ -116,11 +120,11 @@ namespace Game.Buffers
 
         private void addDecal(Decal decal)
         {
-            this.decals.AddLast(decal);
+            this.decals.Add(decal);
             if (decals.Count > amountOfDecals)
             {
-                Decal removed = decals.First.Value;
-                decals.RemoveFirst();
+                Decal removed = decals[0];
+                decals.Remove(removed);
                 this.removedSprites.Add(removed.getDecal());
             }
         }
@@ -157,6 +161,7 @@ namespace Game.Buffers
             analyzeEntities();
             analyzeActions();
             displayDecals();
+            UIDisplay();
             removeSprites();
         }
 
@@ -195,6 +200,7 @@ namespace Game.Buffers
                         decal.setLocation(ent.Position);
                         this.addDecal(decal);
                         break;
+
                     case BufferType.MOVE:
                         ExternalEntity mover = ((MoveEvent)action).Mover;
                         Sprite movement = this.finder.getSprite(mover);
@@ -203,15 +209,47 @@ namespace Game.Buffers
                         movement.Position = position;
                         //TODO - generate turning animation
                         break;
+
                     case BufferType.CREATE:
                         //TODO
                         break;
+
                     case BufferType.SHOT:
                         this.newAnimations.Add(this.createNewShot(((ShotEvent)action).Shot, ((ShotEvent)action).Exit, ((ShotEvent)action).Target));
+                        break;
+
+                    case BufferType.SELECT:
+                        this.selection.Position = ((BufferMouseSelectEvent)action).Coords.toVector2f();
+                        this.selected = true;
+                        break;
+
+                    case BufferType.DESELECT:
+                        this.selected = false;
+                        this.deselected = true;
+                        break;
+
+                    case BufferType.SETPATH:
+                        Sprite tempSprite = finder.getPath(((BufferSetPathActionEvent)action).Path);
+                        tempSprite.Position = ((BufferSetPathActionEvent)action).Position;
+                        this.displaySprites.Add(tempSprite);
                         break;
                 }
             }
             actions.Clear();
+        }
+
+        private void UIDisplay()
+        {
+            if (this.selected)
+            {
+                this.displaySprites.Add(selection);
+                return;
+            }
+            if (this.deselected)
+            {
+                this.removedSprites.Add(this.selection);
+                this.deselected = false;
+            }
         }
 
         private void analyzeEntities()

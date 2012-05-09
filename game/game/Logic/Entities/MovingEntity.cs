@@ -7,7 +7,7 @@ namespace Game.Logic.Entities
         class consts
         ****************/
         
-        const int AMOUNT_OF_MOVES_FOR_STEP = 100;
+        const int AMOUNT_OF_MOVES_FOR_STEP = 70;
 
         /******************
         class members
@@ -15,7 +15,7 @@ namespace Game.Logic.Entities
 
         private readonly int _speed;
         private int _steps = 0;
-        private LinkedList<Direction> _path;
+        private List<Direction> _path;
         private Direction _headed;
         private MovementType _wayToMove = MovementType.GROUND;
 
@@ -23,12 +23,12 @@ namespace Game.Logic.Entities
         constructors
         ****************/
 
-        protected MovingEntity(int reactionTime, reactionFunction reaction, int health, entityType type, Vector size, Affiliation loyalty, Visibility visibility, Sight sight, int speed, LinkedList<Direction> path)
+        protected MovingEntity(int reactionTime, reactionFunction reaction, int health, entityType type, Vector size, Affiliation loyalty, Visibility visibility, Sight sight, int speed, List<Direction> path, Direction headed)
             : base(reactionTime, reaction, health, type, size, loyalty)
         {
             this._speed = speed;
             this._path = path;
-            this._headed = Direction.DOWN;
+            this._headed = headed;
         }
 
         /******************
@@ -40,7 +40,7 @@ namespace Game.Logic.Entities
             get { return _speed; }
         }
 
-        internal LinkedList<Direction> Path
+        internal List<Direction> Path
         {
             get { return _path; }
             set { _path = value; }
@@ -68,7 +68,7 @@ namespace Game.Logic.Entities
         //TODO - incorrect
         internal virtual Direction getDirection()
         {
-            if (this.Path.Count > 0 ) return this.Path.First.Value;
+            if (this.Path.Count > 0 ) return this.Path[0];
             return this._headed;
         }
 
@@ -78,7 +78,7 @@ namespace Game.Logic.Entities
             {
                 _steps -= AMOUNT_OF_MOVES_FOR_STEP;
                 this._headed = this.getDirection();
-                Path.RemoveFirst();
+                Path.RemoveAt(0);
             }
             else
             {

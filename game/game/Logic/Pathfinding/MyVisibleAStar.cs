@@ -1,115 +1,32 @@
 ﻿using System;
 using System.Collections.Generic;
+using SFML.Graphics;
 
 namespace Game.Logic.Pathfinding
-
 {
-    internal class AstarNode : IComparable<AstarNode>
+    class MyVisibleAStar
     {
-        private readonly Point point;
-        private bool open;
-        private Direction dir;
-        private double f_value;
-        private double g_value;
-        private readonly int g_total_value; //the value of the size-portion, for clearance
-        private readonly double h_value;
-        private AstarNode parent;
-
-        public AstarNode(Point value, double g, int g_total, double h, AstarNode _parent)
-        {
-            this.point = value;
-            this.g_total_value = g_total;
-            this.g_value = g;
-            this.f_value = this.g_value + h  + g_total;
-            this.h_value = h;
-            this.parent = _parent;
-            this.dir = Vector.vectorToDirection(this.point, this.parent.Point);
-            this.open = true;
-        }
-
-        //only first node uses this
-        public AstarNode(Point value, double h, Direction _dir)
-        {
-            this.point = value;
-            this.g_total_value = 0;
-            this.g_value = 0;
-            this.f_value = this.g_value + h;
-            this.h_value = h;
-            this.parent = null;
-            this.dir = _dir;
-            this.open = true;
-        }
-
-        public AstarNode Parent
-        {
-            get { return parent; }
-            set { parent = value; this.dir = Vector.vectorToDirection(this.point, parent.point); }
-        }
-
-        public Point Point
-        {
-            get { return point; }
-        }
-
-        public bool Open
-        {
-            get { return open; }
-            set { open = value; }
-        }
-
-        public double H
-        {
-            get { return h_value; }
-        }
-
-        internal Direction Direction
-        {
-            get { return dir; }
-            set { dir = value; }
-        }
-
-        public double G
-        {
-            get { return g_value; }
-            set { g_value = value; f_value = g_value + h_value + g_total_value; }
-        }
-
-        public double F
-        {
-            get { return f_value; }
-        }
-
-        int IComparable<AstarNode>.CompareTo(AstarNode other)
-        {
-            if (this.F > other.F) return 1;
-            if (this.F < other.F) return -1;
-            if (this.H > other.H) return 1;
-            if (this.H < other.H) return -1;
-            return 0;
-        }
-    }
-
-    delegate List<Direction> pathfindFunction(Point entry, Point goal, Vector _size, Logic.TerrainType[,] _grid, Logic.MovementType _traversalMethod, Heuristic _heuristic, Direction dir);
-    public delegate double Heuristic(Point check);
-
-    static class Astar
-    {
-        
-
         static private readonly Dictionary<Point, AstarNode> points = new Dictionary<Point, AstarNode>();
         static private readonly PriorityQueueB<AstarNode> openSet = new PriorityQueueB<AstarNode>();
         //static private readonly HashSet<AstarNode> closedSet = new HashSet<AstarNode>();
         static private Logic.TerrainType[,] grid;
         static private Logic.MovementType traversalMethod;
         static private Heuristic heuristic;
-        static private Vector size;
-        static private System.Diagnostics.Stopwatch timer = new System.Diagnostics.Stopwatch();
+        static Vector size;
+        static RenderWindow window;
+        static List<Sprite> sprites;
+        static Dictionary<String, SFML.Graphics.Texture> images = new Dictionary<string, Texture>
+        {
+            {"white", new Texture("images/debug/white_pixel.png")},
+            {"red", new Texture("images/debug/red_pixel.png")},
+            {"yellow", new Texture("images/debug/yellow_pixel.png")}
+        };
+
 
         static int amountOfNodesChecked;
 
         static public List<Direction> findPath(Point entry, Point goal, Vector _size, Logic.TerrainType[,] _grid, Logic.MovementType _traversalMethod, Heuristic _heuristic, Direction dir)
         {
-            timer.Start();
             amountOfNodesChecked = 0;
             entry = new Point(entry, Vector.directionToVector(dir).multiply(_size));
             size = _size;
@@ -117,24 +34,48 @@ namespace Game.Logic.Pathfinding
             grid = _grid;
             traversalMethod = _traversalMethod;
             points.Add(entry, new AstarNode(entry, heuristic(entry), dir));
-            openSet.Push(points[entry]);
+            openNode(points[entry]);
 
             while (openSet.Count > 0)
             {
                 AstarNode current = openSet.Pop();
                 if (current.Point == goal) return reconstructPath(current);
-                current.Open = false;
+                closeNode(current);
                 checkAllNeighbours(current);
             }
 
             throw new Exception("open set empty, route impossible");
         }
 
+        public static void setup(RenderWindow _win)
+        {
+            window = _win;
+            Sprite back = new Sprite(new Texture(window.Capture()));
+            sprites = new List<Sprite>();
+            sprites.Add(back);
+        }
+
+        private static void display()
+        {
+            foreach (Sprite sprite in sprites)
+            {
+                window.Draw(sprite);
+            }
+            window.Display();
+            if (sprites.Count > 150)
+            {
+                Sprite temp = new Sprite(new Texture(window.Capture()));
+                temp.Position = new SFML.Window.Vector2f(-30,-30);
+                sprites.Clear();
+                sprites.Add(temp);
+            }
+        }
+
         //this function checks over all the relevant neighbours of a point.
         private static void checkAllNeighbours(AstarNode current)
         {
 
-            int x = 0, topX = grid.GetLength(0)-1, topY = grid.GetLength(1)-1;
+            int x = 0, topX = grid.GetLength(0) - 1, topY = grid.GetLength(1) - 1;
             if (current.Point.X > 0)
             {
                 x = current.Point.X - 1;
@@ -187,14 +128,14 @@ namespace Game.Logic.Pathfinding
             //TODO - handle changing size with changing direction
             amountOfNodesChecked++;
             int g = 0, tempG = 0;
-            
+
             AstarNode newNode = null;
             double costToMove = current.G + moveCostDirection(current.Direction, current.Point, temp);
             if (points.ContainsKey(temp))
             {
                 newNode = points[temp];
                 if (!newNode.Open) return;
-                if (costToMove < newNode.G) 
+                if (costToMove < newNode.G)
                 {
                     newNode.Parent = current;
                     newNode.G = costToMove;
@@ -214,13 +155,31 @@ namespace Game.Logic.Pathfinding
                     tempG = costOfMovement(point);
                     if (tempG == -1)
                     {
-                        newNode.Open = false;
+                        closeNode(newNode);
                         return;
                     }
                     g += tempG;
                 }
-                openSet.Push(newNode);
+                openNode(newNode);
             }
+        }
+
+        private static void openNode(AstarNode newNode)
+        {
+            openSet.Push(newNode);
+            Sprite update = new Sprite(images["yellow"]);
+            update.Position = new SFML.Window.Vector2f(newNode.Point.X, newNode.Point.Y);
+            sprites.Add(update);
+            display();
+        }
+
+        private static void closeNode(AstarNode newNode)
+        {
+            newNode.Open = false;
+            Sprite update = new Sprite(images["red"]);
+            update.Position = new SFML.Window.Vector2f(newNode.Point.X, newNode.Point.Y);
+            sprites.Add(update);
+            display();
         }
 
         private static double moveCostDirection(Direction direction, Point point, Point temp)
@@ -284,18 +243,20 @@ namespace Game.Logic.Pathfinding
             points.Clear();
             openSet.Clear();
             //closedSet.Clear();
-            timer.Stop();
-            Console.Out.WriteLine("amount of nodes checked " + amountOfNodesChecked + " amount of time elapsed " + timer.ElapsedTicks + " time per point " + timer.ElapsedTicks / amountOfNodesChecked);
-            timer.Reset();
+            Console.Out.WriteLine("amount of nodes checked " + amountOfNodesChecked);
             List<Direction> ans = new List<Direction>();
 
-            while(current!= null)
+            while (current != null)
             {
+                Sprite update = new Sprite(images["white"]);
+                update.Position = new SFML.Window.Vector2f(current.Point.X, current.Point.Y);
+                sprites.Add(update);
+                display();
                 ans.Insert(0,current.Direction);
                 current = current.Parent;
 
             }
-
+            Console.In.ReadLine();
             return ans;
         }
 

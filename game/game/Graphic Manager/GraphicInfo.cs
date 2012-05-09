@@ -41,19 +41,19 @@ namespace Game.Graphic_Manager
         }
 
 
-        internal void setLocation(Vector vector)
+        internal void setLocation(SFML.Window.Vector2f vector)
         {
-            this._sprite.Position= new Vector2f(vector.X, vector.Y);
+            this._sprite.Position= vector;
         }
     }
 
     internal class Animation
     {
-        LinkedList<Sprite> order;
+        List<Sprite> order;
 
-        internal Animation(LinkedList<Sprite> _list)
+        internal Animation(List<Sprite> _list)
         {
-            this.order = new LinkedList<Sprite>(_list);
+            this.order = new List<Sprite>(_list);
         }
 
         internal Animation(Area area, Logic.entityType type)
@@ -63,14 +63,14 @@ namespace Game.Graphic_Manager
 
         internal Sprite getNext()
         {
-            order.RemoveFirst();
-            Sprite temp = order.First.Value;
+            order.RemoveAt(0);
+            Sprite temp = order[0];
             return temp;
         }
 
         internal Sprite current()
         {
-            Sprite temp = order.First.Value;
+            Sprite temp = order[0];
             return temp;
         }
 
@@ -84,7 +84,7 @@ namespace Game.Graphic_Manager
     {
         private readonly LoopedList<SFML.Graphics.Sprite> _list;
 
-        internal SpriteLoop(LinkedList<SFML.Graphics.Sprite> list)
+        internal SpriteLoop(List<SFML.Graphics.Sprite> list)
         {
             this._list = new LoopedList<SFML.Graphics.Sprite>(list);
         }
@@ -104,26 +104,26 @@ namespace Game.Graphic_Manager
 
     internal class LoopedList<T> //TODO - needs testing
     {
-        private LinkedListNode<T> current;
-        private readonly LinkedList<T> list;
+        private int currentIndex;
+        private readonly List<T> list;
         
-        internal LoopedList(LinkedList<T> _list)
+        internal LoopedList(List<T> _list)
         {
-            current = _list.First;
+            currentIndex = 0;
             this.list = _list;
         }
 
         internal T getValue()
         {
-            return current.Value;
+            return list[currentIndex];
         }
 
         internal void next()
         {
-            if (current.Next != null)
-                current = current.Next;
-            else
-                current = list.First;
+            
+            currentIndex++;
+            if (currentIndex == list.Count)
+                currentIndex = 0;
         }
 
     }

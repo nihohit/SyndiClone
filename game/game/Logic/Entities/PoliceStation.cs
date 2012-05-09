@@ -18,6 +18,7 @@ namespace Game.Logic.Entities
         private int amountOfPolicemen;
         private bool onAlert;
         private Cop toConstruct;
+        private List<Direction> _path = new List<Direction>(); //TODO - delete after I won't need to control the plice
 
         //TODO - set the whole alert operation. another idea - after alert wanes, begin "destroying" cops?
 
@@ -34,7 +35,7 @@ namespace Game.Logic.Entities
             this.onAlert = false;
             reactionFunction react = delegate(List<Entity> ent)
                 {
-                    if (toConstruct == null) toConstruct = new Cop(this);
+                    if (toConstruct == null) toConstruct = new Cop(this, this._path);
                     this._readyToBuild = true;
                     return new Reaction(toConstruct, Action.CREATE_ENTITY);
                 };
@@ -47,29 +48,40 @@ namespace Game.Logic.Entities
 
         public MovingEntity getConstruct()
         {
-            this.toConstruct = new Cop(this);
+            Cop temp = this.toConstruct;
+            this.toConstruct = new Cop(this, this._path);
             this.amountOfPolicemen++;
-            return (MovingEntity)this.Reaction.Focus;
+            return temp;
+        }
+
+        internal List<Direction> Path
+        {
+            get { return _path; }
+            set { _path = value; }
         }
 
         bool Constructor.readyToConstruct()
         {
-            if (onAlert)
+            if (Path.Count > 0)
             {
-                if (this.amountOfPolicemen < this.policemenCap * 3)
+                if (onAlert)
                 {
-                    return base.readyToConstruct();
+                    if (this.amountOfPolicemen < this.policemenCap * 3)
+                    {
+                        return base.readyToConstruct();
+                    }
+                    else //TODO - this is the only place where we remove the policestation's alert. should this be so?
+                    {
+                        this.onAlert = false;
+                        return false;
+                    }
                 }
-                else //TODO - this is the only place where we remove the policestation's alert. should this be so?
+                else
                 {
-                    this.onAlert = false;
-                    return false;
+                    return (base.readyToConstruct() && (this.amountOfPolicemen <= this.policemenCap));
                 }
             }
-            else
-            {
-                return (base.readyToConstruct() && (this.amountOfPolicemen <= this.policemenCap));
-            }
+            return false;
         }
 
         public Vector exitPoint()

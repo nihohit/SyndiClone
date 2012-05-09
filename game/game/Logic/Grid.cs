@@ -29,26 +29,32 @@ namespace Game.Logic
         private readonly UniqueList<ExternalEntity> visible;
         private readonly UniqueList<Entity> destroyed;
         private readonly TerrainType[,] pathFindingGrid;
+        private Entity selected;
+        private Pathfinding.pathfindFunction pathfind = Pathfinding.Astar.findPath;
         //TODO - add corporations?
 
         /******************
         Constructors
         ****************/     
 
-        internal Grid(Entity[,] grid)
+        internal Grid(int x, int y)
         {
-            this.gameGrid = grid;
+            this.gameGrid = new Entity[x, y];
             this.actionsDone = new List<Buffers.BufferEvent>();
             this.locations = new Dictionary<Entity, Area>();
             this.entities = new Dictionary<Entity, ExternalEntity>();
             this.visible = new UniqueList<ExternalEntity>();
             this.destroyed = new UniqueList<Entity>();
-            this.pathFindingGrid = new TerrainType[grid.GetLength(0), grid.GetLength(1)];
-            for (int i = 0; i < grid.GetLength(0); i++)
+            this.pathFindingGrid = new TerrainType[x, y];
+        }
+
+        internal void initialiseMovementMap()
+        {
+            for (int i = 0; i < this.gameGrid.GetLength(0); i++)
             {
-                for (int j = 0; j < grid.GetLength(1); j++)
+                for (int j = 0; j < this.gameGrid.GetLength(1); j++)
                 {
-                    if(grid[i,j] == null) this.pathFindingGrid[i,j] = TerrainType.ROAD;
+                    if (this.gameGrid[i, j] == null) this.pathFindingGrid[i, j] = TerrainType.ROAD;
                     else this.pathFindingGrid[i, j] = TerrainType.BUILDING;
                 }
             }
@@ -250,9 +256,9 @@ namespace Game.Logic
          * This function is used mainly to generate the simple walking path for civilians. 
          * Will probably need to make it better in future, it'll probably serve other functions.
          */
-        private LinkedList<Direction> getSimplePath(Point entry, Point target, MovingEntity ent)
+        private List<Direction> getSimplePath(Point entry, Point target, MovingEntity ent)
         {
-            LinkedList<Direction> ans = new LinkedList<Direction>();
+            List<Direction> ans = new List<Direction>();
 
             ans = processWalkingPath(entry, target);
             if (!(ans.Count == entry.getDiffVector(target).length())){
@@ -265,11 +271,11 @@ namespace Game.Logic
          * This function will be used for player units, taht need complex routes.
          */
         
-        private LinkedList<Direction> getComplexPath(Point entry, Point target, MovingEntity ent)
+        private List<Direction> getComplexPath(Point entry, Point target, Vector size, MovementType movement, Direction direction)
         {
-            LinkedList<Direction> ans = new LinkedList<Direction>();
+            List<Direction> ans = new List<Direction>();
 
-            ans = Pathfinding.Astar.findPath(entry, target, ent.Size, pathFindingGrid, ent.WayToMove, Pathfinding.Astar.diagonalTo(target), ent.getDirection());
+            ans = pathfind(entry, target, size, pathFindingGrid, movement, Pathfinding.Astar.diagonalTo(target), direction);
             if (!(ans.Count == entry.getDiffVector(target).length()))
             {
                 //TODO - probably continue from there.
@@ -280,15 +286,15 @@ namespace Game.Logic
         /*
          * a case of Bresenham's line algorithm that returns a list of directions to go in.
          */
-        private LinkedList<Direction> processWalkingPath(Point exit, Point target)
+        private List<Direction> processWalkingPath(Point exit, Point target)
         {
-            LinkedList<Direction> ans = new LinkedList<Direction>();
+            List<Direction> ans = new List<Direction>();
             int x0 = exit.X;
             int y0 = exit.Y;
             int x1 = target.X;
             int y1 = target.Y;
-            int dx = Vector.abs(x1 - x0);
-            int dy = Vector.abs(y1 - y0);
+            int dx = System.Math.Abs(x1 - x0);
+            int dy = System.Math.Abs(y1 - y0);
             int sx, sy, e2;
             if (x0 < x1) sx = 1; else sx = -1;
             if (y0 < y1) sy = 1; else sy = -1;
@@ -310,14 +316,14 @@ namespace Game.Logic
                             y0 = y0 + sy;
                             if (sy > 0)
                             {
-                                ans.AddLast(Direction.DOWNRIGHT);
+                                ans.Add(Direction.DOWNRIGHT);
                             }
                             else
                             {
-                                ans.AddLast(Direction.UPRIGHT);
+                                ans.Add(Direction.UPRIGHT);
                             }
                         }
-                        else ans.AddLast(Direction.RIGHT);
+                        else ans.Add(Direction.RIGHT);
                     }
                     else
                     {
@@ -327,14 +333,14 @@ namespace Game.Logic
                             y0 = y0 + sy;
                             if (sy > 0)
                             {
-                                ans.AddLast(Direction.DOWNLEFT);
+                                ans.Add(Direction.DOWNLEFT);
                             }
                             else
                             {
-                                ans.AddLast(Direction.UPLEFT);
+                                ans.Add(Direction.UPLEFT);
                             }
                         }
-                        else ans.AddLast(Direction.LEFT);
+                        else ans.Add(Direction.LEFT);
                     }
                 }
                 else
@@ -345,11 +351,11 @@ namespace Game.Logic
                         y0 = y0 + sy;
                         if (sy > 0)
                         {
-                            ans.AddLast(Direction.DOWN);
+                            ans.Add(Direction.DOWN);
                         }
                         else
                         {
-                            ans.AddLast(Direction.UP);
+                            ans.Add(Direction.UP);
                         }
                     }
                 }
@@ -379,7 +385,7 @@ namespace Game.Logic
                 location = location.flip();
             }
 
-            Area areaToCheck = new Area(location, this.directionToVector(direction));
+            Area areaToCheck = new Area(location, Vector.directionToVector(direction));
 
             return canMove(ent, areaToCheck);
         }
@@ -430,7 +436,7 @@ namespace Game.Logic
                 location = location.flip();
             }
 
-            Area toSwitch = new Area(location, this.directionToVector(dir));
+            Area toSwitch = new Area(location, Vector.directionToVector(dir));
 
             CurriedPointOperator putEntityInArea = delegate(Entity entity)
             {
@@ -445,12 +451,12 @@ namespace Game.Logic
             if (this.entities.ContainsKey(ent))
             {
                 ExternalEntity newEnt = this.entities[ent];
-                newEnt.Position = new Vector(location.Entry);
+                newEnt.Position = new SFML.Window.Vector2f(Convert.ToSingle(location.Entry.X), Convert.ToSingle(location.Entry.Y));
                 this.addEvent(new Buffers.MoveEvent(toSwitch, newEnt, rotation));
             }
             else
             {
-                ExternalEntity newEnt = new ExternalEntity(ent, new Vector(location.Entry));
+                ExternalEntity newEnt = new ExternalEntity(ent, new Vector(location.Entry).toVector2f());
                 this.addEvent(new Buffers.MoveEvent(toSwitch, newEnt, rotation));
                 this.entities.Add(ent, newEnt);
 
@@ -468,40 +474,6 @@ namespace Game.Logic
         {
             Area area = this.locations[ent];
             this.iterateOverArea(area, removeEntityFromPoint);
-        }
-
-        private Vector directionToVector(Direction direction)
-        {
-
-            switch (direction)
-            {
-                case(Direction.UP):
-                    return new Vector(0, -1);
-
-                case(Direction.DOWN):
-                    return new Vector(0, 1);
-
-                case(Direction.LEFT):
-                    return new Vector(-1, 0);
-
-                case(Direction.RIGHT):
-                    return new Vector(1, 0);
-
-                case (Direction.UPRIGHT):
-                    return new Vector(1, -1);
-
-                case (Direction.DOWNRIGHT):
-                    return new Vector(1, 1);
-
-                case (Direction.UPLEFT):
-                    return new Vector(-1, -1);
-
-                case (Direction.DOWNLEFT):
-                    return new Vector(-1, 1);
-                
-                default:
-                    throw new Exception("not valid direction found");
-            }
         }
 
         /*
@@ -604,8 +576,8 @@ namespace Game.Logic
             int y0 = exit.Y;
             int x1 = target.X;
             int y1 = target.Y;
-            int dx = Vector.abs(x1-x0);
-            int dy = Vector.abs(y1-y0);
+            int dx = System.Math.Abs(x1-x0);
+            int dy = System.Math.Abs(y1-y0);
             int sx, sy, e2;
             if (x0 < x1) sx = 1; else sx = -1;
             if (y0 < y1) sy = 1; else sy = -1;
@@ -683,7 +655,7 @@ namespace Game.Logic
                 //if (this.gameGrid[point.X, point.Y] != null) throw new Exception();
                 this.gameGrid[point.X, point.Y] = ent;
             }
-            ExternalEntity temp = new ExternalEntity(ent, new Vector(area.Entry.X, area.Entry.Y));
+            ExternalEntity temp = new ExternalEntity(ent, new Vector(area.Entry.X, area.Entry.Y).toVector2f());
             this.entities.Add(ent, temp);
             this.addEvent(new Buffers.CreateEvent(temp, area));
         }
@@ -699,5 +671,25 @@ namespace Game.Logic
             return new Area(new Point(this.convertToCentralPoint((Entity)constructor), constructor.exitPoint()), ent.Size);
         }
 
+
+        internal void select(Point point)
+        {
+            Entity temp = this.getEntityInPoint(point);
+            if ((selected == null) && (temp != null) && (temp.Loyalty == Affiliation.INDEPENDENT))
+            {
+                selected = temp;
+                this.actionsDone.Add (new Buffers.BufferMouseSelectEvent(new Vector(this.convertToCentralPoint(temp).X,this.convertToCentralPoint(temp).Y)));
+                return;
+            }
+            if (selected != null)
+            {
+                PoliceStation pol = ((PoliceStation)selected);
+                pol.Path = this.getComplexPath(new Point(this.convertToCentralPoint(pol), pol.ExitPoint), point, new Vector(1,1), MovementType.GROUND, pol.ExitPoint.vectorToDirection());
+                this.actionsDone.Add(new Buffers.BufferCancelActionEvent());
+                this.actionsDone.Add(new Buffers.BufferSetPathActionEvent(((PoliceStation)selected).Path, this.findConstructionSpot(pol, pol.getConstruct()).Entry.toVector2f()));
+                selected = null;
+            }
+
+        }
     }
 }

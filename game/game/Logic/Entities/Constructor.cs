@@ -5,10 +5,9 @@ using System.Text;
 
 namespace Game.Logic.Entities
 {
-    
+
     interface Constructor
-    {
-           
+    {           
 
         MovingEntity getConstruct();
 

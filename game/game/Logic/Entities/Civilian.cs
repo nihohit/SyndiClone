@@ -24,8 +24,8 @@ namespace Game.Logic.Entities
         Constructors
         ****************/
 
-        internal Civilian() :
-            base(civReact, Affiliation.CIVILIAN, new LinkedList<Direction>())
+        internal Civilian(Direction headed) :
+            base(civReact, Affiliation.CIVILIAN, new List<Direction>(), headed)
         {
             this.fleeing = false;
         }

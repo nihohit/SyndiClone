@@ -22,7 +22,7 @@ namespace Game.Logic.Entities
             this._sizeModifier = sizeModifier;
             reactionFunction react = delegate(List<Entity> ent)
             {
-                Civilian temp = new Civilian();
+                Civilian temp = new Civilian(exit.vectorToDirection());
                 this._readyToBuild = true;
                 return new Reaction(temp, Action.CREATE_ENTITY);
             };
@@ -38,7 +38,7 @@ namespace Game.Logic.Entities
          */
         public Reaction civBuildReact(List<Entity> ent)
         {
-            Civilian temp = new Civilian();
+            Civilian temp = new Civilian(base.ExitPoint.vectorToDirection());
             this._readyToBuild = true;
             return new Reaction(temp, Action.CREATE_ENTITY);
         }

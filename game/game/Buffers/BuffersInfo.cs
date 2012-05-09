@@ -3,7 +3,7 @@ using Game.Logic.Entities;
 
 namespace Game.Buffers
 {
-    internal enum BufferType { MOVE, SHOT, DESTROY, CREATE, PAUSE, SELECT, DESELECT, UNPAUSE, ENDGAME, MOUSEMOVE } //different buffers for the actions that the grid returns after each loop
+    internal enum BufferType { MOVE, SHOT, DESTROY, CREATE, PAUSE, SELECT, DESELECT, UNPAUSE, ENDGAME, MOUSEMOVE, SETPATH } //different buffers for the actions that the grid returns after each loop
 
     internal interface BufferEvent
     {
@@ -16,6 +16,34 @@ namespace Game.Buffers
         {
             return BufferType.PAUSE;
         }
+    }
+
+    internal struct BufferSetPathActionEvent : BufferEvent
+    {
+        BufferType BufferEvent.type()
+        {
+            return BufferType.SETPATH;
+        }
+
+        private readonly System.Collections.Generic.List<Logic.Direction> _path;
+        private readonly SFML.Window.Vector2f _position;
+
+        internal BufferSetPathActionEvent(System.Collections.Generic.List<Logic.Direction> path, SFML.Window.Vector2f pos)
+        {
+            this._path = path;
+            this._position = pos;
+        }
+
+        public System.Collections.Generic.List<Logic.Direction> Path
+        {
+            get { return _path; }
+        }
+
+        public SFML.Window.Vector2f Position
+        {
+            get { return _position; }
+        } 
+
     }
 
     internal struct BufferCancelActionEvent : BufferEvent
@@ -44,7 +72,6 @@ namespace Game.Buffers
         {
             return BufferType.SELECT;
         }
-
 
     }
 

@@ -34,7 +34,7 @@ namespace Game
         {
             double u1 = rand.NextDouble(); //these are uniform(0,1) random doubles
             double u2 = rand.NextDouble();
-            double randStdNormal = Math.Sqrt(-2.0 * Math.Log(u1)) *Math.Sin(2.0 * Math.PI * u2); //random normal(0,1)
+            double randStdNormal = Math.Sqrt(-2.0 * Math.Log(u1)) * Math.Sin(2.0 * Math.PI * u2); //random normal(0,1)
             double randNormal = mean + deviation * randStdNormal; //random normal(mean,stdDev^2)
             return Convert.ToInt16(randNormal);
         }
@@ -42,9 +42,10 @@ namespace Game
         public int X
         {
             get { return _x; }
-        } 
+        }
 
-        public Vector (int x, int y){
+        public Vector(int x, int y)
+        {
             this._x = x;
             this._y = y;
         }
@@ -76,16 +77,11 @@ namespace Game
             total = _x + _y;
             if (dist > 0 && total > 0)
             {
-                int x = dist*_x / total + this._x;
-                int y = dist*_y / total + this._y;
-                return new Vector(x,y);
+                int x = dist * _x / total + this._x;
+                int y = dist * _y / total + this._y;
+                return new Vector(x, y);
             }
             return this;
-        }
-
-        public static int abs(int a)
-        {
-            if (a > 0) return a; else return -a;
         }
 
         public Point toPoint()
@@ -96,8 +92,8 @@ namespace Game
         internal Vector normalise()
         {
             int x = 0, y = 0;
-            if (_x != 0) x = _x / abs(_x);
-            if (_y != 0 ) y = _y / abs(_y);
+            if (_x != 0) x = _x / System.Math.Abs(_x);
+            if (_y != 0) y = _y / System.Math.Abs(_y);
             return new Vector(x, y);
         }
 
@@ -109,7 +105,7 @@ namespace Game
 
         public override int GetHashCode()
         {
-            return _x.GetHashCode()+_y.GetHashCode();
+            return _x.GetHashCode() + _y.GetHashCode();
         }
 
         public override string ToString()
@@ -126,7 +122,7 @@ namespace Game
                 if (this.Y < 0) return Game.Logic.Direction.UPRIGHT;
                 return Logic.Direction.RIGHT;
             }
-            if (this.X < 0) 
+            if (this.X < 0)
             {
                 if (this.Y > 0) return Game.Logic.Direction.DOWNLEFT;
                 if (this.Y < 0) return Game.Logic.Direction.UPLEFT;
@@ -135,6 +131,71 @@ namespace Game
             if (this.Y > 0) return Game.Logic.Direction.DOWN;
             if (this.Y < 0) return Game.Logic.Direction.UP;
             throw new Exception("same points");
+        }
+
+
+        public SFML.Window.Vector2f toVector2f()
+        {
+            return new SFML.Window.Vector2f(Convert.ToSingle(this._x), Convert.ToSingle(this._y));
+        }
+
+        internal static Game.Logic.Direction vectorToDirection(Point point, Point temp)
+        {
+            int x = point.X - temp.X;
+            int y = point.Y - temp.Y;
+            if (x > 0)
+            {
+                if (y > 0) return Game.Logic.Direction.DOWNRIGHT;
+                if (y < 0) return Game.Logic.Direction.UPRIGHT;
+                return Logic.Direction.RIGHT;
+            }
+            if (x < 0)
+            {
+                if (y > 0) return Game.Logic.Direction.DOWNLEFT;
+                if (y < 0) return Game.Logic.Direction.UPLEFT;
+                return Logic.Direction.LEFT;
+            }
+            if (y > 0) return Game.Logic.Direction.DOWN;
+            if (y < 0) return Game.Logic.Direction.UP;
+            throw new Exception("same points");
+        }
+
+        static public Vector directionToVector(Game.Logic.Direction direction)
+        {
+            switch (direction)
+            {
+                case (Game.Logic.Direction.UP):
+                    return new Vector(0, -1);
+
+                case (Game.Logic.Direction.DOWN):
+                    return new Vector(0, 1);
+
+                case (Game.Logic.Direction.LEFT):
+                    return new Vector(-1, 0);
+
+                case (Game.Logic.Direction.RIGHT):
+                    return new Vector(1, 0);
+
+                case (Game.Logic.Direction.UPRIGHT):
+                    return new Vector(1, -1);
+
+                case (Game.Logic.Direction.DOWNRIGHT):
+                    return new Vector(1, 1);
+
+                case (Game.Logic.Direction.UPLEFT):
+                    return new Vector(-1, -1);
+
+                case (Game.Logic.Direction.DOWNLEFT):
+                    return new Vector(-1, 1);
+
+                default:
+                    throw new Exception("not valid direction found");
+            }
+        }
+
+        internal Vector multiply(Vector size)
+        {
+            return new Vector(this._x * size.X, this._y * size.Y);
         }
     }
 

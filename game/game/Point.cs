@@ -69,6 +69,11 @@ namespace Game
             return ((obj is Point) && ((Point)obj == this));
         }
 
+        public SFML.Window.Vector2f toVector2f()
+        {
+            return new SFML.Window.Vector2f(Convert.ToSingle(this._xLoc), Convert.ToSingle(this._yLoc));
+        }
+
         public override int GetHashCode()
         {
             return this._xLoc.GetHashCode() + this._yLoc.GetHashCode();

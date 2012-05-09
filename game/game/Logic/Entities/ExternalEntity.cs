@@ -10,10 +10,10 @@ namespace Game.Logic.Entities
         private readonly Vector _size;
         private readonly entityType _type;
         private readonly Affiliation _loyalty;
-        private Vector _position;
+        private SFML.Window.Vector2f _position;
         private readonly Entity _ent;
 
-        internal ExternalEntity(Entity ent, Vector position)
+        internal ExternalEntity(Entity ent, SFML.Window.Vector2f position)
         {
             this._loyalty = ent.Loyalty;
             this._position = position;
@@ -42,7 +42,7 @@ namespace Game.Logic.Entities
             get { return _type; }
         }
 
-        internal Vector Position
+        internal SFML.Window.Vector2f Position
         {
             get { return _position; }
             set { _position = value; }

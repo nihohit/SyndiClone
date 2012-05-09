@@ -48,7 +48,18 @@ namespace Game.Logic.Entities
         ***********/
 
        public Cop(PoliceStation station) :
-           base(copReact, Affiliation.INDEPENDENT, new LinkedList<Direction>())
+           base(copReact, Affiliation.INDEPENDENT, new List<Direction>(), station.ExitPoint.vectorToDirection())
+       {
+           // TODO: Complete member initialization
+           this.station = station;
+           this.timeBeforeShot = 0;
+           List<Upgrades> list = new List<Upgrades>();
+           list.Add(Upgrades.BULLETPROOF_VEST);
+           base.upgrade(list);
+       }
+
+       public Cop(PoliceStation station, List<Direction> path) :
+           base(copReact, Affiliation.INDEPENDENT, new List<Direction>(path), station.ExitPoint.vectorToDirection())
        {
            // TODO: Complete member initialization
            this.station = station;

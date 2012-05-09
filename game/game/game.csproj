@@ -58,10 +58,12 @@
   <ItemGroup>
     <Compile Include="Buffers\Buffer.cs" />
     <Compile Include="Buffers\BuffersInfo.cs" />
+    <Compile Include="FileHandler.cs" />
     <Compile Include="Graphic Manager\BuildingImageGenerator.cs" />
-    <Compile Include="FileReader.cs" />
     <Compile Include="Logic\Pathfinding\MyAStar.cs" />
+    <Compile Include="Logic\Pathfinding\MyVisibleAStar.cs" />
     <Compile Include="Logic\Pathfinding\PriorityQueueB.cs" />
+    <Compile Include="Logic\Targeters.cs" />
     <Compile Include="Screen Manager\InputBuffer.cs" />
     <Compile Include="Screen Manager\ScreenManager.cs" />
     <Compile Include="testInput.cs" />
@@ -108,7 +110,8 @@
     <Reference Include="sfmlnet-audio-2">
       <HintPath>..\..\SFML.Net-2.0-rc\lib\x86\sfmlnet-audio-2.dll</HintPath>
     </Reference>
-    <Reference Include="sfmlnet-graphics-2">
+    <Reference Include="sfmlnet-graphics-2, Version=0.0.0.0, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\SFML.Net-2.0-rc\lib\x86\sfmlnet-graphics-2.dll</HintPath>
     </Reference>
     <Reference Include="sfmlnet-window-2">
