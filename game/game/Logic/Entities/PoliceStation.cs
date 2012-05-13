@@ -37,7 +37,7 @@ namespace Game.Logic.Entities
                 {
                     if (toConstruct == null) toConstruct = new Cop(this, this._path);
                     this._readyToBuild = true;
-                    return new Reaction(toConstruct, Action.CREATE_ENTITY);
+                    return new ConstructReaction(toConstruct);
                 };
             this.ReactionFunction = react;
         }

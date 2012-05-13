@@ -264,7 +264,7 @@ namespace Game.Logic
                     ent.WhatSees.Clear();
                 }
                 Reaction react = ent.Reaction;
-                Action action = react.ActionChosen;
+                Action action = react.action();
 
                 if (action == Action.FIRE_AT || action == Action.MOVE_WHILE_SHOOT)
                 {
@@ -285,7 +285,7 @@ namespace Game.Logic
                     }
                 }
 
-                if (action == Action.CREATE_ENTITY)
+                if (action == Action.CONSTRUCT_ENTITY)
                 {
                     Constructor temp = (Constructor)ent;
                     bool check = temp.readyToConstruct();

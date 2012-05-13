@@ -40,13 +40,13 @@ namespace Game.Graphic_Manager
             return this._sprite;
         }
 
-
         internal void setLocation(SFML.Window.Vector2f vector)
         {
             this._sprite.Position= vector;
         }
     }
 
+    //TODO - a struct?
     internal class Animation
     {
         List<Sprite> order;
@@ -80,7 +80,7 @@ namespace Game.Graphic_Manager
         }
     }
 
-       internal class SpriteLoop
+    internal class SpriteLoop
     {
         private readonly LoopedList<SFML.Graphics.Sprite> _list;
 
@@ -120,10 +120,9 @@ namespace Game.Graphic_Manager
 
         internal void next()
         {
-            
-            currentIndex++;
-            if (currentIndex == list.Count)
-                currentIndex = 0;
+            this.currentIndex = currentIndex+1;
+            if (this.currentIndex == list.Count)
+                this.currentIndex = 0;
         }
 
     }

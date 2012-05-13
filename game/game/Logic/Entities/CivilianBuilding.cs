@@ -24,7 +24,7 @@ namespace Game.Logic.Entities
             {
                 Civilian temp = new Civilian(exit.vectorToDirection());
                 this._readyToBuild = true;
-                return new Reaction(temp, Action.CREATE_ENTITY);
+                return new ConstructReaction(temp);
             };
             this.ReactionFunction = react;
         }
@@ -40,12 +40,12 @@ namespace Game.Logic.Entities
         {
             Civilian temp = new Civilian(base.ExitPoint.vectorToDirection());
             this._readyToBuild = true;
-            return new Reaction(temp, Action.CREATE_ENTITY);
+            return new ConstructReaction(temp);
         }
 
         public MovingEntity getConstruct()
         {
-            return (MovingEntity)this.Reaction.Focus;
+            return ((ConstructReaction)this.Reaction).Focus;
         }
 
         bool Constructor.readyToConstruct()

@@ -3,13 +3,18 @@ using Game.Logic.Entities;
 
 namespace Game.Buffers
 {
-    internal enum BufferType { MOVE, SHOT, DESTROY, CREATE, PAUSE, SELECT, DESELECT, UNPAUSE, ENDGAME, MOUSEMOVE, SETPATH } //different buffers for the actions that the grid returns after each loop
+    /*This enumerator represents the different buffer types we use. 
+     * TODO - different buffers will use different events - might be useful to seperate to different enumerators.
+     */
+    internal enum BufferType { MOVE, SHOT, DESTROY, CREATE, PAUSE, SELECT, DESELECT, UNPAUSE, ENDGAME, MOUSEMOVE, SETPATH, UNIT_SELECT } 
 
+    //this interface represents the basic buffer event - it just identifies itself, the rest is in the specific events.
     internal interface BufferEvent
     {
         BufferType type();
     }
 
+    //this event pauses the game.
     internal struct PauseEvent : BufferEvent
     {
         BufferType BufferEvent.type()
@@ -18,6 +23,9 @@ namespace Game.Buffers
         }
     }
 
+    /*this event holds a point and a path from that point. 
+     * is used from logic to display buffer, to display the different paths. 
+     */
     internal struct BufferSetPathActionEvent : BufferEvent
     {
         BufferType BufferEvent.type()
@@ -27,11 +35,13 @@ namespace Game.Buffers
 
         private readonly System.Collections.Generic.List<Logic.Direction> _path;
         private readonly SFML.Window.Vector2f _position;
+        private readonly ExternalEntity _ent;
 
-        internal BufferSetPathActionEvent(System.Collections.Generic.List<Logic.Direction> path, SFML.Window.Vector2f pos)
+        internal BufferSetPathActionEvent(ExternalEntity ent, System.Collections.Generic.List<Logic.Direction> path, SFML.Window.Vector2f pos)
         {
             this._path = path;
             this._position = pos;
+            this._ent = ent;
         }
 
         public System.Collections.Generic.List<Logic.Direction> Path
@@ -42,10 +52,12 @@ namespace Game.Buffers
         public SFML.Window.Vector2f Position
         {
             get { return _position; }
-        } 
+        }
 
+        public ExternalEntity Ent { get { return _ent; } }
     }
 
+    //this event represents a cancel action - deselection of units, etc. basically right click.
     internal struct BufferCancelActionEvent : BufferEvent
     {
         BufferType BufferEvent.type()
@@ -54,6 +66,7 @@ namespace Game.Buffers
         }
     }
 
+    //this event represents a mouse left click on specific window coordinates.
     internal struct BufferMouseSelectEvent : BufferEvent
     {
         private readonly Vector coords;
@@ -75,6 +88,32 @@ namespace Game.Buffers
 
     }
 
+    internal struct BufferUnitSelectEvent : BufferEvent
+    {
+        private readonly Vector coords;
+        private readonly ExternalEntity _ent;
+
+        internal Vector Coords
+        {
+            get { return coords; }
+        }
+
+        internal BufferUnitSelectEvent(ExternalEntity ent, Vector _coords)
+        {
+            this.coords = _coords;
+            this._ent = ent;
+        }
+
+        public ExternalEntity Ent { get { return _ent; } }
+
+        BufferType BufferEvent.type()
+        {
+            return BufferType.UNIT_SELECT;
+        }
+
+    }
+
+    //this event represents mouse moving. used to display the cursor by the display manager.
     internal struct BufferMouseMoveEvent : BufferEvent
     {
         private readonly SFML.Window.Vector2f coords;
@@ -93,21 +132,11 @@ namespace Game.Buffers
         {
             coords = vec;
         }
-        /*
-        public float X
-        {
-            get { return coords.X; }
-        }
-
-        public float Y
-        {
-            get { return coords.Y; }
-        } */
-
 
         public SFML.Window.Vector2f Coords { get { return this.coords ;}}
     }
 
+    //this event ends a game. 
     internal struct EndGameEvent : BufferEvent
     {
         BufferType BufferEvent.type()
@@ -124,6 +153,7 @@ namespace Game.Buffers
         }
     }
 
+    //this event represents a shot being fired - entry, exit & type. used from logic to display.
     internal struct ShotEvent : BufferEvent
     {
         private readonly ShotType _shot;
@@ -159,6 +189,7 @@ namespace Game.Buffers
 
     }
 
+    //this event will be sent by the logic to the output buffers when an entity is destroyed.
     internal struct DestroyEvent : BufferEvent
     {
         private readonly Area _area;
@@ -186,41 +217,8 @@ namespace Game.Buffers
         }
     }
 
-    internal struct MoveEvent : BufferEvent
-    {
 
-        private readonly Area _entry;
-        private readonly ExternalEntity _mover;
-        private readonly int _rotation;
-
-        internal MoveEvent(Area entry, ExternalEntity mover, int rotation)
-        {
-            this._entry = entry;
-            this._mover = mover;
-            this._rotation = rotation;
-        }
-
-        public int Rotation
-        {
-            get { return _rotation; }
-        }
-
-        internal ExternalEntity Mover
-        {
-            get { return _mover; }
-        }
-
-        internal Area Entry
-        {
-            get { return _entry; }
-        }
-
-        public BufferType type()
-        {
-            return BufferType.MOVE;
-        }
-    }
-
+    //this event signifies the creation of a new entity.
     internal struct CreateEvent : BufferEvent
     {
         private readonly ExternalEntity _mover;

@@ -46,12 +46,12 @@ namespace Game.Logic.Entities
 
             if (threat == null) //TODO - add ignoring cops
             {
-                react = new Reaction(null, Action.IGNORE);
+                react = new IgnoreReaction();
             }
 
             else
             {
-                react = new Reaction(threat, Action.RUN_AWAY_FROM);
+                react = new RunAwayReaction(threat);
             }
 
             return react;

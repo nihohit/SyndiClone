@@ -10,24 +10,25 @@ namespace Game.Graphic_Manager
     //Just some random stuff for the class
     enum BuildingStyle { BLUE, RED, GREEN, YELLOW }
 
+    //this 
     internal struct Block
     {
-        const int TILE_SIZE = 32;
+        static readonly uint TILE_SIZE = FileHandler.getUintProperty("tile size", FileAccessor.GENERAL);
 
-        private readonly int x, y;
+        private readonly uint x, y;
 
-        internal Block(int _x, int _y)
+        internal Block(uint _x, uint _y)
         {
             this.x = _x / TILE_SIZE;
             this.y = _y / TILE_SIZE;
         }
 
-        internal int Y
+        internal uint Y
         {
             get { return y; }
         }
 
-        internal int X
+        internal uint X
         {
             get { return x; }
         }
@@ -38,29 +39,33 @@ namespace Game.Graphic_Manager
         }
     }
 
+    //this class creates the building images
     internal static class BuildingImageGenerator
     {
-        const uint TILE_SIZE = 32;
+        static readonly uint TILE_SIZE = FileHandler.getUintProperty("tile size", FileAccessor.GENERAL);
         private static Dictionary<ExternalEntity, Texture> buildings = new Dictionary<ExternalEntity, Texture>(new externalEntityEqualityComparer());
         private static Dictionary<Tuple<Block, BuildingStyle>, Texture> templates = new Dictionary<Tuple<Block, BuildingStyle>, Texture>(new tupleEqualityComparer());
 
+        //checks if the image exists, if not, then if an equivalent image exist, and if not, creates a new image. 
         private static Texture GetBuildingImage(ExternalEntity building)
         {
             if (buildings.ContainsKey(building)) return buildings[building];
-            var temp = Tuple.Create(new Block(building.Size.Y, building.Size.X), generateStyle(building.Loyalty));
+            var temp = Tuple.Create(new Block((uint)building.Size.Y, (uint)building.Size.X), generateStyle(building.Loyalty));
             Texture image = null;
             if (templates.ContainsKey(temp))
             {
                 image = templates[temp];
-                buildings.Add(building, image);
-                return image;
             }
-            image = new Texture(generateBuildingImage(temp));
+            else
+            {
+                image = new Texture(generateBuildingImage(temp));
+                templates.Add(temp, image);
+            }
             buildings.Add(building,image);
-            templates.Add(temp,image);
             return image;
         }
 
+        //generate 
         private static Image generateBuildingImage(Tuple<Block, BuildingStyle> temp)
         {
             //TODO - if too heavy for realtime computing, try instead of generating an image, generating a rendertexture.
@@ -83,6 +88,7 @@ namespace Game.Graphic_Manager
                     basic = Color.Blue;
                     break;
             }
+
             Image img = new Image(TILE_SIZE * depth, TILE_SIZE * height, basic);
             List<Image> Images = new List<Image>();
             for (int i = 1; i <= depth; i++)
@@ -110,6 +116,7 @@ namespace Game.Graphic_Manager
                 }
             }
 
+            //this replaces the invisible part of the building with the basic color
             //TODO - see if I can overcome this. 
             for(uint x = 0 ; x < img.Size.X ; x++)
             {
@@ -122,6 +129,7 @@ namespace Game.Graphic_Manager
             //img.SaveToFile("building_Test.jpg");
             return img;
         }
+
 
         private static Image getBuildingTile(uint length, uint depth, int i, int j, BuildingStyle style)
         {
@@ -263,7 +271,7 @@ namespace Game.Graphic_Manager
 
         public int GetHashCode(Tuple<Block, BuildingStyle> item)
         {
-            int hCode = item.Item1.X * item.Item1.Y * item.Item2.GetHashCode();
+            int hCode = (int)(item.Item1.X * item.Item1.Y * item.Item2.GetHashCode());
             return hCode.GetHashCode();
         }
 

@@ -8,8 +8,8 @@ namespace Game.City_Generator
     class CityImageGenerator
     {
 
-        
-        static uint TILE_SIZE = 32;
+
+        static readonly uint TILE_SIZE = FileHandler.getUintProperty("tile size", FileAccessor.GENERAL);
         
         public static SFML.Graphics.Texture convert_to_image(GameBoard city){
             //TODO - set up all the images ahead of time in a dictionary, so we won't load them all the time.

@@ -17,10 +17,10 @@ namespace Game.Logic.Entities
            Entity temp = Targeters.simpleTestTargeter(list, Affiliation.INDEPENDENT);
            if (temp == null)
            {
-               return new Reaction(null, Action.IGNORE);
+               return new IgnoreReaction();
                
            }
-           return new Reaction(temp, Action.FIRE_AT);
+           return new ShootReaction(temp);
 
        }
        //TODO - change back to threatTargeterHigh
@@ -100,7 +100,7 @@ namespace Game.Logic.Entities
 
        Entity Shooter.target()
        {
-           return this.Reaction.Focus;
+           return ((ShootReaction)this.Reaction).Focus;
        }
 
        targetChooser Shooter.targeter()

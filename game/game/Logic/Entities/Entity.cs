@@ -38,7 +38,7 @@ namespace Game.Logic.Entities
             this._type = type;
             this._loyalty = loyalty;
             this._sight = Sight.instance(SightType.DEFAULT_SIGHT);
-            this._reaction = new Reaction (null, Action.IGNORE);
+            this._reaction = new IgnoreReaction();
             this._visible = Visibility.REVEALED;
             this._howReact = reaction;
             this._reactionTime = reactionTime;
@@ -89,7 +89,7 @@ namespace Game.Logic.Entities
 
         protected static Reaction reactionPlaceHolder(System.Collections.Generic.List<Entity> list)
         {
-            return new Reaction();
+            return new IgnoreReaction();
         }
 
         protected virtual void upgrade(System.Collections.Generic.List<Upgrades> list)

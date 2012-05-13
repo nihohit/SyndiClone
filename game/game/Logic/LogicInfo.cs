@@ -11,7 +11,7 @@ namespace Game.Logic
     internal delegate Entity targetChooser(List<Entity> targets); //These functions choose which entity, out of the list of possible entities, to target
     internal delegate Reaction reactionFunction(List<Entity> ent); //These functions set the reaction of entities
 
-    internal enum Action { FIRE_AT, IGNORE, RUN_AWAY_FROM, MOVE_TOWARDS, MOVE_WHILE_SHOOT, CREATE_ENTITY } //This enum checks the possible actions entities can take
+    internal enum Action { FIRE_AT, IGNORE, RUN_AWAY_FROM, MOVE_TOWARDS, MOVE_WHILE_SHOOT, CONSTRUCT_ENTITY } //This enum checks the possible actions entities can take
     internal enum entityType { PERSON, VEHICLE, BUILDING} //the different types of entities
     internal enum Visibility { CLOAKED, MASKED, REVEALED, SOLID } //the visibility of an entity
     internal enum Affiliation { INDEPENDENT, CORP1, CORP2, CORP3, CORP4, CIVILIAN } //to which player each entity belongs
@@ -40,25 +40,100 @@ namespace Game.Logic
         } 
     }
 
-    internal struct Reaction{
 
+    internal interface Reaction
+    {
+        Action action();
+    }
+
+    internal struct ShootReaction : Reaction
+    {
         private readonly Entity _focus;
-        private readonly Action _actionChosen;
-
-        internal Action ActionChosen
-        {
-            get { return _actionChosen; }
-        }
 
         internal Entity Focus
         {
             get { return _focus; }
         } 
 
-        internal Reaction(Entity ent, Action action)
+        Action Reaction.action()
         {
-            this._actionChosen = action;
-            this._focus = ent;
+            return Action.FIRE_AT;
+        }
+
+        internal ShootReaction(Entity focus)
+        {
+            this._focus = focus;
+        }
+
+    }
+
+    internal struct ShootAndMoveReaction : Reaction
+    {
+        private readonly Entity _focus;
+
+        internal Entity Focus
+        {
+            get { return _focus; }
+        } 
+
+        Action Reaction.action()
+        {
+            return Action.MOVE_WHILE_SHOOT;
+        }
+
+        ShootAndMoveReaction(Entity focus)
+        {
+            this._focus = focus;
+        }
+    }
+
+    internal struct ConstructReaction : Reaction
+    {
+        private readonly MovingEntity _focus;
+
+        internal MovingEntity Focus
+        {
+            get { return _focus; }
+        } 
+
+        Action Reaction.action()
+        {
+            return Action.CONSTRUCT_ENTITY;
+        }
+
+        internal ConstructReaction(MovingEntity focus)
+        {
+            this._focus = focus;
+        }
+
+    }
+
+    internal struct RunAwayReaction : Reaction
+    {
+        private readonly Entity _focus;
+
+        internal Entity Focus
+        {
+            get { return _focus; }
+        } 
+
+        Action Reaction.action()
+        {
+            return Action.RUN_AWAY_FROM;
+        }
+
+        internal RunAwayReaction(Entity focus)
+        {
+            this._focus = focus;
+        }
+
+    }
+
+    internal struct IgnoreReaction : Reaction
+    {
+        Action Reaction.action()
+        {
+            return Action.IGNORE;
         }
     }
 

@@ -123,49 +123,11 @@
     <Reference Include="System.Drawing" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="City Generator\images\2_road1intersect.jpg" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="City Generator\images\3_road1mid.jpg" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="City Generator\images\4_road2intersect.jpg" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="City Generator\images\5_road2side.jpg" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="City Generator\images\6_road3intersect.jpg" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="City Generator\images\7_road3middle.jpg" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="City Generator\images\8_road3side.jpg" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="City Generator\images\0_empty.jpg" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="City Generator\images\1_road1.jpg" />
-  </ItemGroup>
-  <ItemGroup>
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="City Generator\images\0.png" />
     <Content Include="bin\Debug\game.exe" />
     <Content Include="bin\Debug\game.pdb" />
-    <Content Include="City Generator\images\0_buildingtemp.jpg" />
-    <None Include="City Generator\images\9.png" />
-    <None Include="City Generator\images\8.png" />
-    <None Include="City Generator\images\7.png" />
-    <None Include="City Generator\images\6.png" />
-    <None Include="City Generator\images\5.png" />
-    <None Include="City Generator\images\4.png" />
-    <None Include="City Generator\images\3.png" />
-    <None Include="City Generator\images\2.png" />
-    <None Include="City Generator\images\1.png" />
     <Content Include="Coding Conventions.txt" />
   </ItemGroup>
   <ItemGroup>

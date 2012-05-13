@@ -33,6 +33,7 @@ namespace Game.Buffers
         private bool selected = false;
         private bool deselected = false;
         private readonly Sprite selection = new Sprite(new Texture("images/UI/selection.png"));
+        private ExternalEntity selectedEntity;
 
         /******************
         Constructors
@@ -71,8 +72,6 @@ namespace Game.Buffers
             if (x0 < x1) sx = 1; else sx = -1;
             if (y0 < y1) sy = 1; else sy = -1;
             int err = dx - dy;
-            bool rightLeft = false;
-            bool upDown = false;
             Sprite temp = null;
             while (!(x0 == x1 & y0 == y1))
             {
@@ -81,24 +80,20 @@ namespace Game.Buffers
                 {
                     err = err - dy;
                     x0 = x0 + sx;
-                    rightLeft = true;
                 }
                 if (e2 < dx)
                 {
                     err = err + dx;
                     y0 = y0 + sy;
-                    upDown = true;
                 }
 
-                temp = this.finder.getShot(shot, (upDown & rightLeft));
+                temp = this.finder.getShot(shot);
                 //TODO - rotate the shot
                 temp.Position = new Vector2f(x0, y0);
                 for (int i = 0; i < amountOfReapeatingSpritesInAnimation; i++)
                 {
                     ans.Add(temp);
                 }
-                rightLeft = false;
-                upDown = false;
             }
             return new Animation(ans);
         }
@@ -201,15 +196,6 @@ namespace Game.Buffers
                         this.addDecal(decal);
                         break;
 
-                    case BufferType.MOVE:
-                        ExternalEntity mover = ((MoveEvent)action).Mover;
-                        Sprite movement = this.finder.getSprite(mover);
-                        movement.Rotation = ((MoveEvent)action).Rotation;
-                        Vector2f position = new Vector2f(mover.Position.X, mover.Position.Y);
-                        movement.Position = position;
-                        //TODO - generate turning animation
-                        break;
-
                     case BufferType.CREATE:
                         //TODO
                         break;
@@ -218,8 +204,9 @@ namespace Game.Buffers
                         this.newAnimations.Add(this.createNewShot(((ShotEvent)action).Shot, ((ShotEvent)action).Exit, ((ShotEvent)action).Target));
                         break;
 
-                    case BufferType.SELECT:
-                        this.selection.Position = ((BufferMouseSelectEvent)action).Coords.toVector2f();
+                    case BufferType.UNIT_SELECT:
+                        this.selection.Position = ((BufferUnitSelectEvent)action).Coords.toVector2f();
+                        this.selectedEntity = ((BufferUnitSelectEvent)action).Ent;
                         this.selected = true;
                         break;
 
@@ -229,9 +216,8 @@ namespace Game.Buffers
                         break;
 
                     case BufferType.SETPATH:
-                        Sprite tempSprite = finder.getPath(((BufferSetPathActionEvent)action).Path);
-                        tempSprite.Position = ((BufferSetPathActionEvent)action).Position;
-                        this.displaySprites.Add(tempSprite);
+                        finder.removePath(((BufferSetPathActionEvent)action).Ent);
+                        finder.setPath(((BufferSetPathActionEvent)action).Ent, ((BufferSetPathActionEvent)action).Path, ((BufferSetPathActionEvent)action).Position);
                         break;
                 }
             }
@@ -243,6 +229,7 @@ namespace Game.Buffers
             if (this.selected)
             {
                 this.displaySprites.Add(selection);
+                this.displayAdditionalInfo(selectedEntity);
                 return;
             }
             if (this.deselected)
@@ -250,6 +237,16 @@ namespace Game.Buffers
                 this.removedSprites.Add(this.selection);
                 this.deselected = false;
             }
+        }
+
+        private void displayAdditionalInfo(ExternalEntity selectedEntity)
+        {
+            if (this.finder.hasPath(selectedEntity))
+            {
+                this.removedSprites.Add(this.finder.getPath(selectedEntity));
+                this.displaySprites.Add(this.finder.nextPathStep(selectedEntity));
+            }
+
         }
 
         private void analyzeEntities()

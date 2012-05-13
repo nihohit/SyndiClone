@@ -191,7 +191,7 @@ namespace Game.Logic
         internal void resolveMove(MovingEntity ent)
         {
 
-            Action action = ent.Reaction.ActionChosen;
+            Action action = ent.Reaction.action();
             switch (action)
             {
                 case Action.IGNORE:
@@ -199,7 +199,7 @@ namespace Game.Logic
                     break;
 
                 case Action.RUN_AWAY_FROM:
-                    Point from = this.convertToCentralPoint(ent.Reaction.Focus);
+                    Point from = this.convertToCentralPoint(((RunAwayReaction)ent.Reaction).Focus);
                     Point currentLocation = this.convertToCentralPoint(ent);
                     Point runTo = getOppositePoint(from, currentLocation, CIV_FLEE_RANGE);
                     ent.Path = getSimplePath(currentLocation, runTo, ent);
@@ -431,7 +431,6 @@ namespace Game.Logic
          */
         private void moveToNewLocation(MovingEntity ent, Direction dir)
         {
-            int rotation = 0;
             Area location = this.locations[ent];
             if (ent.needFlip())
             {
@@ -454,14 +453,10 @@ namespace Game.Logic
             {
                 ExternalEntity newEnt = this.entities[ent];
                 newEnt.Position = new SFML.Window.Vector2f(Convert.ToSingle(location.Entry.X), Convert.ToSingle(location.Entry.Y));
-                this.addEvent(new Buffers.MoveEvent(toSwitch, newEnt, rotation));
             }
             else
             {
-                ExternalEntity newEnt = new ExternalEntity(ent, new Vector(location.Entry).toVector2f());
-                this.addEvent(new Buffers.MoveEvent(toSwitch, newEnt, rotation));
-                this.entities.Add(ent, newEnt);
-
+                throw new Exception("entity isn't in entities dictionary");
             }
             this.locations[ent] = toSwitch;
         }
@@ -554,10 +549,9 @@ namespace Game.Logic
             //get the path the bullet is going through, and affect targets
             Point endPoint = this.processPath(exit, new Point(exit, direction), shot);
 
-            if (shot.Blast != null){
-
+            if (shot.Blast != null)
+            {
                 this.areaEffect(endPoint, shot.Blast);
-
             }
         }
 
@@ -684,7 +678,8 @@ namespace Game.Logic
             if ((selected == null) && (temp != null) && (temp.Loyalty == Affiliation.INDEPENDENT))
             {
                 selected = temp;
-                this.actionsDone.Add (new Buffers.BufferMouseSelectEvent(new Vector(this.convertToCentralPoint(temp).X,this.convertToCentralPoint(temp).Y)));
+                this.actionsDone.Add(new Buffers.BufferUnitSelectEvent(this.entities[selected], 
+                    new Vector(this.convertToCentralPoint(temp).X,this.convertToCentralPoint(temp).Y)));
                 return;
             }
             if (selected != null)
@@ -693,7 +688,7 @@ namespace Game.Logic
                 PoliceStation pol = ((PoliceStation)selected);
                 pol.Path = this.getComplexPath(this.getExitPoint(pol), point, new Vector(1,1), MovementType.GROUND, pol.ExitPoint.vectorToDirection());
                 this.actionsDone.Add(new Buffers.BufferCancelActionEvent());
-                this.actionsDone.Add(new Buffers.BufferSetPathActionEvent(((PoliceStation)selected).Path, this.findConstructionSpot(pol, pol.getConstruct()).Entry.toVector2f()));
+                this.actionsDone.Add(new Buffers.BufferSetPathActionEvent(this.entities[pol],((PoliceStation)selected).Path, this.findConstructionSpot(pol, pol.getConstruct()).Entry.toVector2f()));
                 selected = null;
             }
 

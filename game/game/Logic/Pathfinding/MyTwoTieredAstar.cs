@@ -9,7 +9,7 @@ namespace Game.Logic.Pathfinding
     {
         const int MIN_DISTANCE = 4;
 
-        static int TILE_SIZE;
+        static int TILE_SIZE = (int)FileHandler.getUintProperty("tile size", FileAccessor.GENERAL);
         static private Point entry;
         static private Point goal;
         static private Vector size;
@@ -121,9 +121,5 @@ namespace Game.Logic.Pathfinding
             return newGrid;
         }
 
-        public static void setup(int _tileSize)
-        {
-            TILE_SIZE = _tileSize;
-        }
     }
 }

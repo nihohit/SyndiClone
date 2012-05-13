@@ -6,21 +6,29 @@ using SFML.Graphics;
 
 namespace Game.Graphic_Manager
 {
-
-    internal abstract class TextureFinder
+    //this is the general class for finding textures, just in case I'd like to replace the sprite finder
+     interface TextureFinder
     {
-        internal abstract Sprite getSprite(ExternalEntity ent);
-        internal abstract Sprite getShot(ShotType shot, bool diagonal);
-        internal abstract Sprite remove(ExternalEntity ent);
-        internal abstract Sprite nextSprite(ExternalEntity mover);
-        internal abstract Animation generateDestoryResults(Area area, entityType entityType);
-        internal abstract Sprite getPath(List<Direction> path);
+        Sprite getSprite(ExternalEntity ent);
+        Sprite getShot(ShotType shot);
+        Sprite remove(ExternalEntity ent);
+        Sprite nextSprite(ExternalEntity mover);
+        Sprite getPath(ExternalEntity mover);
+        Animation generateDestoryResults(Area area, entityType entityType);
+        void setPath(ExternalEntity ent, List<Direction> path, SFML.Window.Vector2f position);
+        void removePath(ExternalEntity ent);
+        bool hasPath(ExternalEntity ent);
+
+        Sprite nextPathStep(ExternalEntity ent);
     }
 
-    internal class SpriteFinder : TextureFinder
+     class SpriteFinder : TextureFinder
     {
+        enum ImageType {PATH }
+
         private Dictionary<ExternalEntity, SpriteLoop> spriteLoopFinder = new Dictionary<ExternalEntity, SpriteLoop>();
-        private static Dictionary<Logic.Affiliation, Texture> personFinder = new Dictionary<Logic.Affiliation, Texture>
+        private Dictionary<ExternalEntity, SpriteLoop> pathFinder = new Dictionary<ExternalEntity, SpriteLoop>();
+        private Dictionary<Logic.Affiliation, Texture> personFinder = new Dictionary<Logic.Affiliation, Texture>
         {
             {Logic.Affiliation.INDEPENDENT, new Texture("images/Persons/personblue.png")},
             {Logic.Affiliation.CORP1, new Texture("images/Persons/personpurple.png")},
@@ -29,40 +37,40 @@ namespace Game.Graphic_Manager
             {Logic.Affiliation.CORP3, new Texture("images/Persons/personred.png")},
             {Logic.Affiliation.CIVILIAN, new Texture("images/Persons/personyellow.png")}
         };
-        private static Dictionary<ShotType, Texture> straightshots = new Dictionary<ShotType, Texture>
+
+        private Dictionary<ShotType, Texture> shots = new Dictionary<ShotType, Texture>
         {
             { ShotType.PISTOL_BULLET, new Texture("images/shots/bulletshotstraight.png")}
 
         };
-        private static Dictionary<ShotType, Texture> diagonalshots = new Dictionary<ShotType, Texture>
-        {
-            { ShotType.PISTOL_BULLET, new Texture("images/shots/bulletshotdiagonal.png")}
 
+        private Dictionary<ImageType, Texture> miscellaneous = new Dictionary<ImageType, Texture>
+        {
+            {ImageType.PATH, new Texture("images/UI/path.png")}
         };
 
-        private static List<ExternalEntity> removed = new List<ExternalEntity>();
+        private List<ExternalEntity> removed = new List<ExternalEntity>();
 
         internal SpriteFinder()
         {
         }
 
-        internal override Sprite getShot(ShotType shot, bool diagonal)
+        Sprite TextureFinder.getShot(ShotType shot)
         {
-            if (diagonal) return new Sprite(diagonalshots[shot]);
-            return new Sprite(straightshots[shot]);
+            return new Sprite(shots[shot]);
         }
 
-        internal override Sprite getSprite(ExternalEntity ent)
+        Sprite TextureFinder.getSprite(ExternalEntity ent)
         {
             if (!spriteLoopFinder.ContainsKey(ent))
             {
                 spriteLoopFinder.Add(ent, this.generateNewSpriteLoop(ent));
             }
-            Sprite sprite = spriteLoopFinder[ent].Next();
-            return sprite;
+            return spriteLoopFinder[ent].Next();
         }
 
-        internal override Graphic_Manager.Animation generateDestoryResults(Area area, entityType type)
+        //this function returns an animation as the result of destroying an entity.
+         Graphic_Manager.Animation TextureFinder.generateDestoryResults(Area area, entityType type)
         {
             //TODO - missing function
             return new Graphic_Manager.Animation(area, type);
@@ -99,14 +107,14 @@ namespace Game.Graphic_Manager
             return sprite;
         }
 
-        internal override Sprite remove(ExternalEntity ent)
+        Sprite TextureFinder.remove(ExternalEntity ent)
         {
             Sprite temp = this.spriteLoopFinder[ent].getSprite();
             this.spriteLoopFinder.Remove(ent);
             return temp;
         }
 
-        internal override Sprite nextSprite(ExternalEntity mover)
+        Sprite TextureFinder.nextSprite(ExternalEntity mover)
         {
             return this.spriteLoopFinder[mover].Next();
         }
@@ -114,121 +122,74 @@ namespace Game.Graphic_Manager
         /*************
         * PATHS
         *************/
-        internal override Sprite getPath(List<Game.Logic.Direction> path)
+        void TextureFinder.removePath(ExternalEntity ent)
         {
-            Area size = getPathSize(path);
-            Image img = new Image((uint)size.Size.X, (uint)size.Size.Y, Color.White);
-
-            uint x = (uint)size.Entry.X, y = (uint)size.Entry.Y;
-            foreach (Game.Logic.Direction dir in path)
-            {
-                if (x == 0 || y == 0 || x >= img.Size.X - 1 || y >= img.Size.Y - 1)
-                {
-                    x--;
-                }
-                img.SetPixel(x, y, Color.Green);
-                img.SetPixel(x, y + 1, Color.Green);
-                img.SetPixel(x, y - 1, Color.Green);
-                img.SetPixel(x - 1, y, Color.Green);
-                img.SetPixel(x - 1, y + 1, Color.Green);
-                img.SetPixel(x - 1, y - 1, Color.Green);
-                img.SetPixel(x + 1, y, Color.Green);
-                img.SetPixel(x + 1, y - 1, Color.Green);
-                img.SetPixel(x + 1, y + 1, Color.Green);
-                switch (dir)
-                {
-                    case (Game.Logic.Direction.DOWN):
-                        y++;
-                        break;
-                    case (Game.Logic.Direction.DOWNLEFT):
-                        y++;
-                        x--;
-                        break;
-                    case (Game.Logic.Direction.DOWNRIGHT):
-                        y++;
-                        x++;
-                        break;
-                    case (Game.Logic.Direction.LEFT):
-                        x--;
-                        break;
-                    case (Game.Logic.Direction.RIGHT):
-                        x++;
-                        break;
-                    case (Game.Logic.Direction.UP):
-                        y--;
-                        break;
-                    case (Game.Logic.Direction.UPLEFT):
-                        y--;
-                        x--;
-                        break;
-                    case (Game.Logic.Direction.UPRIGHT):
-                        x++;
-                        y--;
-                        break;
-                }
-            }
-            //TODO - img.CreateMaskFromColor(Color.White); or use gImage.getPixels to make this faster
-            for (uint i = 0; i < img.Size.X; i++)
-            {
-                for (uint j = 0; j < img.Size.Y; j++)
-                {
-                    if (img.GetPixel(i, j).Equals(Color.White))
-                    {
-                        img.SetPixel(i,j,new Color(0,0,0,0));
-                    }
-                }
-
-            }
-            Sprite ans = new Sprite(new Texture(img));
-            ans.Origin = new SFML.Window.Vector2f(size.Entry.X, size.Entry.Y);
-            return ans;
+            if(pathFinder.ContainsKey(ent)) pathFinder.Remove(ent);
         }
 
-        private Area getPathSize(List<Direction> path)
+        void TextureFinder.setPath(ExternalEntity ent, List<Game.Logic.Direction> path, SFML.Window.Vector2f position)
         {
-            int xSize = 3, xPos = 1, ySize = 3, yPos = 1, x = 1, y = 1;
+            pathFinder.Add(ent, generateNewPathSprite(path, position));
+        }
+
+        private SpriteLoop generateNewPathSprite(List<Direction> path, SFML.Window.Vector2f position)
+        {
+            List<Sprite> newList = new List<Sprite>();
+            Vector initial = new Vector(Convert.ToInt32(position.X), Convert.ToInt32(position.Y));
+            Sprite temp;
             foreach (Direction dir in path)
             {
+                temp = new Sprite(miscellaneous[ImageType.PATH]);
                 switch (dir)
                 {
-                    case (Game.Logic.Direction.DOWN):
-                        y++;
+                    case(Direction.UP):
                         break;
-                    case (Game.Logic.Direction.DOWNLEFT):
-                        y++;
-                        x--;
+                    case (Direction.DOWN):
+                        temp.Rotation = 180F;
                         break;
-                    case (Game.Logic.Direction.DOWNRIGHT):
-                        y++;
-                        x++;
+                    case (Direction.LEFT):
+                        temp.Rotation = 270;
                         break;
-                    case (Game.Logic.Direction.LEFT):
-                        x--;
+                    case (Direction.RIGHT):
+                        temp.Rotation = 90F;
                         break;
-                    case (Game.Logic.Direction.RIGHT):
-                        x++;
+                    case (Direction.UPRIGHT):
+                        temp.Rotation = 45F;
                         break;
-                    case (Game.Logic.Direction.UP):
-                        y--;
+                    case (Direction.UPLEFT):
+                        temp.Rotation = 315F;
                         break;
-                    case (Game.Logic.Direction.UPLEFT):
-                        y--;
-                        x--;
+                    case (Direction.DOWNRIGHT):
+                        temp.Rotation = 135F;
                         break;
-                    case (Game.Logic.Direction.UPRIGHT):
-                        x++;
-                        y--;
+                    case (Direction.DOWNLEFT):
+                        temp.Rotation = 225F;
                         break;
                 }
-                if (x < 1) { xPos++; xSize++; x = 1; }
-                if (y < 1) { yPos++; ySize++; y = 1; }
-                if (x >= xSize-1) { xSize++; }
-                if (y >= ySize-1) { ySize++; }
+                initial = initial.addVector(Vector.directionToVector(dir));
+                temp.Position = initial.toVector2f();
+                newList.Add(temp);
             }
 
-            return new Area(new Point(xPos, yPos), new Vector(xSize, ySize));
+            return new SpriteLoop(newList);
         }
 
+        Sprite TextureFinder.getPath(ExternalEntity ent)
+        {
+            return this.pathFinder[ent].getSprite();
+        }
+
+
+        Sprite TextureFinder.nextPathStep(ExternalEntity ent)
+        {
+            return this.pathFinder[ent].Next();
+        }
+
+
+        bool TextureFinder.hasPath(ExternalEntity ent)
+        {
+            return pathFinder.ContainsKey(ent);
+        }
     }
 
     class externalEntityEqualityComparer : IEqualityComparer<ExternalEntity>

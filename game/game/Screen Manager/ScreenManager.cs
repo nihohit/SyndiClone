@@ -12,7 +12,6 @@ namespace Game.Screen_Manager
         /**************
          * class members
          *************/
-        static private FileHandler reader = new FileHandler("screen");
         static private float backgroundX, backgroundY;
         static private RenderWindow mainWindow;
         static private Buffers.InputBuffer input;
@@ -26,15 +25,15 @@ namespace Game.Screen_Manager
         /***************
          * class consts
          **************/
-        static float AMOUNT_OF_PIXEL_ALLOWED_OFFSCREEN = reader.getFloatProperty("pixels allowed off background");
-        static uint SCREEN_EDGE_WIDTH_FOR_MOUSE_SCROLLING = reader.getUintProperty("mouse scroll range");
-        static uint SCREEN_EDGE_MOUSE_SCROLL_RELATION = reader.getUintProperty("mouse scroll relation");
-        static uint SPEED_OF_MOUSE_SCROLL = reader.getUintProperty("mouse scroll speed");
-        static uint screenWidth = reader.getUintProperty("screen width");
-        static uint screenHeight = reader.getUintProperty("screen height");
-        static uint bits = reader.getUintProperty("bits");
-        static uint frameRates = reader.getUintProperty("frame rates");
-        static private float minX = reader.getFloatProperty("minimal view size"), minY, topY, topX; //these represent the bounds on the size of the view
+        static float AMOUNT_OF_PIXEL_ALLOWED_OFFSCREEN = FileHandler.getFloatProperty("pixels allowed off background", FileAccessor.SCREEN);
+        static uint SCREEN_EDGE_WIDTH_FOR_MOUSE_SCROLLING = FileHandler.getUintProperty("mouse scroll range", FileAccessor.SCREEN);
+        static uint SCREEN_EDGE_MOUSE_SCROLL_RELATION = FileHandler.getUintProperty("mouse scroll relation", FileAccessor.SCREEN);
+        static uint SPEED_OF_MOUSE_SCROLL = FileHandler.getUintProperty("mouse scroll speed", FileAccessor.SCREEN);
+        static uint screenWidth = FileHandler.getUintProperty("screen width", FileAccessor.SCREEN);
+        static uint screenHeight = FileHandler.getUintProperty("screen height", FileAccessor.SCREEN);
+        static uint bits = FileHandler.getUintProperty("bits", FileAccessor.SCREEN);
+        static uint frameRates = FileHandler.getUintProperty("frame rates", FileAccessor.SCREEN);
+        static private float minX = FileHandler.getFloatProperty("minimal view size", FileAccessor.SCREEN), minY, topY, topX; //these represent the bounds on the size of the view
 
         public static void initialise()
         {
