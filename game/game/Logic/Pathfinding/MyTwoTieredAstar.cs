@@ -52,21 +52,42 @@ namespace Game.Logic.Pathfinding
         {
             List<Direction> newList = new List<Direction>();
             Point begin = goal, end = goal;
-            Direction dir = origianlDirection;
+            Direction dir;
+            bool straightCheck;
             //this is checking the course backwards through the nodes
             while(node != null)
             {
+                straightCheck = true;
+                dir = node.Direction;
                 for (int j = 0; j < MIN_DISTANCE ; j++)
                 {
+                    node = node.Parent;
                     if (node != null)
-                        node = node.Parent;
+                    {
+                        straightCheck = straightCheck && dir == node.Direction;
+                    }
+                    else
+                    {
+                        break;
+                    }
                 }
                 if (node != null)
                 {
-                    dir = node.Direction;
-                    begin = convertToCentralPoint(node.Point);
-                    newList.InsertRange(0, Astar.findPath(begin, end, size, gridHolder, traversalMethod, heuristic, dir));
-                    end = begin;
+                    if (straightCheck)
+                    {
+                        for (int i = 0; i < MIN_DISTANCE * TILE_SIZE; i++)
+                        {
+                            newList.Insert(0, dir);
+                        }
+                        end = new Point(end, Vector.directionToVector(dir).multiply(-MIN_DISTANCE * TILE_SIZE));
+                    }
+                    else
+                    {
+                        dir = node.Direction;
+                        begin = convertToCentralPoint(node.Point);
+                        newList.InsertRange(0, Astar.findPath(begin, end, size, gridHolder, traversalMethod, heuristic, dir));
+                        end = begin;
+                    }
                 }
             }
             newList.InsertRange(0,Astar.findPath(entry, end, size, gridHolder, traversalMethod, heuristic, origianlDirection));

@@ -197,6 +197,11 @@ namespace Game
         {
             return new Vector(this._x * size.X, this._y * size.Y);
         }
+
+        internal Vector multiply(int size)
+        {
+            return new Vector(this._x * size, this._y * size);
+        }
     }
 
     internal struct Area
