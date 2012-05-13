@@ -4,117 +4,29 @@ using System.Collections.Generic;
 namespace Game.Logic.Pathfinding
 
 {
-    internal class AstarNode : IComparable<AstarNode>
-    {
-        private readonly Point point;
-        private bool open;
-        private Direction dir;
-        private double f_value;
-        private double g_value;
-        private readonly int g_total_value; //the value of the size-portion, for clearance
-        private readonly double h_value;
-        private AstarNode parent;
-
-        public AstarNode(Point value, double g, int g_total, double h, AstarNode _parent)
-        {
-            this.point = value;
-            this.g_total_value = g_total;
-            this.g_value = g;
-            this.f_value = this.g_value + h  + g_total;
-            this.h_value = h;
-            this.parent = _parent;
-            this.dir = Vector.vectorToDirection(this.point, this.parent.Point);
-            this.open = true;
-        }
-
-        //only first node uses this
-        public AstarNode(Point value, double h, Direction _dir)
-        {
-            this.point = value;
-            this.g_total_value = 0;
-            this.g_value = 0;
-            this.f_value = this.g_value + h;
-            this.h_value = h;
-            this.parent = null;
-            this.dir = _dir;
-            this.open = true;
-        }
-
-        public AstarNode Parent
-        {
-            get { return parent; }
-            set { parent = value; this.dir = Vector.vectorToDirection(this.point, parent.point); }
-        }
-
-        public Point Point
-        {
-            get { return point; }
-        }
-
-        public bool Open
-        {
-            get { return open; }
-            set { open = value; }
-        }
-
-        public double H
-        {
-            get { return h_value; }
-        }
-
-        internal Direction Direction
-        {
-            get { return dir; }
-            set { dir = value; }
-        }
-
-        public double G
-        {
-            get { return g_value; }
-            set { g_value = value; f_value = g_value + h_value + g_total_value; }
-        }
-
-        public double F
-        {
-            get { return f_value; }
-        }
-
-        int IComparable<AstarNode>.CompareTo(AstarNode other)
-        {
-            if (this.F > other.F) return 1;
-            if (this.F < other.F) return -1;
-            if (this.H > other.H) return 1;
-            if (this.H < other.H) return -1;
-            return 0;
-        }
-    }
-
-    delegate List<Direction> pathfindFunction(Point entry, Point goal, Vector _size, Logic.TerrainType[,] _grid, Logic.MovementType _traversalMethod, Heuristic _heuristic, Direction dir);
-    public delegate double Heuristic(Point check);
-
     static class Astar
     {
         
-
         static private readonly Dictionary<Point, AstarNode> points = new Dictionary<Point, AstarNode>();
         static private readonly PriorityQueueB<AstarNode> openSet = new PriorityQueueB<AstarNode>();
         //static private readonly HashSet<AstarNode> closedSet = new HashSet<AstarNode>();
-        static private Logic.TerrainType[,] grid;
+        static private Logic.TerrainGrid gridHolder;
         static private Logic.MovementType traversalMethod;
         static private Heuristic heuristic;
         static private Vector size;
         static private System.Diagnostics.Stopwatch timer = new System.Diagnostics.Stopwatch();
-
+        static private bool directionCritical = true;
+        static private bool diagonalMovement = true;
         static int amountOfNodesChecked;
 
-        static public List<Direction> findPath(Point entry, Point goal, Vector _size, Logic.TerrainType[,] _grid, Logic.MovementType _traversalMethod, Heuristic _heuristic, Direction dir)
+        static public List<Direction> findPath(Point entry, Point goal, Vector _size, Logic.TerrainGrid _grid, Logic.MovementType _traversalMethod, Heuristic _heuristic, Direction dir)
         {
             timer.Start();
             amountOfNodesChecked = 0;
-            entry = new Point(entry, Vector.directionToVector(dir).multiply(_size));
+            //entry = new Point(entry, Vector.directionToVector(dir).multiply(_size));
             size = _size;
             heuristic = _heuristic;
-            grid = _grid;
+            gridHolder = _grid;
             traversalMethod = _traversalMethod;
             points.Add(entry, new AstarNode(entry, heuristic(entry), dir));
             openSet.Push(points[entry]);
@@ -130,56 +42,146 @@ namespace Game.Logic.Pathfinding
             throw new Exception("open set empty, route impossible");
         }
 
+        static public AstarNode findPathNoReconstruction(Point entry, Point goal, Vector _size, Logic.TerrainGrid _grid, Logic.MovementType _traversalMethod, Heuristic _heuristic, Direction dir)
+        {
+            timer.Start();
+            amountOfNodesChecked = 0;
+            //entry = new Point(entry, Vector.directionToVector(dir).multiply(_size));
+            size = _size;
+            heuristic = _heuristic;
+            gridHolder = _grid;
+            traversalMethod = _traversalMethod;
+            points.Add(entry, new AstarNode(entry, heuristic(entry), dir));
+            openSet.Push(points[entry]);
+
+            while (openSet.Count > 0)
+            {
+                AstarNode current = openSet.Pop();
+                if (current.Point == goal) return current;
+                current.Open = false;
+                checkAllNeighbours(current);
+            }
+
+            throw new Exception("open set empty, route impossible");
+        }
+
         //this function checks over all the relevant neighbours of a point.
+        /*
+        private static void checkAllNeighboursReduced(AstarNode current)
+        {
+            int x = current.Point.X, y = current.Point.Y;
+            bool down = (current.Point.Y < gridHolder.Grid.GetLength(1) - 1);
+            bool up = (current.Point.Y > 0);
+            bool left = (current.Point.X > 0);
+            bool right = (current.Point.X < gridHolder.Grid.GetLength(0) - 1);
+            switch (current.Direction)
+            {
+                case(Game.Logic.Direction.DOWN):
+                    if (down )
+                    {
+                        y = current.Point.Y + 1;
+                        checkPoint(new Point(x, y), current);
+                        if (left ) checkPoint(new Point(x - 1, y), current);
+                        if (right) checkPoint(new Point(x + 1, y), current);
+                    }
+                    break;
+
+                case (Game.Logic.Direction.UP):
+                    if (up)
+                    {
+                        y = current.Point.Y - 1;
+                        checkPoint(new Point(x, y), current);
+                        if (left ) checkPoint(new Point(x - 1, y), current);
+                        if (right)checkPoint(new Point(x + 1, y), current);
+                    }
+                    break;
+                case (Game.Logic.Direction.LEFT):
+                    if (left)
+                    {
+                        x = current.Point.X - 1;
+                        checkPoint(new Point(x, y), current);
+                        if (up)checkPoint(new Point(x, y - 1), current);
+                        if (down)checkPoint(new Point(x, y + 1), current);
+                    }
+                    break;
+
+                case (Game.Logic.Direction.RIGHT):
+                    if (right)
+                    {
+                        x = current.Point.X + 1;
+                        checkPoint(new Point(x, y), current);
+                        if (up) checkPoint(new Point(x, y - 1), current);
+                        if (down) checkPoint(new Point(x, y + 1), current);
+                    }
+                    break;
+
+                case (Game.Logic.Direction.DOWNLEFT):
+                    if (left) checkPoint(new Point(x - 1, y), current);
+                    if (down) checkPoint(new Point(x, y + 1), current);
+                    if (down && left) checkPoint(new Point(x - 1, y + 1), current);
+                    if (up && left) checkPoint(new Point(x - 1, y - 1), current);
+                    if (down && right) checkPoint(new Point(x + 1, y + 1), current);
+                    break;
+
+                case (Game.Logic.Direction.DOWNRIGHT):
+                    if (right) checkPoint(new Point(x + 1, y), current);
+                    if (down) checkPoint(new Point(x, y + 1), current);
+                    if (down && right) checkPoint(new Point(x + 1, y + 1), current);
+                    if (up && right) checkPoint(new Point(x + 1, y - 1), current);
+                    if (down && left) checkPoint(new Point(x - 1, y + 1), current);
+                    break;
+
+                case (Game.Logic.Direction.UPLEFT):
+                    if (left) checkPoint(new Point(x - 1, y), current);
+                    if (up) checkPoint(new Point(x, y - 1), current);
+                    if (up && left) checkPoint(new Point(x - 1, y - 1), current);
+                    if (down && left) checkPoint(new Point(x - 1, y + 1), current);
+                    if (up && right) checkPoint(new Point(x + 1, y - 1), current);
+
+                    break;
+
+                case (Game.Logic.Direction.UPRIGHT):
+                    if (right) checkPoint(new Point(x + 1, y), current);
+                    if (up) checkPoint(new Point(x, y - 1), current);
+                    if (up && right) checkPoint(new Point(x + 1, y - 1), current);
+                    if (up && left) checkPoint(new Point(x - 1, y - 1), current);
+                    if (down && right) checkPoint(new Point(x + 1, y + 1), current);
+                    break;
+            }
+        }*/
+        
         private static void checkAllNeighbours(AstarNode current)
         {
 
-            int x = 0, topX = grid.GetLength(0)-1, topY = grid.GetLength(1)-1;
-            if (current.Point.X > 0)
+            int x = current.Point.X, y;
+            bool down = (current.Point.Y < gridHolder.Grid.GetLength(1) - 1);
+            bool up = (current.Point.Y > 0);
+            bool left = (current.Point.X > 0);
+            bool right = (current.Point.X < gridHolder.Grid.GetLength(0) - 1);
+            if (up)
             {
-                x = current.Point.X - 1;
-
-                checkPoint(new Point(x, current.Point.Y), current);
-
-                if (current.Point.Y > 0)
+                y = y = current.Point.Y - 1;
+                checkPoint(new Point(x, y), current);
+                if (diagonalMovement)
                 {
-                    checkPoint(new Point(x, current.Point.Y - 1), current);
-                }
-
-                if (current.Point.Y < topY)
-                {
-                    checkPoint(new Point(x, current.Point.Y + 1), current);
+                    if (left) checkPoint(new Point(x - 1, y), current);
+                    if (right) checkPoint(new Point(x + 1, y), current);
                 }
             }
 
-            if (current.Point.X < topX)
+            if (down)
             {
-                x = current.Point.X + 1;
-
-                checkPoint(new Point(x, current.Point.Y), current);
-
-                if (current.Point.Y > 0)
+                y = y = current.Point.Y + 1;
+                checkPoint(new Point(x, y), current);
+                if (diagonalMovement)
                 {
-                    checkPoint(new Point(x, current.Point.Y - 1), current);
-                }
-
-                if (current.Point.Y < topY)
-                {
-                    checkPoint(new Point(x, current.Point.Y + 1), current);
+                    if (left) checkPoint(new Point(x - 1, y), current);
+                    if (right) checkPoint(new Point(x + 1, y), current);
                 }
             }
-
-            x = current.Point.X;
-
-            if (current.Point.Y > 0)
-            {
-                checkPoint(new Point(x, current.Point.Y - 1), current);
-            }
-
-            if (current.Point.Y < topY)
-            {
-                checkPoint(new Point(x, current.Point.Y + 1), current);
-            }
+            y= current.Point.Y;
+            if(left) checkPoint(new Point(x -1 , y), current);
+            if (right) checkPoint(new Point(x + 1, y), current);
         }
 
         private static void checkPoint(Point temp, AstarNode current)
@@ -226,7 +228,9 @@ namespace Game.Logic.Pathfinding
         private static double moveCostDirection(Direction direction, Point point, Point temp)
         {
             Direction newDir = Vector.vectorToDirection(point, temp);
-            return switchDirectionCost(direction, newDir) + directionalMovementCost(newDir);
+            double check = directionalMovementCost(newDir);
+            if (directionCritical) check += switchDirectionCost(direction, newDir);
+            return check;
         }
 
         private static double switchDirectionCost(Direction origianlDirection, Direction newDir)
@@ -264,7 +268,7 @@ namespace Game.Logic.Pathfinding
         private static int costOfMovement(Point temp)
         {
             if (traversalMethod == MovementType.FLYER) return 1;
-            switch (grid[temp.X, temp.Y])
+            switch (gridHolder.Grid[temp.X, temp.Y])
             {
                 case TerrainType.ROAD:
                     return 1;
@@ -285,7 +289,7 @@ namespace Game.Logic.Pathfinding
             openSet.Clear();
             //closedSet.Clear();
             timer.Stop();
-            Console.Out.WriteLine("amount of nodes checked " + amountOfNodesChecked + " amount of time elapsed " + timer.ElapsedTicks + " time per point " + timer.ElapsedTicks / amountOfNodesChecked);
+            //Console.Out.WriteLine("amount of nodes checked " + amountOfNodesChecked + " amount of time elapsed " + timer.ElapsedTicks);
             timer.Reset();
             List<Direction> ans = new List<Direction>();
 
@@ -293,29 +297,21 @@ namespace Game.Logic.Pathfinding
             {
                 ans.Insert(0,current.Direction);
                 current = current.Parent;
-
             }
 
             return ans;
         }
 
-        public static Heuristic diagonalTo(Point goal)
+        public static bool DirectionChangeMatters
         {
-            return delegate(Point entry)
-            {
-                int diagonal = Math.Max(Math.Abs(entry.X - goal.X), Math.Abs(entry.Y - goal.Y));
-                int straight = Math.Abs(entry.X - goal.X) + Math.Abs(entry.Y - goal.Y);
-                return Math.Sqrt(2) * diagonal + straight - (2 * diagonal);
-            };
+            get { return Astar.directionCritical; }
+            set { Astar.directionCritical = value; }
         }
 
-        static int nodeComparer(AstarNode a, AstarNode b)
+        public static bool DiagonalMovement
         {
-            if (a.F > b.F) return 1;
-            if (a.F < b.F) return -1;
-            if (a.H > b.H) return 1;
-            if (a.H < b.H) return -1;
-            return 0;
+            get { return Astar.diagonalMovement; }
+            set { Astar.diagonalMovement = value; }
         }
 
     }

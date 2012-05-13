@@ -61,7 +61,9 @@
     <Compile Include="FileHandler.cs" />
     <Compile Include="Graphic Manager\BuildingImageGenerator.cs" />
     <Compile Include="Logic\Pathfinding\MyAStar.cs" />
+    <Compile Include="Logic\Pathfinding\MyTwoTieredAstar.cs" />
     <Compile Include="Logic\Pathfinding\MyVisibleAStar.cs" />
+    <Compile Include="Logic\Pathfinding\PathfindingInfo.cs" />
     <Compile Include="Logic\Pathfinding\PriorityQueueB.cs" />
     <Compile Include="Logic\Targeters.cs" />
     <Compile Include="Screen Manager\InputBuffer.cs" />

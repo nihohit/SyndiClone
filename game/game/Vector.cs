@@ -8,9 +8,40 @@ namespace Game
 
         static private Random rand = new Random();
 
+        public Vector(int x, int y)
+        {
+            this._x = x;
+            this._y = y;
+        }
+
+        public Vector(Point a, Point b)
+        {
+            this._x = a.X - b.X;
+            this._y = a.Y - b.Y;
+        }
+
+
+        public Vector(Point a)
+        {
+            this._x = a.X;
+            this._y = a.Y;
+        }
+
+        public int X
+        {
+            get { return _x; }
+        }
+
         public int Y
         {
             get { return _y; }
+        }
+
+        public Vector flip()
+        {
+            int x = this._y;
+            int y = this._x;
+            return new Vector(x, y);
         }
 
         public Vector addVector(Vector add)
@@ -37,37 +68,6 @@ namespace Game
             double randStdNormal = Math.Sqrt(-2.0 * Math.Log(u1)) * Math.Sin(2.0 * Math.PI * u2); //random normal(0,1)
             double randNormal = mean + deviation * randStdNormal; //random normal(mean,stdDev^2)
             return Convert.ToInt16(randNormal);
-        }
-
-        public int X
-        {
-            get { return _x; }
-        }
-
-        public Vector(int x, int y)
-        {
-            this._x = x;
-            this._y = y;
-        }
-
-        public Vector(Point a, Point b)
-        {
-            this._x = a.X - b.X;
-            this._y = a.Y - b.Y;
-        }
-
-
-        public Vector(Point a)
-        {
-            this._x = a.X;
-            this._y = a.Y;
-        }
-
-        public Vector flip()
-        {
-            int x = this._y;
-            int y = this._x;
-            return new Vector(x, y);
         }
 
         public Vector completeToDistance(int dist)

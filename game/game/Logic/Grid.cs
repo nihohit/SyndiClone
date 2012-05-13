@@ -28,9 +28,9 @@ namespace Game.Logic
         private readonly List<Buffers.BufferEvent> actionsDone;
         private readonly UniqueList<ExternalEntity> visible;
         private readonly UniqueList<Entity> destroyed;
-        private readonly TerrainType[,] pathFindingGrid;
+        private readonly TerrainGrid pathFindingGrid;
         private Entity selected;
-        private Pathfinding.pathfindFunction pathfind = Pathfinding.Astar.findPath;
+        private Pathfinding.pathfindFunction pathfind = Pathfinding.AdvancedAstar.findPath;
         //TODO - add corporations?
 
         /******************
@@ -45,21 +45,23 @@ namespace Game.Logic
             this.entities = new Dictionary<Entity, ExternalEntity>();
             this.visible = new UniqueList<ExternalEntity>();
             this.destroyed = new UniqueList<Entity>();
-            this.pathFindingGrid = new TerrainType[x, y];
+            this.pathFindingGrid = new TerrainGrid(x,y);
         }
 
-        internal void initialiseMovementMap()
+        internal void initialiseTerrainGrid()
         {
             for (int i = 0; i < this.gameGrid.GetLength(0); i++)
             {
                 for (int j = 0; j < this.gameGrid.GetLength(1); j++)
                 {
-                    if (this.gameGrid[i, j] == null) this.pathFindingGrid[i, j] = TerrainType.ROAD;
-                    else this.pathFindingGrid[i, j] = TerrainType.BUILDING;
+                    if (this.gameGrid[i, j] == null) this.pathFindingGrid.Grid[i, j] = TerrainType.ROAD;
+                    else this.pathFindingGrid.Grid[i, j] = TerrainType.BUILDING;
                 }
             }
         }
 
+
+            
 
         internal void initialiseExitPoints()
         {
@@ -275,7 +277,7 @@ namespace Game.Logic
         {
             List<Direction> ans = new List<Direction>();
 
-            ans = pathfind(entry, target, size, pathFindingGrid, movement, Pathfinding.Astar.diagonalTo(target), direction);
+            ans = pathfind(entry, target, size, pathFindingGrid, movement, Pathfinding.Heuristics.diagonalTo(target), direction);
             if (!(ans.Count == entry.getDiffVector(target).length()))
             {
                 //TODO - probably continue from there.
@@ -626,7 +628,7 @@ namespace Game.Logic
                 Area area = this.locations[ent];
                 foreach (Point point in area.getPointArea())
                 {
-                    this.pathFindingGrid[point.X, point.Y] = TerrainType.ROAD;
+                    this.pathFindingGrid.Grid[point.X, point.Y] = TerrainType.ROAD;
                 }
             }
 
@@ -668,9 +670,13 @@ namespace Game.Logic
 
         private Area findConstructionSpot(Constructor constructor, Entity ent)
         {
-            return new Area(new Point(this.convertToCentralPoint((Entity)constructor), constructor.exitPoint()), ent.Size);
+            return new Area(getExitPoint((Building)constructor), ent.Size);
         }
 
+        private Point getExitPoint(Building constructor)
+        {
+            return new Point(this.convertToCentralPoint(constructor), constructor.ExitPoint);
+        }
 
         internal void select(Point point)
         {
@@ -683,8 +689,9 @@ namespace Game.Logic
             }
             if (selected != null)
             {
+                if ((temp != null) && (temp.Type == entityType.BUILDING)) point = this.getExitPoint((Building)temp); 
                 PoliceStation pol = ((PoliceStation)selected);
-                pol.Path = this.getComplexPath(new Point(this.convertToCentralPoint(pol), pol.ExitPoint), point, new Vector(1,1), MovementType.GROUND, pol.ExitPoint.vectorToDirection());
+                pol.Path = this.getComplexPath(this.getExitPoint(pol), point, new Vector(1,1), MovementType.GROUND, pol.ExitPoint.vectorToDirection());
                 this.actionsDone.Add(new Buffers.BufferCancelActionEvent());
                 this.actionsDone.Add(new Buffers.BufferSetPathActionEvent(((PoliceStation)selected).Path, this.findConstructionSpot(pol, pol.getConstruct()).Entry.toVector2f()));
                 selected = null;

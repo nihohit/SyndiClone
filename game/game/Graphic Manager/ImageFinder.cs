@@ -167,7 +167,8 @@ namespace Game.Graphic_Manager
                         break;
                 }
             }
-            //img.CreateMaskFromColor(Color.White);
+            //TODO - img.CreateMaskFromColor(Color.White); or use gImage.getPixels to make this faster
+            byte[] pixels = img.Pixels;
             for (uint i = 0; i < img.Size.X; i++)
             {
                 for (uint j = 0; j < img.Size.Y; j++)

@@ -23,7 +23,22 @@ namespace Game.Logic
     internal enum ShotType { SIGHT, PISTOL_BULLET }
     internal enum Direction { LEFT, RIGHT, UP, DOWN, UPLEFT, UPRIGHT, DOWNLEFT, DOWNRIGHT }
     internal enum Corporations { BIOTECH, STEALTH, ARMS, VEHICLES, VISION }
-    internal enum Upgrades { BULLETPROOF_VEST, VISIBILITY_SOLID, BUILDING_BLIND, FLYER, HOVER, CRUSHER } 
+    internal enum Upgrades { BULLETPROOF_VEST, VISIBILITY_SOLID, BUILDING_BLIND, FLYER, HOVER, CRUSHER }
+
+    internal class TerrainGrid
+    {
+        private readonly TerrainType[,] grid;
+
+        public TerrainGrid(int x, int y)
+        {
+            this.grid = new TerrainType[x, y];
+        }
+
+        internal Logic.TerrainType[,] Grid
+        {
+            get { return grid; }
+        } 
+    }
 
     internal struct Reaction{
 

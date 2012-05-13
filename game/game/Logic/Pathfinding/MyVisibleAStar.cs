@@ -134,7 +134,7 @@ namespace Game.Logic.Pathfinding
             if (points.ContainsKey(temp))
             {
                 newNode = points[temp];
-                if (!newNode.Open) return;
+                if (newNode == null) return;
                 if (costToMove < newNode.G)
                 {
                     newNode.Parent = current;
@@ -175,7 +175,7 @@ namespace Game.Logic.Pathfinding
 
         private static void closeNode(AstarNode newNode)
         {
-            newNode.Open = false;
+            points[newNode.Point] = null;
             Sprite update = new Sprite(images["red"]);
             update.Position = new SFML.Window.Vector2f(newNode.Point.X, newNode.Point.Y);
             sprites.Add(update);

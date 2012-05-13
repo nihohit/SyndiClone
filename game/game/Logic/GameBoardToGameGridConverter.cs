@@ -48,9 +48,13 @@ namespace Game.Logic
                 Area area = convertToArea(origin);
                 grid.addEntity(result, area);
             }
-            grid.initialiseMovementMap();
+
+            grid.initialiseTerrainGrid();
             grid.initialiseExitPoints();
             //TODO - insert police/other buildings
+
+            //TODO - only if I use tiered astar at the end product;
+            Pathfinding.AdvancedAstar.setup(TILE_SIZE_CONVERSION);
             return grid;
         }
 

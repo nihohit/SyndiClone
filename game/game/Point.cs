@@ -79,4 +79,26 @@ namespace Game
             return this._xLoc.GetHashCode() + this._yLoc.GetHashCode();
         }
     }
+
+    public struct SmallPoint
+    {
+
+        private readonly ushort _xLoc, _yLoc;
+
+        public SmallPoint(ushort x, ushort y)
+        {
+            this._xLoc = x;
+            this._yLoc = y;
+        }
+
+        public ushort Y
+        {
+            get { return _yLoc; }
+        }
+
+        public ushort X
+        {
+            get { return _xLoc; }
+        }
+    }
 }

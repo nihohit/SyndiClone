@@ -248,7 +248,7 @@ namespace Game.Screen_Manager
             if (e.Button == Mouse.Button.Left) {
                 Vector2f temp = mainWindow.ConvertCoords(new Vector2i(e.X, e.Y));
                 Vector result = new Vector(Convert.ToInt16(temp.X), Convert.ToInt16(temp.Y));
-                Console.Out.WriteLine("clicked on " + result.X + " , " + result.Y);
+                //Console.Out.WriteLine("clicked on " + result.X + " , " + result.Y);
                 input.enterEvent(new BufferMouseSelectEvent(result)); 
                 return; }
             if (e.Button == Mouse.Button.Right) { input.enterEvent(new BufferCancelActionEvent()); }
