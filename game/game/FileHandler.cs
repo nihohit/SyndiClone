@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Game
 {
-    enum FileAccessor {GENERAL, DISPALY, SCREEN}
+    enum FileAccessor {GENERAL, DISPLAY, SCREEN}
 
     static class FileHandler
     {
@@ -13,7 +13,7 @@ namespace Game
         static Dictionary<FileAccessor, Dictionary<string, string>> navigator = new Dictionary<FileAccessor, Dictionary<string, string>>
         {
             {FileAccessor.SCREEN, screen}, 
-            {FileAccessor.DISPALY, display},
+            {FileAccessor.DISPLAY, display},
             {FileAccessor.GENERAL, general}
         };
 
@@ -42,7 +42,7 @@ namespace Game
 
         private static void setupDisplay()
         {
-            readFromFile("display", FileAccessor.DISPALY);
+            readFromFile("display", FileAccessor.DISPLAY);
         }
 
         private static void setupGeneral()

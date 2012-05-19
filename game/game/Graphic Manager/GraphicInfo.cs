@@ -8,11 +8,12 @@ namespace Game.Graphic_Manager
 
 
     internal enum DisplayCommand { MOVE_VIEW, ZOOM_VIEW, ADD_ENTITY, MOVE_ENTITY, ADD_SHOT, DESTROY_ENTITY }
-    internal enum DecalType { WRECKAGE, BLOOD, RUBBLE } //TODO - different vehicles wreckage?
-
+    internal enum DecalType { WRECKAGE, BLOOD, RUBBLE } //TODO - different vehicles wreckages for different vehicles?
+    
+    //this struct represents decals - temporary static pictures.
     internal struct Decal
     {
-        const int DECAL_STAY_TIME = 3000;
+        static readonly uint DECAL_STAY_TIME = FileHandler.getUintProperty("decal stay time", FileAccessor.DISPLAY);
         static Dictionary<DecalType, Texture> decals = new Dictionary<DecalType,Texture>
             {
                 //{DecalType.EXPLOSION, 
@@ -21,7 +22,7 @@ namespace Game.Graphic_Manager
             };
 
         private readonly Sprite _sprite;
-        private int _stayTime;
+        private uint _stayTime;
 
         internal Decal(DecalType type)
         {
@@ -46,8 +47,9 @@ namespace Game.Graphic_Manager
         }
     }
 
-    //TODO - a struct?
-    internal class Animation
+    //this struct is in charge of changing Sprites with a limited amount of appearances. Also, supposed not to be connected to an ExternalEntity, but held in a different list. 
+    //TODO - replace with a spriteloop and a timer? 
+    internal struct Animation
     {
         List<Sprite> order;
 
@@ -59,6 +61,7 @@ namespace Game.Graphic_Manager
         internal Animation(Area area, Logic.entityType type)
         {
             // TODO - missing function. The basic idea is to generate an explosion sprite based on size, and whether it's a person, building or vehicle
+            order = null;
         }
 
         internal Sprite getNext()
@@ -80,7 +83,8 @@ namespace Game.Graphic_Manager
         }
     }
 
-    internal class SpriteLoop
+    //this represents a series of Sprites that are repeated one after the other. 
+    internal struct SpriteLoop
     {
         private readonly LoopedList<SFML.Graphics.Sprite> _list;
 
@@ -89,20 +93,20 @@ namespace Game.Graphic_Manager
             this._list = new LoopedList<SFML.Graphics.Sprite>(list);
         }
 
-        internal SFML.Graphics.Sprite Next()
+        internal SFML.Graphics.Sprite nextSprite()
         {
             this._list.next();
-            return this.getSprite();
+            return this.CurrentSprite();
         }
 
-        internal SFML.Graphics.Sprite getSprite()
+        internal SFML.Graphics.Sprite CurrentSprite()
         {
             return this._list.getValue();
         }
 
     }
 
-    internal class LoopedList<T> //TODO - needs testing
+    internal class LoopedList<T> 
     {
         private int currentIndex;
         private readonly List<T> list;
@@ -110,7 +114,7 @@ namespace Game.Graphic_Manager
         internal LoopedList(List<T> _list)
         {
             currentIndex = 0;
-            this.list = _list;
+            this.list = new List<T>(_list);
         }
 
         internal T getValue()

@@ -24,16 +24,22 @@ namespace Game.Logic.Entities
 
         internal ExternalEntity(Entity ent)
         {
-            this._loyalty = ent.Loyalty;
-            this._size = ent.Size;
-            this._type = ent.Type;
-            this._ent = ent;
+            if (ent != null)
+            {
+                this._loyalty = ent.Loyalty;
+                this._size = ent.Size;
+                this._type = ent.Type;
+                this._ent = ent;
+            }
         }
 
         public override bool Equals(object obj)
         {
             if (obj is ExternalEntity)
+            {
+                if (this._ent == null) return (((ExternalEntity)obj).Ent == null);
                 return (this.Ent.Equals(((ExternalEntity)obj).Ent));
+            }
             else return false;
         }
 

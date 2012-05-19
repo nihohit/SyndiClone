@@ -6,22 +6,31 @@ using Game.Buffers;
 
 namespace Game.Graphic_Manager
 {
+    //This class is in charge of displaying an actual game instance. 
     class Game_Screen
     {
+        /*TODO - right now there's a central problem, that some UI elements are handled by the manager 
+         * and some by the buffer (basically, what depends on whether they demand knowledge of logic events is handled by the buffer and what 
+         * demands knowledge of screen events is handled by the manager). 
+         * This should be remedied - maybe move everything to the buffer. 
+
         /************
          * class members
          ***************/
+        private Sprite crosshair = new Sprite(new Texture("images/UI/crosshairs.png"));
+        private HashSet<Sprite> displayedSprites = new HashSet<Sprite>();
+        private HashSet<Sprite> removedSprites = new HashSet<Sprite>();
+        private HashSet<Animation> animations = new HashSet<Animation>();
+        private HashSet<Animation> doneAnimations = new HashSet<Animation>();
+
         private RenderWindow _mainWindow;
         private Game.Buffers.DisplayBuffer _buffer;
-        private InputBuffer input;
-        private HashSet<Sprite> displayedSprites;
-        private HashSet<Sprite> removedSprites;
-        private HashSet<Animation> animations;
-        private HashSet<Animation> doneAnimations;
+        private InputBuffer input; //HACK - is this needed? maybe put that in the display buffer too?
         private Sprite background;
-        private Sprite crosshair;
         private View UIview;
 
+        //DEBUG & PERFORMANCE TOOLS
+        //TODO - remove.
         System.Diagnostics.Stopwatch remove = new System.Diagnostics.Stopwatch();
         System.Diagnostics.Stopwatch displayWatch = new System.Diagnostics.Stopwatch();
         System.Diagnostics.Stopwatch synch = new System.Diagnostics.Stopwatch();
@@ -31,18 +40,14 @@ namespace Game.Graphic_Manager
 
         /************
          * constructor
+         * 
          ***************/
         public Game_Screen(Game.Buffers.DisplayBuffer buffer, Texture _background, RenderWindow window, InputBuffer _input)
         {
             this._buffer = buffer;
             this.input = _input;
             background = new Sprite(_background);
-            displayedSprites = new HashSet<Sprite>();
-            removedSprites = new HashSet<Sprite>();
-            animations = new HashSet<Animation>();
-            doneAnimations = new HashSet<Animation>();
             this._mainWindow = window;
-            this.crosshair = new Sprite(new Texture("images/UI/crosshairs.png"));
             this.crosshair.Origin = new Vector2f(this.crosshair.Texture.Size.X / 2, this.crosshair.Texture.Size.Y / 2);
             this.UIview = new View(new Vector2f(_background.Size.X/2, _background.Size.Y/2), new Vector2f(_background.Size.X, _background.Size.Y));
             this.displayWatch.Start();
@@ -53,74 +58,8 @@ namespace Game.Graphic_Manager
          *************/
 
         /***********
-         * communication
-         ************/
-
-        private void updateInfo()
-        {
-            lock (input)
-            {
-                if (input.GraphicInput)
-                {
-                    List<BufferEvent> list = input.graphicEvents();
-                    foreach (BufferEvent action in list)
-                    {
-                        if (action.type() == BufferType.ENDGAME)
-                            displayStats();
-                    }
-
-                }
-            }
-            this.synch.Start();
-            if (this._buffer.Updated)
-            {
-                lock (this._buffer)
-                {
-                    this._buffer.analyzeData();
-                    this.findSpritesToRemove();
-                    this.findSpritesToDisplay();
-                    this.updateAnimations();
-                    this._buffer.Updated = false;
-                }
-            }
-            this.synch.Stop();
-            this.remove.Start();
-            removeSprites();
-            this.remove.Stop();
-            this.update.Start();
-            enterAnimations();
-            displaySprites();
-            drawUI();
-            this.update.Stop();
-        }
-
-        private void drawUI()
-        {
-            crosshair.Position = _mainWindow.ConvertCoords(Mouse.GetPosition(_mainWindow));
-            this._mainWindow.Draw(crosshair);
-        }
-
-
-
-        private void findSpritesToDisplay()
-        {
-            this.displayedSprites.UnionWith(this._buffer.newSpritesToDisplay());
-        }
-
-        private void findSpritesToRemove()
-        {
-            this.removedSprites.UnionWith(this._buffer.spritesToRemove());
-        }
-
-        private void updateAnimations()
-        {
-            this.animations.UnionWith(this._buffer.getAnimations());
-        }
-
-
-        /***********
-         * main loop
-         ***********/
+          * main loop
+          ***********/
         /*
         public void run()
         {
@@ -143,6 +82,79 @@ namespace Game.Graphic_Manager
             runs++;
         }
 
+        /***********
+         * communication
+         ************/
+
+        //This is the central 
+        private void updateInfo()
+        {
+            handleInputBuffer();
+            handleDisplayBuffer();
+            this.remove.Start();
+            removeSprites();
+            this.remove.Stop();
+            this.update.Start();
+            enterAnimations();
+            displaySprites();
+            drawUI();
+            this.update.Stop();
+        }
+
+        private void handleDisplayBuffer()
+        {
+            this.synch.Start();
+            if (this._buffer.Updated)
+            {
+                lock (this._buffer)
+                {
+                    this._buffer.analyzeData();
+                    this.findSpritesToRemove();
+                    this.findSpritesToDisplay();
+                    this.updateAnimations();
+                    this._buffer.Updated = false;
+                }
+            }
+            this.synch.Stop();
+        }
+
+        private void handleInputBuffer()
+        {
+            lock (input)
+            {
+                if (input.GraphicInput)
+                {
+                    List<BufferEvent> list = input.graphicEvents();
+                    foreach (BufferEvent action in list)
+                    {
+                        if (action.type() == BufferType.ENDGAME)
+                            displayStats();
+                    }
+
+                }
+            }
+        }
+
+        private void drawUI()
+        {
+            crosshair.Position = _mainWindow.ConvertCoords(Mouse.GetPosition(_mainWindow));
+            this._mainWindow.Draw(crosshair);
+        }
+
+        private void findSpritesToDisplay()
+        {
+            this.displayedSprites.UnionWith(this._buffer.newSpritesToDisplay());
+        }
+
+        private void findSpritesToRemove()
+        {
+            this.removedSprites.UnionWith(this._buffer.spritesToRemove());
+        }
+
+        private void updateAnimations()
+        {
+            this.animations.UnionWith(this._buffer.getAnimations());
+        }
 
         /***********
          * info handling
@@ -193,6 +205,8 @@ namespace Game.Graphic_Manager
             _mainWindow.Display();
         }
 
+
+        //TODO - debug, remove
         internal void displayStats()
         {
             this.displayWatch.Stop();

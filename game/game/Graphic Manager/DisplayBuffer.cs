@@ -14,26 +14,28 @@ namespace Game.Buffers
         /******************
         Class consts
         ****************/
+        //TODO - debug, remove
         const int amountOfReapeatingSpritesInAnimation = 1;
-        const int amountOfDecals = 10;
+        readonly uint amountOfDecals = FileHandler.getUintProperty("decal amount", FileAccessor.DISPLAY);
 
         /******************
         Class members
         ****************/
-        
-        private HashSet<Sprite> displaySprites;
-        private HashSet<Sprite> removedSprites;
-        private List<Decal> decals;
+        private readonly Sprite selection = new Sprite(new Texture("images/UI/selection.png"));
+
+        private HashSet<Sprite> displaySprites = new HashSet<Sprite>();
+        private HashSet<Sprite> removedSprites = new HashSet<Sprite>();
+        private List<Decal> decals = new List<Decal>();
         private List<Decal> doneDecals = new List<Decal>();
-        private HashSet<Game.Graphic_Manager.Animation> newAnimations;
-        private TextureFinder finder;
-        private HashSet<BufferEvent> actions;
-        private List<ExternalEntity> visibleEntities;
-        private bool updated;
+        private HashSet<Game.Graphic_Manager.Animation> newAnimations = new HashSet<Game.Graphic_Manager.Animation>();
+        private TextureFinder finder = new SpriteFinder();
+        private HashSet<BufferEvent> actions = new HashSet<BufferEvent>();
+        private List<ExternalEntity> visibleEntities = new List<ExternalEntity>();
+        private bool updated = false;
         private bool selected = false;
         private bool deselected = false;
-        private readonly Sprite selection = new Sprite(new Texture("images/UI/selection.png"));
-        private ExternalEntity selectedEntity;
+        
+        private ExternalEntity selectedEntity; //For UI purposes
 
         /******************
         Constructors
@@ -42,23 +44,75 @@ namespace Game.Buffers
         public DisplayBuffer()
         {
             selection.Origin = new Vector2f(selection.Texture.Size.X/2, selection.Texture.Size.Y/2);
-            this.removedSprites = new HashSet<Sprite>();
-            this.displaySprites = new HashSet<Sprite>();
-            this.decals = new List<Decal>();
-            this.newAnimations = new HashSet<Game.Graphic_Manager.Animation>();
-            this.finder = new SpriteFinder();
-            this.actions = new HashSet<BufferEvent>();
-            this.visibleEntities = new List<ExternalEntity>();
-            this.updated = false;
         }
 
         /******************
         Methods
         ****************/
 
+        /************
+         * output methods
+         ************/
+
+        internal void analyzeData()
+        {
+            clearInfo();
+            analyzeEntities();
+            analyzeActions();
+            displayDecals();
+            UIDisplay();
+            removeSprites();
+        }
+
+        internal HashSet<Sprite> newSpritesToDisplay()
+        {
+            return displaySprites;
+        }
+
+        internal HashSet<Sprite> spritesToRemove()
+        {
+            return this.removedSprites;
+        }
+
+        internal IEnumerable<Animation> getAnimations()
+        {
+            return newAnimations;
+        }
+
+        internal void clearInfo()
+        {
+            newAnimations.Clear();
+            this.removedSprites.Clear();
+            this.displaySprites.Clear();
+        }
+
+        public bool Updated
+        {
+            get { return updated; }
+            set { updated = value; }
+        }
+
+        /************
+         * input methods
+         ************/
+
+        internal void receiveVisibleEntities(List<ExternalEntity> visibleExternalEntityList)
+        {
+            this.visibleEntities = visibleExternalEntityList;
+        }
+
+        internal void receiveActions(List<BufferEvent> _actions)
+        {
+            this.actions.UnionWith(_actions);
+        }
+
         /**********
          * internal methods
          *********/
+
+        /*
+         * This function is a repeat of the Berensham's line algorithm, this time painting a straight line. 
+         */
         private Animation createNewShot(ShotType shot, Point exit, Point target)
         {
             List<Sprite> ans = new List<Sprite>();
@@ -96,68 +150,6 @@ namespace Game.Buffers
                 }
             }
             return new Animation(ans);
-        }
-
-        public bool Updated
-        {
-            get { return updated; }
-            set { updated = value; }
-        }
-
-        /************
-         * input methods
-         ************/
-
-        internal void receiveActions(List<BufferEvent> _actions)
-        {
-            this.actions.UnionWith(_actions);
-        }
-
-        private void addDecal(Decal decal)
-        {
-            this.decals.Add(decal);
-            if (decals.Count > amountOfDecals)
-            {
-                Decal removed = decals[0];
-                decals.Remove(removed);
-                this.removedSprites.Add(removed.getDecal());
-            }
-        }
-
-        internal void receiveVisibleEntities(List<ExternalEntity> visibleExternalEntityList)
-        {
-            this.visibleEntities = visibleExternalEntityList;
-        }
-
-        private void displayDecals()
-        {
-            foreach (Decal decal in decals)
-            {
-                if (decal.isDone())
-                {
-                    doneDecals.Add(decal);
-                    this.removedSprites.Add(decal.getDecal());
-                }
-                else
-                    this.displaySprites.Add(decal.getDecal());
-            }
-            foreach (Decal decal in doneDecals)
-                decals.Remove(decal);
-            doneDecals.Clear();
-        }
-
-        /************
-         * output methods
-         ************/
-
-        internal void analyzeData()
-        {
-            clearInfo();
-            analyzeEntities();
-            analyzeActions();
-            displayDecals();
-            UIDisplay();
-            removeSprites();
         }
 
         private void removeSprites()
@@ -216,12 +208,44 @@ namespace Game.Buffers
                         break;
 
                     case BufferType.SETPATH:
-                        finder.removePath(((BufferSetPathActionEvent)action).Ent);
+                        Sprite toRemove = finder.removePath(((BufferSetPathActionEvent)action).Ent);
+                        if (toRemove != null)
+                        {
+                            this.removedSprites.Add(toRemove);
+                        }
                         finder.setPath(((BufferSetPathActionEvent)action).Ent, ((BufferSetPathActionEvent)action).Path, ((BufferSetPathActionEvent)action).Position);
                         break;
                 }
             }
             actions.Clear();
+        }
+
+        private void addDecal(Decal decal)
+        {
+            this.decals.Add(decal);
+            if (decals.Count > amountOfDecals)
+            {
+                Decal removed = decals[0];
+                decals.Remove(removed);
+                this.removedSprites.Add(removed.getDecal());
+            }
+        }
+
+        private void displayDecals()
+        {
+            foreach (Decal decal in decals)
+            {
+                if (decal.isDone())
+                {
+                    doneDecals.Add(decal);
+                    this.removedSprites.Add(decal.getDecal());
+                }
+                else
+                    this.displaySprites.Add(decal.getDecal());
+            }
+            foreach (Decal decal in doneDecals)
+                decals.Remove(decal);
+            doneDecals.Clear();
         }
 
         private void UIDisplay()
@@ -235,7 +259,16 @@ namespace Game.Buffers
             if (this.deselected)
             {
                 this.removedSprites.Add(this.selection);
+                this.removeAdditionalInfo(selectedEntity);
                 this.deselected = false;
+            }
+        }
+
+        private void removeAdditionalInfo(ExternalEntity selectedEntity)
+        {
+            if (this.finder.hasPath(selectedEntity))
+            {
+                this.removedSprites.Add(this.finder.getPath(selectedEntity));
             }
         }
 
@@ -258,29 +291,6 @@ namespace Game.Buffers
                 displaySprites.Add(temp);
             }
             visibleEntities.Clear();
-        }
-
-
-        internal HashSet<Sprite> newSpritesToDisplay()
-        {
-            return displaySprites;
-        }
-
-        internal HashSet<Sprite> spritesToRemove()
-        {
-            return this.removedSprites;
-        }
-
-        internal IEnumerable<Animation> getAnimations()
-        {
-            return newAnimations; 
-        }
-
-        internal void clearInfo()
-        {
-            newAnimations.Clear();
-            this.removedSprites.Clear();
-            this.displaySprites.Clear();
         }
 
     }

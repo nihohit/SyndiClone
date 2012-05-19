@@ -112,13 +112,13 @@ namespace Game.Logic.Pathfinding
         }
 
         /// <summary>
-        /// Notify the PQ that the object at position i has changed
+        /// Notify the PQ that the object at position x has changed
         /// and the PQ needs to restore order.
         /// Since you dont have access to any indexes (except by using the
         /// explicit IList.this) you should not call this function without knowing exactly
         /// what you do.
         /// </summary>
-        /// <param name="i">The index of the changed object.</param>
+        /// <param name="x">The index of the changed object.</param>
         public void Update(int i)
         {
             int p = i, pn;

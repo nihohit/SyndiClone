@@ -10,7 +10,8 @@ namespace Game.Graphic_Manager
     //Just some random stuff for the class
     enum BuildingStyle { BLUE, RED, GREEN, YELLOW }
 
-    //this 
+    //this converts a Vector to smaller sized vectors, based on a set tile size. 
+    //Didn't use vector, in order to make sure this is used only in this palce.
     internal struct Block
     {
         static readonly uint TILE_SIZE = FileHandler.getUintProperty("tile size", FileAccessor.GENERAL);
@@ -42,9 +43,17 @@ namespace Game.Graphic_Manager
     //this class creates the building images
     internal static class BuildingImageGenerator
     {
+        enum BuildingParts {EDGE, CORNER, CENTER}
+
         static readonly uint TILE_SIZE = FileHandler.getUintProperty("tile size", FileAccessor.GENERAL);
         private static Dictionary<ExternalEntity, Texture> buildings = new Dictionary<ExternalEntity, Texture>(new externalEntityEqualityComparer());
         private static Dictionary<Tuple<Block, BuildingStyle>, Texture> templates = new Dictionary<Tuple<Block, BuildingStyle>, Texture>(new tupleEqualityComparer());
+        private static Dictionary<BuildingParts, Texture> parts = new Dictionary<BuildingParts, Texture>
+        {
+            {BuildingParts.CENTER, new Texture("images/buildings/0_buildingmiddle.gif")},
+            {BuildingParts.CORNER, new Texture("images/buildings/9_corner.gif")},
+            {BuildingParts.EDGE, new Texture("images/buildings/9_edge.gif")}
+        };
 
         //checks if the image exists, if not, then if an equivalent image exist, and if not, creates a new image. 
         private static Texture GetBuildingImage(ExternalEntity building)
@@ -65,8 +74,8 @@ namespace Game.Graphic_Manager
             return image;
         }
 
-        //generate 
-        private static Image generateBuildingImage(Tuple<Block, BuildingStyle> temp)
+        //generate a building image from a block
+        private static Texture generateBuildingImage(Tuple<Block, BuildingStyle> temp)
         {
             //TODO - if too heavy for realtime computing, try instead of generating an image, generating a rendertexture.
             uint depth = Convert.ToUInt16(temp.Item1.X);
@@ -89,119 +98,107 @@ namespace Game.Graphic_Manager
                     break;
             }
 
-            Image img = new Image(TILE_SIZE * depth, TILE_SIZE * height, basic);
-            List<Image> Images = new List<Image>();
+            RenderTexture img = new RenderTexture(TILE_SIZE * depth, TILE_SIZE * height);
+            img.Draw(new Sprite(new Texture(new Image(TILE_SIZE * depth, TILE_SIZE * height, basic))));
+            List<Sprite> sprites = new List<Sprite>();
             for (int i = 1; i <= depth; i++)
             {
                 for (int j = 1; j <= height; j++)
                 {
-                    Images.Add(getBuildingTile(depth, height, i, j, style));
+                    sprites.Add(getBuildingTile(depth, height, i, j, style));
                 }
             }
 
-            uint depthOffset = 0;
-            uint heightOffset = 0;
-            int num = 1;
-
-            foreach (Image Image in Images)
+            uint depthOffset = TILE_SIZE/2;
+            uint heightOffset = TILE_SIZE / 2;
+            //this copies all the smaller images into the larger one.
+            foreach (Sprite sprite in sprites)
             {
-                img.Copy(Image, depthOffset, heightOffset);
-                num++;
+                if (sprite != null)
+                {
+                    sprite.Position = new SFML.Window.Vector2f(depthOffset, heightOffset);
+                    img.Draw(sprite);
+                }
 
                 heightOffset += TILE_SIZE;
-                if (heightOffset == img.Size.Y)
+                if (heightOffset > img.Size.Y)
                 {
                     depthOffset += TILE_SIZE;
-                    heightOffset = 0;
+                    heightOffset = TILE_SIZE / 2;
                 }
             }
 
-            //this replaces the invisible part of the building with the basic color
-            //TODO - see if I can overcome this. 
-            for(uint x = 0 ; x < img.Size.X ; x++)
-            {
-                for (uint y = 0; y < img.Size.Y; y++)
-                {
-                    if (img.GetPixel(x, y).A < 255)
-                        img.SetPixel(x, y, basic);
-                }
-            }
+            img.Display();
             //img.SaveToFile("building_Test.jpg");
-            return img;
+            return new Texture(img.Texture);
         }
 
 
-        private static Image getBuildingTile(uint length, uint depth, int i, int j, BuildingStyle style)
+        private static Sprite getBuildingTile(uint length, uint depth, int x, int y, BuildingStyle style)
         {
             //TODO - account for style
-            Image img = null;
+            Sprite img = null;
             int id = 0;
-            if (i == 1)
+            if (x == 1)
             {
                 id += 1;
             }
-            if (i == length)
+            if (x == length)
             {
                 id += 9;
             }
-            if (j == 1)
+            if (y == 1)
             {
                 id += 10;
             }
-            if (j == depth)
+            if (y == depth)
             {
                 id += 90;
             }
-            //TODO - put all the parts in a dictionary, so we won't need to reload them into new images. 
             switch (id)
             {
                 case (0):
-                    img = new Image("images/buildings/0_buildingmiddle.gif");
+                    img = new Sprite(parts[BuildingParts.CENTER]);
                     break;
                 case (1):
-                    img = new Image("images/buildings/9_edge.gif");
-                    //img.RotateFlip(RotateFlipType.Rotate180FlipNone);
-                    img = rotate180(img);
+                    img = new Sprite(parts[BuildingParts.EDGE]);
+                    img.Rotation = 180f;
                     break;
                 case (9):
-                    img = new Image("images/buildings/9_edge.gif");
+                    img = new Sprite(parts[BuildingParts.EDGE]);
                     break;
                 case (10):
-                    img = new Image("images/buildings/9_edge.gif");
-                    //img.RotateFlip(RotateFlipType.Rotate270FlipNone);
-                    img = rotate270(img);
+                    img = new Sprite(parts[BuildingParts.EDGE]);
+                    img.Rotation = 270f;;
                     break;
                 case (90):
-                    img = new Image("images/buildings/9_edge.gif");
-                    //img.RotateFlip(RotateFlipType.Rotate90FlipNone);
-                    img = rotate90(img);
+                    img = new Sprite(parts[BuildingParts.EDGE]);
+                    img.Rotation = 90f;
                     break;
                 case (11):
-                    img = new Image("images/buildings/9_corner.gif");
-                    //img.RotateFlip(RotateFlipType.RotateNoneFlipX);
-                    img.FlipHorizontally();
+                    img = new Sprite(parts[BuildingParts.CORNER]);
+                    img.Rotation = 270f;
                     break;
                 case (91):
-                    img = new Image("images/buildings/9_corner.gif");
-                    //img.RotateFlip(RotateFlipType.Rotate90FlipX);
-                    img = rotate90(img);
-                    img.FlipHorizontally();
+                    img = new Sprite(parts[BuildingParts.CORNER]);
+                    img.Rotation = 180f;
                     break;
                 case (19):
-                    img = new Image("images/buildings/9_corner.gif");
+                    img = new Sprite(parts[BuildingParts.CORNER]);
                     break;
                 case (99):
-                    img = new Image("images/buildings/9_corner.gif");
-                    //img.RotateFlip(RotateFlipType.Rotate90FlipNone);
-                    img = rotate90(img);
+                    img = new Sprite(parts[BuildingParts.CORNER]);
+                    img.Rotation = 90f;
                     break;
                 default:
                     break;
             }
+            if (img != null) img.Origin = new SFML.Window.Vector2f(img.Texture.Size.X / 2, img.Texture.Size.Y / 2);
+            else throw new NullReferenceException();
             return img;
         }
 
-        private static BuildingStyle generateStyle(Game.Logic.Affiliation aff)
+        private static BuildingStyle generateStyle(Logic.Affiliation aff)
         {
             //TODO - missing function
             int num = (int)aff;
@@ -212,51 +209,6 @@ namespace Game.Graphic_Manager
         {
             Texture temp = GetBuildingImage(building);
             return temp;
-        }
-
-        private static Image rotate270(Image temp)
-        {
-            uint maxY = temp.Size.Y;
-            uint maxX = temp.Size.X;
-            Image val = new Image(maxY, maxX);
-            for (uint x = 0; x < maxX; x++)
-            {
-                for (uint y = 0; y < maxY; y++)
-                {
-                    val.SetPixel(y, maxX-1-x, temp.GetPixel(x, y));
-                }
-            }
-            return val;
-        }
-
-        private static Image rotate90(Image temp)
-        {
-            uint maxY = temp.Size.Y;
-            uint maxX = temp.Size.X;
-            Image val = new Image(maxY, maxX);
-            for (uint x = 0; x < maxX; x++)
-            {
-                for (uint y = 0; y < maxY; y++)
-                {
-                    val.SetPixel(maxY-1-y, x, temp.GetPixel(x, y));
-                }
-            }
-            return val;
-        }
-
-        private static Image rotate180(Image temp)
-        {
-            uint maxY = temp.Size.Y;
-            uint maxX = temp.Size.X;
-            Image val = new Image(maxX, maxY);
-            for (uint x = 0; x < maxX; x++)
-            {
-                for (uint y = 0; y < maxY; y++)
-                {
-                    val.SetPixel(maxX-1-x, maxY-1-y, temp.GetPixel(x, y));
-                }
-            }
-            return val;
         }
     }
 

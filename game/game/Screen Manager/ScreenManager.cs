@@ -90,14 +90,13 @@ namespace Game.Screen_Manager
             backgroundY = background.Size.Y;
             inGame = true;
             activeGame = true;
-            Game.Logic.Pathfinding.MyVisibleAStar.setup(mainWindow);
             return logic;
         }
 
         public static void run()
         {
             initialise();
-            startNewGame(40, 30, 200);
+            startNewGame(32, 32, 200);
             while(active)
             {
                 loop();

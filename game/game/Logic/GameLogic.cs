@@ -235,6 +235,9 @@ namespace Game.Logic
                             case BufferType.SELECT:
                                 this._grid.select(((BufferMouseSelectEvent)action).Coords.toPoint());
                                 break;
+                            case BufferType.DESELECT:
+                                this._grid.deselect();
+                                break;
                         }
                     }
                 }

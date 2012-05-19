@@ -56,20 +56,120 @@
     <Folder Include="Audio Manager\" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Buffers\Buffer.cs" />
-    <Compile Include="Buffers\BuffersInfo.cs" />
+    <Compile Include="Buffers\Buffer.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Buffers\BuffersInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Buffers\SoundBuffer.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="FileHandler.cs" />
-    <Compile Include="Graphic Manager\BuildingImageGenerator.cs" />
-    <Compile Include="Logic\Pathfinding\MyAStar.cs" />
-    <Compile Include="Logic\Pathfinding\MyTwoTieredAstar.cs" />
-    <Compile Include="Logic\Pathfinding\MyVisibleAStar.cs" />
-    <Compile Include="Logic\Pathfinding\PathfindingInfo.cs" />
-    <Compile Include="Logic\Pathfinding\PriorityQueueB.cs" />
-    <Compile Include="Logic\Targeters.cs" />
-    <Compile Include="Screen Manager\InputBuffer.cs" />
-    <Compile Include="Screen Manager\ScreenManager.cs" />
+    <Compile Include="Graphic Manager\BuildingImageGenerator.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Graphic Manager\DisplayBuffer.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Graphic Manager\DisplayManager.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Graphic Manager\GraphicInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Graphic Manager\ImageFinder.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Logic\Entities\Agent.cs" />
+    <Compile Include="Logic\Entities\BlastEffect.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Logic\Entities\Building.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Logic\Entities\Civilian.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Logic\Entities\CivilianBuilding.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Logic\Entities\Constructor.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Logic\Entities\Cop.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Logic\Entities\Entity.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Logic\Entities\ExternalEntity.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Logic\Entities\MovingEntity.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Logic\Entities\Person.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Logic\Entities\PoliceStation.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Logic\Entities\Shooter.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Logic\Entities\Shot.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Logic\Entities\Sight.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Logic\Entities\Vehicle.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Logic\Entities\Weapon.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Logic\GameBoardToGameGridConverter.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Logic\GameLogic.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Logic\Grid.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Logic\LogicInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Logic\Pathfinding\MyAStar.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Logic\Pathfinding\MyTwoTieredAstar.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Logic\Pathfinding\MyVisibleAStar.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Logic\Pathfinding\PathfindingInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Logic\Pathfinding\PriorityQueueB.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Logic\Targeters.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Point.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Screen Manager\InputBuffer.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Screen Manager\ScreenManager.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="testInput.cs" />
-    <Compile Include="Graphic Manager\ImageFinder.cs" />
     <Compile Include="City Generator\Block.cs" />
     <Compile Include="City Generator\Building.cs" />
     <Compile Include="City Generator\BuildingTile.cs" />
@@ -80,32 +180,6 @@
     <Compile Include="City Generator\GameBoard.cs" />
     <Compile Include="City Generator\RoadTile.cs" />
     <Compile Include="City Generator\Tile.cs" />
-    <Compile Include="Graphic Manager\DisplayBuffer.cs" />
-    <Compile Include="Graphic Manager\DisplayManager.cs" />
-    <Compile Include="Graphic Manager\GraphicInfo.cs" />
-    <Compile Include="Logic\Entities\Agent.cs" />
-    <Compile Include="Logic\Entities\BlastEffect.cs" />
-    <Compile Include="Logic\Entities\Building.cs" />
-    <Compile Include="Logic\Entities\Civilian.cs" />
-    <Compile Include="Logic\Entities\CivilianBuilding.cs" />
-    <Compile Include="Logic\Entities\Cop.cs" />
-    <Compile Include="Logic\Entities\ExternalEntity.cs" />
-    <Compile Include="Logic\Entities\Constructor.cs" />
-    <Compile Include="Logic\Entities\Person.cs" />
-    <Compile Include="Logic\Entities\PoliceStation.cs" />
-    <Compile Include="Logic\Entities\Shot.cs" />
-    <Compile Include="Logic\Entities\Vehicle.cs" />
-    <Compile Include="Logic\GameBoardToGameGridConverter.cs" />
-    <Compile Include="Logic\Grid.cs" />
-    <Compile Include="Logic\LogicInfo.cs" />
-    <Compile Include="Logic\Entities\MovingEntity.cs" />
-    <Compile Include="Logic\Entities\Entity.cs" />
-    <Compile Include="Logic\GameLogic.cs" />
-    <Compile Include="Logic\Entities\Shooter.cs" />
-    <Compile Include="Logic\Entities\Sight.cs" />
-    <Compile Include="Logic\Entities\Weapon.cs" />
-    <Compile Include="Point.cs" />
-    <Compile Include="Buffers\SoundBuffer.cs" />
     <Compile Include="Vector.cs" />
   </ItemGroup>
   <ItemGroup>

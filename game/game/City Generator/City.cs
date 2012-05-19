@@ -52,7 +52,7 @@ namespace Game.City_Generator
             /********************************Constructor***************************************/
             internal BuildingPlacer() {
                 _hPlaces = new double[ARR_SIZE];
-                _vPlaces = new double[ARR_SIZE];// these two arrays hold the probability to get an i length wall.
+                _vPlaces = new double[ARR_SIZE];// these two arrays hold the probability to get an x length wall.
 
                 //initialize the arrays.
                 _vPlaces[0] = _vPlaces[1] = _hPlaces[0] = _hPlaces[1] = 0;
@@ -100,20 +100,20 @@ namespace Game.City_Generator
                 int retVal;
                 max = Math.Min(max, ARR_SIZE - 1);
 
-                //double step = DECREASE_FACTOR / (ARR_SIZE - 3);//"-3" is meant to represent the fact that I'm not increasing the size of places 0,1 and i;
+                //double step = DECREASE_FACTOR / (ARR_SIZE - 3);//"-3" is meant to represent the fact that I'm not increasing the size of places 0,1 and x;
                 //double total = 0;
                 double rand = _rand.NextDouble() * _vPlaces[Math.Min(max, ARR_SIZE - 1)]; 
                 for (retVal = 2; ((rand > _vPlaces[retVal])&&(retVal<=max)); ++retVal) ; //make sure that retVal is not higher than max (in case of non-positive probabilities)
-               /* for (int j = 2; j < ARR_SIZE; ++j)
+               /* for (int y = 2; y < ARR_SIZE; ++y)
                 {
-                    if (j == retVal)
+                    if (y == retVal)
                     {
                         total -= (DECREASE_FACTOR + step);
                         //MessageBox.Show("total = " + total+" STEP="+step);
                     }
                     total += step;
-                    _vPlaces[j] += total;
-                    if (_vPlaces[j] < 0) _vPlaces[j] = 0;
+                    _vPlaces[y] += total;
+                    if (_vPlaces[y] < 0) _vPlaces[y] = 0;
                     
                 }*/
                 //TODO: decide if the code above is useful or not.
@@ -127,21 +127,21 @@ namespace Game.City_Generator
                  //   Console.Out.WriteLine("H: Overshot. max is:" + max + " and the array is just:" + ARR_SIZE);//TODO - remove (debug)
 
                 int retVal;
-                //double step = DECREASE_FACTOR / (ARR_SIZE - 3);//"-3" is meant to represent the fact that I'm not increasing the size of places 0,1 and i;
+                //double step = DECREASE_FACTOR / (ARR_SIZE - 3);//"-3" is meant to represent the fact that I'm not increasing the size of places 0,1 and x;
                 //double total = 0;
                 max = Math.Min(max, ARR_SIZE - 1);
                 double rand = _rand.NextDouble() * _hPlaces[max];
                 for (retVal = 2; (rand > _hPlaces[retVal])&&(retVal<=max); ++retVal) ;
-                /*for (int j = 2; j < ARR_SIZE; ++j)
+                /*for (int y = 2; y < ARR_SIZE; ++y)
                 {
-                    if (j == retVal)
+                    if (y == retVal)
                     {
                         total -= (DECREASE_FACTOR+step);
                         //MessageBox.Show("total = " + total+" STEP="+step);
                     }
                     total += step;
-                    _hPlaces[j] += total;
-                    if (_hPlaces[j] < 0) _hPlaces[j] = 0;
+                    _hPlaces[y] += total;
+                    if (_hPlaces[y] < 0) _hPlaces[y] = 0;
                 }*/
                 //TODO: decide what to do with the code above
                 return retVal;
@@ -302,7 +302,7 @@ namespace Game.City_Generator
                         if ((blockdepth < 0) || (blockLength < 0))
                             Console.Error.WriteLine(startX + " ERROR!!! " + startY); //TODO - remove (debug)
                         else blocks.Add(new Block(depBlockEdge[j],lenBlockEdge[i], blockLength, blockdepth));
-                        // Console.Out.WriteLine(lenBlockEdge[i]+"-"+lenBlockEdge[i+1]+"X"+depBlockEdge[j]+"-"+depBlockEdge[j+1]+" legnthXdep =" +blockLength+"X"+blockdepth);
+                        // Console.Out.WriteLine(lenBlockEdge[x]+"-"+lenBlockEdge[x+1]+"X"+depBlockEdge[y]+"-"+depBlockEdge[y+1]+" legnthXdep =" +blockLength+"X"+blockdepth);
                     }
                 }
             }
@@ -323,7 +323,7 @@ namespace Game.City_Generator
                     if (_grid2[i, j].Type == ContentType.ROAD)
                     {
                         _grid2[i, j].Rotate = 0;
-                        //System.Console.WriteLine("new point: (" + i + "," + j + ")");
+                        //System.Console.WriteLine("new point: (" + x + "," + y + ")");
 
                         current = (RoadTile)_grid2[i, j];
                         //set number of exits from the tile
@@ -368,7 +368,7 @@ namespace Game.City_Generator
                 for (int j = 0; j < _dep; ++j)
                     if (_grid2[i, j].Type == ContentType.EMPTY)
                     {
-                        addBuilding(i, j, id); //j will be bigger in the depth of the new building
+                        addBuilding(i, j, id); //y will be bigger in the depth of the new building
                         id++;
                     }
             //Console.Out.WriteLine("buildings num=" + _buildings.Count);
@@ -576,7 +576,7 @@ namespace Game.City_Generator
                         else
                         {
                             _grid2[b.StartY - 1, i] = new BuildingTile(b);
-                            _grid[b.StartY - 1, i] = '#';//_grid[b.StartY, i];
+                            _grid[b.StartY - 1, i] = '#';//_grid[b.StartY, x];
                         }
                     }
                     b.Length++;

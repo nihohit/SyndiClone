@@ -687,11 +687,16 @@ namespace Game.Logic
                 if ((temp != null) && (temp.Type == entityType.BUILDING)) point = this.getExitPoint((Building)temp); 
                 PoliceStation pol = ((PoliceStation)selected);
                 pol.Path = this.getComplexPath(this.getExitPoint(pol), point, new Vector(1,1), MovementType.GROUND, pol.ExitPoint.vectorToDirection());
-                this.actionsDone.Add(new Buffers.BufferCancelActionEvent());
                 this.actionsDone.Add(new Buffers.BufferSetPathActionEvent(this.entities[pol],((PoliceStation)selected).Path, this.findConstructionSpot(pol, pol.getConstruct()).Entry.toVector2f()));
-                selected = null;
+                
             }
 
+        }
+
+        internal void deselect()
+        {
+            this.actionsDone.Add(new Buffers.BufferCancelActionEvent());
+            selected = null;
         }
     }
 }
