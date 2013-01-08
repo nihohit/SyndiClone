@@ -24,8 +24,7 @@ namespace Game.City_Generator
         private const char ROAD_GENERIC = '*'; // a generic char for a road, not knowing direction or it's adjacent squares.
         private const int MIN_BLOCK_SIZE = 0; // the smaller block that will have sub-roads is of size 7X6
         private const int CORP_DIM = 20; //see "add corporates()" for use, signifies the size of each initial corporate
-        private static readonly Random _rand = new Random();
-
+        static Random staticRandom = new Random();
 
         /********************************members***************************************/
         private char[,] _grid;
@@ -102,7 +101,7 @@ namespace Game.City_Generator
 
                 //double step = DECREASE_FACTOR / (ARR_SIZE - 3);//"-3" is meant to represent the fact that I'm not increasing the size of places 0,1 and x;
                 //double total = 0;
-                double rand = _rand.NextDouble() * _vPlaces[Math.Min(max, ARR_SIZE - 1)]; 
+                double rand = staticRandom.NextDouble() * _vPlaces[Math.Min(max, ARR_SIZE - 1)]; 
                 for (retVal = 2; ((rand > _vPlaces[retVal])&&(retVal<=max)); ++retVal) ; //make sure that retVal is not higher than max (in case of non-positive probabilities)
                /* for (int y = 2; y < ARR_SIZE; ++y)
                 {
@@ -130,7 +129,7 @@ namespace Game.City_Generator
                 //double step = DECREASE_FACTOR / (ARR_SIZE - 3);//"-3" is meant to represent the fact that I'm not increasing the size of places 0,1 and x;
                 //double total = 0;
                 max = Math.Min(max, ARR_SIZE - 1);
-                double rand = _rand.NextDouble() * _hPlaces[max];
+                double rand = staticRandom.NextDouble() * _hPlaces[max];
                 for (retVal = 2; (rand > _hPlaces[retVal])&&(retVal<=max); ++retVal) ;
                 /*for (int y = 2; y < ARR_SIZE; ++y)
                 {
@@ -157,7 +156,6 @@ namespace Game.City_Generator
         /********************************Constructor***************************************/
         public City(int gridL, int gridW)
         {
-            //_rand = new Random();
             _img = null;
             _bp = new BuildingPlacer();
             _len = gridL;
@@ -212,7 +210,6 @@ namespace Game.City_Generator
         {
 
             int lenRoadsNum = 0, depRoadsNum = 0;
-            //Random rand = new Random();
 
             //this gives us the max possible road depth for both vertical(length) and horizontal(depth) roads
             int maxLenRoad = (int)(Math.Log10(length));
@@ -227,13 +224,13 @@ namespace Game.City_Generator
             gap = maxDepRoad * GAP_RATIO;
             for (int i = 0; i < depRoadsNum; ++i)
             {
-                lenRoads.Add(_rand.Next(maxDepRoad, gap - maxDepRoad) + (i * gap));
+                lenRoads.Add(staticRandom.Next(maxDepRoad, gap - maxDepRoad) + (i * gap));
             }
 
             gap = maxLenRoad * GAP_RATIO;
             for (int i = 0; i < lenRoadsNum; ++i)
             {
-                depRoads.Add(_rand.Next(maxLenRoad, gap - maxLenRoad) + (i * gap));
+                depRoads.Add(staticRandom.Next(maxLenRoad, gap - maxLenRoad) + (i * gap));
             }
 
             List<int> lenBlockEdge = new List<int>();
@@ -245,7 +242,7 @@ namespace Game.City_Generator
             {
                 foreach (int i in lenRoads)
                 {
-                    m = _rand.Next(1, maxDepRoad);
+                    m = staticRandom.Next(1, maxDepRoad);
                     lenBlockEdge.Add(i);
                     lenBlockEdge.Add(i + m);
                     for (int j = 0; j < m; ++j)
@@ -266,7 +263,7 @@ namespace Game.City_Generator
             {
                 foreach (int i in depRoads)
                 {
-                    m = _rand.Next(1, maxLenRoad);
+                    m = staticRandom.Next(1, maxLenRoad);
                     depBlockEdge.Add(i);
                     depBlockEdge.Add(i + m);
                     for (int j = 0; j < m; ++j)
@@ -483,9 +480,9 @@ namespace Game.City_Generator
                 foreach (Building b in _buildings)
                 {
                     connected = false;
-                    if (b.StartY + b.Length < _len)
+                    if (b.StartY + b.X < _len)
                     {
-                        if (_grid2[b.StartY + b.Length, b.StartX].Type == ContentType.ROAD)
+                        if (_grid2[b.StartY + b.X, b.StartX].Type == ContentType.ROAD)
                         {
                             //Console.Out.WriteLine("(" + b.StartY + "," + b.StartX + ") ---ROAD Below");
                             //continue;
@@ -515,9 +512,9 @@ namespace Game.City_Generator
                         }
                     }
 
-                    if (b.StartX + b.Depth < _dep)
+                    if (b.StartX + b.Y < _dep)
                     {
-                        if (_grid2[b.StartY, b.StartX + b.Depth].Type == ContentType.ROAD)
+                        if (_grid2[b.StartY, b.StartX + b.Y].Type == ContentType.ROAD)
                         {
                             // Console.Out.WriteLine("(" + b.StartY + "," + b.StartX + ") ---ROAD to Right");
                             //continue;
@@ -528,8 +525,8 @@ namespace Game.City_Generator
                     if (expandToRoad(b)||connected)
                         continue;
                 
-                   for (int i = 0; i < b.Length; ++i)
-                        for (int j = 0; j < b.Depth; ++j)
+                   for (int i = 0; i < b.X; ++i)
+                        for (int j = 0; j < b.Y; ++j)
                         {
                             _grid2[b.StartY + i, b.StartX + j] = new Tile();
                             _grid[b.StartY + i, b.StartX + j] = '/';
@@ -548,20 +545,20 @@ namespace Game.City_Generator
         {
             bool retVal = false;
 
-            if (b.StartX + b.Depth + 1 < _dep)
-                if ((_grid2[b.StartY, b.StartX + b.Depth].Type == ContentType.EMPTY) && (_grid2[b.StartY, b.StartX + b.Depth + 1].Type == ContentType.ROAD))
+            if (b.StartX + b.Y + 1 < _dep)
+                if ((_grid2[b.StartY, b.StartX + b.Y].Type == ContentType.EMPTY) && (_grid2[b.StartY, b.StartX + b.Y + 1].Type == ContentType.ROAD))
                 {
-                    for (int i = b.StartY; i < b.StartY + b.Length; ++i)
+                    for (int i = b.StartY; i < b.StartY + b.X; ++i)
                     {
-                        if (_grid2[i, b.StartX + b.Depth].Type != ContentType.EMPTY)
+                        if (_grid2[i, b.StartX + b.Y].Type != ContentType.EMPTY)
                             Console.Out.WriteLine("trying to overwrite (" + (b.StartY - 1) + "," + i + ")");
                         else
                         {
-                            _grid2[i, b.StartX + b.Depth] = new BuildingTile(b);
-                            _grid[i, b.StartX + b.Depth] = '#';//_grid[b.StartY, b.StartX];
+                            _grid2[i, b.StartX + b.Y] = new BuildingTile(b);
+                            _grid[i, b.StartX + b.Y] = '#';//_grid[b.StartY, b.StartX];
                         }
                     }
-                    b.Depth++;
+                    b.Y++;
                     retVal = true;
                     
                 }
@@ -569,7 +566,7 @@ namespace Game.City_Generator
             if (b.StartY > 1)
                 if ((_grid2[b.StartY - 1, b.StartX].Type == ContentType.EMPTY) && (_grid2[b.StartY - 2, b.StartX].Type == ContentType.ROAD))
                 {
-                    for (int i = b.StartX; i < b.StartX + b.Depth; ++i)
+                    for (int i = b.StartX; i < b.StartX + b.Y; ++i)
                     {
                         if (_grid2[b.StartY - 1, i].Type != ContentType.EMPTY)
                             Console.Out.WriteLine("trying to override (" + (b.StartY - 1) + "," + i + ")");
@@ -579,7 +576,7 @@ namespace Game.City_Generator
                             _grid[b.StartY - 1, i] = '#';//_grid[b.StartY, x];
                         }
                     }
-                    b.Length++;
+                    b.X++;
                     b.StartY--;
                     retVal = true;
                     
@@ -588,7 +585,7 @@ namespace Game.City_Generator
             if (b.StartX > 1)
                 if ((_grid2[b.StartY, b.StartX - 1].Type == ContentType.EMPTY) && (_grid2[b.StartY, b.StartX - 2].Type == ContentType.ROAD))
                 {
-                    for (int i = b.StartY; i < b.StartY + b.Length; ++i)
+                    for (int i = b.StartY; i < b.StartY + b.X; ++i)
                     {
                         if (_grid2[i, b.StartX - 1].Type != ContentType.EMPTY)
                             Console.Out.WriteLine("trying to override (" + (b.StartY - 1) + "," + i + ")");
@@ -598,7 +595,7 @@ namespace Game.City_Generator
                             _grid[i, b.StartX - 1] = '#';// _grid[b.StartY, b.StartX];
                         }
                     }
-                    b.Depth++;
+                    b.Y++;
                     b.StartX--;
                     retVal =  true;
                 
@@ -606,20 +603,20 @@ namespace Game.City_Generator
 
 
 
-            if (b.StartY + b.Length + 1 < _len)
-                if ((_grid2[b.StartY + b.Length, b.StartX].Type == ContentType.EMPTY) && (_grid2[b.StartY + b.Length + 1, b.StartX].Type == ContentType.ROAD))
+            if (b.StartY + b.X + 1 < _len)
+                if ((_grid2[b.StartY + b.X, b.StartX].Type == ContentType.EMPTY) && (_grid2[b.StartY + b.X + 1, b.StartX].Type == ContentType.ROAD))
                 {
-                    for (int i = b.StartX; i < b.StartX + b.Depth; ++i)
+                    for (int i = b.StartX; i < b.StartX + b.Y; ++i)
                     {
-                        if (_grid2[b.StartY + b.Length, i].Type != ContentType.EMPTY)
+                        if (_grid2[b.StartY + b.X, i].Type != ContentType.EMPTY)
                             Console.Out.WriteLine("trying to override (" + (b.StartY - 1) + "," + i + ")");
                         else
                         {
-                            _grid2[b.StartY + b.Length, i] = new BuildingTile(b);
-                            _grid[b.StartY + b.Length, i] = '#';//_grid[b.StartY, b.StartX];
+                            _grid2[b.StartY + b.X, i] = new BuildingTile(b);
+                            _grid[b.StartY + b.X, i] = '#';//_grid[b.StartY, b.StartX];
                         }
                     }
-                    b.Length++;
+                    b.X++;
                     retVal = true;
                    
                 }
@@ -640,11 +637,11 @@ namespace Game.City_Generator
                 if (t.Type == ContentType.BUILDING) {
                     b = ((BuildingTile)t).Building;
                     if (!b.hasCorp()) {
-                        b.joinCorp(_corpList[(b.StartY + (b.Length / 2)) / CORP_DIM, (b.StartX + (b.Depth / 2)) / CORP_DIM]);
+                        b.joinCorp(_corpList[(b.StartY + (b.X / 2)) / CORP_DIM, (b.StartX + (b.Y / 2)) / CORP_DIM]);
                     }
                 }
             for (int i = 0; i < BIG_CORPS; ++i)
-                takeover(_rand.Next(_len / CORP_DIM), _rand.Next(_dep / CORP_DIM));
+                takeover(staticRandom.Next(_len / CORP_DIM), staticRandom.Next(_dep / CORP_DIM));
         }
 
         /**
@@ -658,7 +655,7 @@ namespace Game.City_Generator
                 for (int j = jLoc - 1; j <= jLoc + 1; ++j) {
                     if (j < 0) continue;
                     if (j >= _corpList.GetLength(1)) break;
-                    if (_rand.NextDouble() <TAKEOVER_CHANCE)
+                    if (staticRandom.NextDouble() < TAKEOVER_CHANCE)
                     {
                         _corpList[iLoc, jLoc].takeover(_corpList[i, j]);
                         _corpList[i, j] = _corpList[iLoc, jLoc];

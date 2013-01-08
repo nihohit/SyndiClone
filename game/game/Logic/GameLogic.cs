@@ -12,8 +12,8 @@ namespace Game.Logic
         /******************
         Class members
         ****************/
-        const int FRAMES_PER_SECOND = 120; //determines the amount of repeats the system can have in a second
-        const int MIN_MILLISECONDS_PER_FRAME = 1000 / FRAMES_PER_SECOND;
+        static private readonly uint FRAMES_PER_SECOND = FileHandler.getUintProperty("logic frames per second", FileAccessor.LOGIC); //determines the amount of repeats the system can have in a second
+        private readonly uint MIN_MILLISECONDS_PER_FRAME = 1000 / FRAMES_PER_SECOND;
 
         private List<Entity> activeEntities = new List<Entity>(); //TODO - readonly uniquelist?
         private readonly UniqueList<MovingEntity> movers = new UniqueList<MovingEntity>();
@@ -30,8 +30,9 @@ namespace Game.Logic
         private readonly SoundBuffer soundBuffer;
         private bool active;
         private bool gameRunning;
-        System.Diagnostics.Stopwatch frameTester = new System.Diagnostics.Stopwatch();
+        System.Diagnostics.Stopwatch frameTimer = new System.Diagnostics.Stopwatch();
 
+        //TODO - debug, remove.
         int runs = 0;
         System.Diagnostics.Stopwatch synch = new System.Diagnostics.Stopwatch();
         System.Diagnostics.Stopwatch move = new System.Diagnostics.Stopwatch();
@@ -41,6 +42,7 @@ namespace Game.Logic
         System.Diagnostics.Stopwatch orders = new System.Diagnostics.Stopwatch();
         System.Diagnostics.Stopwatch sight = new System.Diagnostics.Stopwatch();
         System.Diagnostics.Stopwatch totalWatch = new System.Diagnostics.Stopwatch();
+
         /******************
         Constructors
         ****************/
@@ -66,7 +68,7 @@ namespace Game.Logic
             this.active = true;
             this.gameRunning = true;
             this.totalWatch.Start();
-            this.frameTester.Start();
+            this.frameTimer.Start();
         }
 
         /******************
@@ -78,8 +80,6 @@ namespace Game.Logic
          */
         public void loop()
         {
-            
-
             this.synch.Start();
             this.handleInput();
             this.synch.Stop();
@@ -134,11 +134,15 @@ namespace Game.Logic
             runs++;
         }
 
+        /*
+         * This method limits the amount of logic frames per second. 
+         */
         private void frameLimit()
         {
-            while (frameTester.ElapsedMilliseconds < MIN_MILLISECONDS_PER_FRAME) { }
-            this.frameTester.Restart();
+            while (frameTimer.ElapsedMilliseconds < MIN_MILLISECONDS_PER_FRAME) { }
+            this.frameTimer.Restart();
         }
+
 
         private void handleUnitCreation()
         {

@@ -58,9 +58,8 @@ namespace Game.Logic
 
         private static Entities.Building convertToPoliceStation(City_Generator.Building build)
         {
-            Vector realSize = new Vector((short) (build.Depth * TILE_SIZE_CONVERSION), (short) (build.Length * TILE_SIZE_CONVERSION));
-            int sizeModifier = (build.Depth * build.Length);
-            //TODO - why do I need to flip x & y?!
+            Vector realSize = new Vector(build.X * TILE_SIZE_CONVERSION, build.Y * TILE_SIZE_CONVERSION);
+            int sizeModifier = build.Y * build.X;
             return new Game.Logic.Entities.PoliceStation(realSize, sizeModifier, getExitVector(build));
         }
 
@@ -69,9 +68,8 @@ namespace Game.Logic
          */
         public static Game.Logic.Entities.Building convertToCivilianBuilding(Game.City_Generator.Building build)
         {
-            Vector realSize = new Vector((short) (build.Depth * TILE_SIZE_CONVERSION), (short) (build.Length * TILE_SIZE_CONVERSION));
-            int sizeModifier = (build.Depth * build.Length);
-            //TODO - why do I need to flip x & y?!
+            Vector realSize = new Vector(build.X * TILE_SIZE_CONVERSION, build.Y * TILE_SIZE_CONVERSION);
+            int sizeModifier = build.Y * build.X;
             return new Game.Logic.Entities.CivilianBuilding(realSize, sizeModifier, getExitVector(build));
         }
 
@@ -108,7 +106,7 @@ namespace Game.Logic
         {
             return new Area(
                 new Point((short) (build.StartY * TILE_SIZE_CONVERSION), (short) (build.StartX * TILE_SIZE_CONVERSION)), 
-                new Vector((short) (build.Length * TILE_SIZE_CONVERSION), (short) (build.Depth * TILE_SIZE_CONVERSION)));
+                new Vector((short) (build.X * TILE_SIZE_CONVERSION), (short) (build.Y * TILE_SIZE_CONVERSION)));
         }
 
     }

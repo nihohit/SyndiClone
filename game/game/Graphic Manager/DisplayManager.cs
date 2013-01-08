@@ -7,7 +7,7 @@ using Game.Buffers;
 namespace Game.Graphic_Manager
 {
     //This class is in charge of displaying an actual game instance. 
-    class Game_Screen
+    class GameDisplay
     {
         /*TODO - right now there's a central problem, that some UI elements are handled by the manager 
          * and some by the buffer (basically, what depends on whether they demand knowledge of logic events is handled by the buffer and what 
@@ -42,7 +42,7 @@ namespace Game.Graphic_Manager
          * constructor
          * 
          ***************/
-        public Game_Screen(Game.Buffers.DisplayBuffer buffer, Texture _background, RenderWindow window, InputBuffer _input)
+        public GameDisplay(Game.Buffers.DisplayBuffer buffer, Texture _background, RenderWindow window, InputBuffer _input)
         {
             this._buffer = buffer;
             this.input = _input;
@@ -104,16 +104,19 @@ namespace Game.Graphic_Manager
         private void handleDisplayBuffer()
         {
             this.synch.Start();
-            if (this._buffer.Updated)
+
+            lock (this._buffer)
             {
-                lock (this._buffer)
+                if (!this._buffer.Updated)
                 {
-                    this._buffer.analyzeData();
-                    this.findSpritesToRemove();
-                    this.findSpritesToDisplay();
-                    this.updateAnimations();
-                    this._buffer.Updated = false;
+                    //TODO - needs reviewing
+                    System.Threading.Monitor.Wait(this._buffer);
                 }
+                this._buffer.analyzeData();
+                this.findSpritesToRemove();
+                this.findSpritesToDisplay();
+                this.updateAnimations();
+                this._buffer.Updated = false;
             }
             this.synch.Stop();
         }

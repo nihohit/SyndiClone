@@ -3,299 +3,74 @@ using SFML.Window;
 using System;
 using Game.Buffers;
 using System.Threading;
+using Gwen;
 
 namespace Game.Screen_Manager
 {
     static class ScreenManager
     {
+        #region static members
 
-        /**************
-         * class members
-         *************/
-        static private float backgroundX, backgroundY;
-        static private RenderWindow mainWindow;
-        static private Buffers.InputBuffer input;
-        static private Graphic_Manager.Game_Screen gameScreen;
-        static private bool active = false, inGame = false, activeGame = false;
-        static private float xMove, yMove;
-        static private float mouseX, mouseY;
-        static Thread logicThread = null;
-        static int mouseScrollAmount = 0;
+        private static Gwen.Input.SFML s_Input;
+        private static RenderWindow s_window;
+        private static IScreen s_currentScreen;
 
-        /***************
-         * class consts
-         **************/
-        static float AMOUNT_OF_PIXEL_ALLOWED_OFFSCREEN = FileHandler.getFloatProperty("pixels allowed off background", FileAccessor.SCREEN);
-        static uint SCREEN_EDGE_WIDTH_FOR_MOUSE_SCROLLING = FileHandler.getUintProperty("mouse scroll range", FileAccessor.SCREEN);
-        static uint SCREEN_EDGE_MOUSE_SCROLL_RELATION = FileHandler.getUintProperty("mouse scroll relation", FileAccessor.SCREEN);
-        static uint SPEED_OF_MOUSE_SCROLL = FileHandler.getUintProperty("mouse scroll speed", FileAccessor.SCREEN);
-        static uint screenWidth = FileHandler.getUintProperty("screen width", FileAccessor.SCREEN);
-        static uint screenHeight = FileHandler.getUintProperty("screen height", FileAccessor.SCREEN);
-        static uint bits = FileHandler.getUintProperty("bits", FileAccessor.SCREEN);
-        static uint frameRates = FileHandler.getUintProperty("frame rates", FileAccessor.SCREEN);
-        static private float minX = FileHandler.getFloatProperty("minimal view size", FileAccessor.SCREEN), minY, topY, topX; //these represent the bounds on the size of the view
+        #endregion
 
-        public static void initialise()
+        #region properties
+
+        public static IScreen CurrentScreen { get; set;}
+
+        #endregion
+
+        public static void Run()
         {
-            mainWindow = new RenderWindow(new VideoMode(screenWidth, screenHeight, bits), "main display");
-            mainWindow.SetFramerateLimit(frameRates);
-            minY = minX * screenHeight / screenWidth;
-            mainWindow.SetActive(false);
-            mainWindow.Closed += new EventHandler(OnClosed);
-            mainWindow.KeyPressed += new EventHandler<KeyEventArgs>(OnKeyPressed);
-            mainWindow.GainedFocus += new EventHandler(OnGainingFocus);
-            mainWindow.LostFocus += new EventHandler(OnLosingFocus);
-            mainWindow.MouseWheelMoved += new EventHandler<MouseWheelEventArgs>(Zooming);
-            mainWindow.MouseButtonPressed += new EventHandler<MouseButtonEventArgs>(MouseClick);
-            mainWindow.MouseMoved += new EventHandler<MouseMoveEventArgs>(MouseMoved);
-            mainWindow.SetMouseCursorVisible(false);
-            mainWindow.MouseButtonPressed += new EventHandler<MouseButtonEventArgs>(MouseButtonPressed);
-            mainWindow.Resized += new EventHandler<SizeEventArgs>(resizing);
-            active = true;
-        }
+            s_window = new RenderWindow(new VideoMode(600, 400), "main display");
+            Gwen.Renderer.SFML UIrenderer = new Gwen.Renderer.SFML(s_window);
+            Gwen.Skin.TexturedBase skin = new Gwen.Skin.TexturedBase(UIrenderer, "DefaultSkin.png");
+            Gwen.Control.Canvas canvas = new Gwen.Control.Canvas(skin);
+            canvas.SetSize((int)s_window.Size.X, (int)s_window.Size.Y);
+            canvas.MouseInputEnabled = true;
+            s_Input = new Gwen.Input.SFML();
+            s_Input.Initialize(canvas, s_window);
+            
+            // set up SFML input handlers
+            s_window.MouseButtonPressed += WindowMouseButtonPressed;
+            s_window.MouseButtonReleased += WindowMouseButtonReleased;
+            s_window.MouseMoved += WindowMouseMoved;
+            s_window.Closed += WindowClosed;
+            CurrentScreen = MainScreen.Instance;
+            CurrentScreen.GainControl(s_window, canvas);
 
-        //TODO - change to private, internally create the buffers.
-        public static void startNewGame(int mapX, int mapY, int civAmount)
-        {
-            City_Generator.GameBoard city = City_Generator.CityFactory.createCity(mapX, mapY);
-            Buffers.DisplayBuffer disp = new Buffers.DisplayBuffer();
-            input = new Buffers.InputBuffer();
-            Buffers.SoundBuffer sound = new Buffers.SoundBuffer();
-            Logic.GameLogic logic = new Logic.GameLogic(disp, input, sound, city, civAmount);
-            Texture background = city.Img;
-            gameScreen = new Graphic_Manager.Game_Screen(disp, background, mainWindow, input);
-            topX = background.Size.X;
-            topY = background.Size.X * screenHeight / screenWidth;
-            backgroundX = background.Size.X;
-            backgroundY = background.Size.Y;
-            inGame = true;
-            activeGame = true;
-            logicThread = new Thread(new ThreadStart(logic.run));
-            logicThread.Start();
-        }
-
-        //TODO - remove, this is a debug tool
-        public static Logic.GameLogic startNewGameThreadless(int mapX, int mapY, int civAmount)
-        {
-            City_Generator.GameBoard city = City_Generator.CityFactory.createCity(mapX, mapY);
-            Buffers.DisplayBuffer disp = new Buffers.DisplayBuffer();
-            input = new Buffers.InputBuffer();
-            Buffers.SoundBuffer sound = new Buffers.SoundBuffer();
-            Logic.GameLogic logic = new Logic.GameLogic(disp, input, sound, city, civAmount);
-            Texture background = city.Img;
-            gameScreen = new Graphic_Manager.Game_Screen(disp, background, mainWindow, input);
-            topX = background.Size.X;
-            topY = background.Size.X * screenHeight / screenWidth;
-            backgroundX = background.Size.X;
-            backgroundY = background.Size.Y;
-            inGame = true;
-            activeGame = true;
-            return logic;
-        }
-
-        public static void run()
-        {
-            initialise();
-            startNewGame(32, 32, 200);
-            while(active)
+            while (s_window.IsOpen()) // quit if main window is closed
             {
-                loop();
+                CurrentScreen.Loop();
             }
         }
 
-        public static void loop()
+        static void WindowClosed(object sender, System.EventArgs e)
         {
-            mainWindow.DispatchEvents();
-            scrollScreen();
-            if (inGame)
-            {
-                gameScreen.loop();
-            }
+            s_window.Close();
         }
 
-        private static void scrollScreen()
+        #region input handlers
+        // input handlers - just pass mouse data to Gwen
+
+        static void WindowMouseMoved(object sender, MouseMoveEventArgs e)
         {
-            if (mouseScrollAmount < SPEED_OF_MOUSE_SCROLL)
-                mouseScrollAmount++;
-            else
-            {
-                centerNew(xMove, yMove);
-                mouseScrollAmount = 0;
-            }
+            s_Input.ProcessMessage(e);
         }
 
-        internal static bool initialised()
+        static void WindowMouseButtonPressed(object sender, MouseButtonEventArgs e)
         {
-            return active;
+            s_Input.ProcessMessage(new Gwen.Input.SFMLMouseButtonEventArgs(e, true));
         }
 
-        static void OnKeyPressed(object sender, KeyEventArgs e)
+        static void WindowMouseButtonReleased(object sender, MouseButtonEventArgs e)
         {
-            if (e.Code == Keyboard.Key.Left)
-            {
-                centerNew( - 10, 0);
-            }
-
-            if (e.Code == Keyboard.Key.Right)
-            {
-                centerNew(10, 0);
-            }
-
-            if (e.Code == Keyboard.Key.Up)
-            {
-                centerNew(0, - 10);
-                return;
-            }
-
-            if (e.Code == Keyboard.Key.Down)
-            {
-                centerNew(0, 10);
-                return;
-            }
-            if (e.Code == Keyboard.Key.Space && inGame)
-            {
-                lock(input)
-                {
-                    if (activeGame)
-                        input.enterEvent(new PauseEvent());
-                    else
-                        input.enterEvent(new UnPauseEvent());
-                    activeGame = !activeGame;
-                }
-                return;
-            }
-            if (e.Code == Keyboard.Key.Escape)
-            {
-                OnClosed(sender, e);
-                return;
-            }
-            /*
-            if (e.Code == Keyboard.Key.Return)
-            {
-                startNewGame(40, 30, 200);
-                return;
-            }*/
+            s_Input.ProcessMessage(new Gwen.Input.SFMLMouseButtonEventArgs(e, false));
         }
 
-        static void resizing(object sender, SizeEventArgs e)
-        {
-            View temp = mainWindow.GetView();
-            temp.Size = new Vector2f(e.Width, e.Height);
-        }
-
-        static void Zooming(object sender, MouseWheelEventArgs e)
-        {
-            float scale = 1 - (e.Delta / 10F);
-            if (scale != 1)
-            {
-                View currentView = ((RenderWindow)sender).GetView();
-                float newX = currentView.Size.X * scale, newY = currentView.Size.Y * scale;
-                if (((scale > 1) && (newX < topX && newY < topY))
-                    || ((scale < 1) && (newX > minX || newY > minY)))
-                    currentView.Zoom(scale);
-
-                else if (scale > 1) currentView.Size = new Vector2f(topX, topY); else  currentView.Size = new Vector2f(minX, minY);
-                float left = currentView.Center.X - currentView.Size.X / 2;
-                float right = currentView.Center.X + currentView.Size.X / 2;
-                float up = currentView.Center.Y - currentView.Size.Y / 2;
-                float down = currentView.Center.Y + currentView.Size.Y / 2;
-                newX = 0;
-                newY = 0;
-
-                if (right > topX)
-                    newX = right - topX;
-                else
-                    if (left < 0)
-                        newX = left;
-                if (up < 0)
-                    newY = up;
-                else
-                    if (down > topY)
-                        newY = down - topY;
-                currentView.Center = new Vector2f(currentView.Center.X - newX, currentView.Center.Y - newY);
-                //((RenderWindow)sender).SetView(currentView);
-            }
-        }
-
-        static void OnLosingFocus(object sender, EventArgs e)
-        {
-            //input.enterEvent(new PauseEvent());
-            //activeGame = false;
-        }
-
-        /// <summary>
-        /// Function called when the window is closed
-        /// </summary>
-        static void OnClosed(object sender, EventArgs e)
-        {
-            Window window = (Window)sender;
-            window.Close();
-            active = false;
-            input.enterEvent(new EndGameEvent());
-            logicThread.Join();
-        }
-
-        static void OnGainingFocus(object sender, EventArgs e)
-        {
-            input.enterEvent(new UnPauseEvent());
-            activeGame = true;
-        }
-
-        static void MouseClick(object sender, MouseButtonEventArgs e)
-        {
-            if (e.Button == Mouse.Button.Left) {
-                Vector2f temp = mainWindow.ConvertCoords(new Vector2i(e.X, e.Y));
-                Vector result = new Vector(Convert.ToInt16(temp.X), Convert.ToInt16(temp.Y));
-                //Console.Out.WriteLine("clicked on " + result.X + " , " + result.Y);
-                input.enterEvent(new BufferMouseSelectEvent(result)); 
-                return; }
-            if (e.Button == Mouse.Button.Right) { input.enterEvent(new BufferCancelActionEvent()); }
-        }
-
-        static void MouseMoved(object sender, MouseMoveEventArgs e)
-        {
-            mouseX = e.X;
-            mouseY = e.Y;
-            float x = mainWindow.Size.X;
-            float y = mainWindow.Size.Y;
-            xMove = 0;
-            yMove = 0;
-            //System.Console.Out.WriteLine("x,y, and size: " + e.X + " " + e.Y + "  " + x + " " + y );
-            if (mouseX < SCREEN_EDGE_WIDTH_FOR_MOUSE_SCROLLING)
-            {
-                xMove = -(SCREEN_EDGE_WIDTH_FOR_MOUSE_SCROLLING-mouseX) / SCREEN_EDGE_MOUSE_SCROLL_RELATION;
-            }
-            if (x - mouseX < SCREEN_EDGE_WIDTH_FOR_MOUSE_SCROLLING)
-            {
-                xMove = (SCREEN_EDGE_WIDTH_FOR_MOUSE_SCROLLING -(x - mouseX)) / SCREEN_EDGE_MOUSE_SCROLL_RELATION;
-            }
-            if (mouseY < SCREEN_EDGE_WIDTH_FOR_MOUSE_SCROLLING)
-            {
-                yMove = -(SCREEN_EDGE_WIDTH_FOR_MOUSE_SCROLLING - mouseY) / SCREEN_EDGE_MOUSE_SCROLL_RELATION;
-            }
-            if (mouseY > y - SCREEN_EDGE_WIDTH_FOR_MOUSE_SCROLLING)
-            {
-                yMove = (SCREEN_EDGE_WIDTH_FOR_MOUSE_SCROLLING -(y - mouseY)) / SCREEN_EDGE_MOUSE_SCROLL_RELATION;
-            }
-            //if(input != null)
-                //input.enterEvent(new BufferMouseMoveEvent(mainWindow.ConvertCoords(new Vector2i(Convert.ToInt16(mouseX), Convert.ToInt16(mouseY)))));
-        }
-
-        static void centerNew(float x, float y)
-        {
-            View currentView = mainWindow.GetView();
-            float halfX = (currentView.Size.X / 2);
-            float halfY = (currentView.Size.Y / 2);
-            y = Math.Min(currentView.Center.Y+y, backgroundY - halfY + AMOUNT_OF_PIXEL_ALLOWED_OFFSCREEN);
-            y = Math.Max(y, halfY - AMOUNT_OF_PIXEL_ALLOWED_OFFSCREEN);
-            x = Math.Min(currentView.Center.X+x, backgroundX - halfX + AMOUNT_OF_PIXEL_ALLOWED_OFFSCREEN);
-            x = Math.Max(x, halfX - AMOUNT_OF_PIXEL_ALLOWED_OFFSCREEN);
-            currentView.Center = new Vector2f(x,y);
-            mainWindow.SetView(currentView);
-        }
-
-        static void MouseButtonPressed(Object sender, MouseButtonEventArgs e)
-        {
-        }
+        #endregion
     }
 }

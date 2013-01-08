@@ -9,7 +9,6 @@ namespace Game.Logic.Entities
        /*********
         * class statics
         *********/
-       static Random generator = new Random();
 
        //TODO - change back to threatTargeterHigh
        static private Reaction copReact(List<Entity> list)
@@ -50,7 +49,6 @@ namespace Game.Logic.Entities
        public Cop(PoliceStation station) :
            base(copReact, Affiliation.INDEPENDENT, new List<Direction>(), station.ExitPoint.vectorToDirection())
        {
-           // TODO: Complete member initialization
            this.station = station;
            this.timeBeforeShot = 0;
            List<Upgrades> list = new List<Upgrades>();
@@ -61,7 +59,6 @@ namespace Game.Logic.Entities
        public Cop(PoliceStation station, List<Direction> path) :
            base(copReact, Affiliation.INDEPENDENT, new List<Direction>(path), station.ExitPoint.vectorToDirection())
        {
-           // TODO: Complete member initialization
            this.station = station;
            this.timeBeforeShot = 0;
            List<Upgrades> list = new List<Upgrades>();

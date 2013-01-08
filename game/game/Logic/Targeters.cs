@@ -3,6 +3,9 @@ using System.Collections.Generic;
 
 namespace Game.Logic
 {
+    /*
+     * This class is in charge of choosing targets to a given shooter out of the list of enemies in range of him. 
+     */
     internal static class Targeters
     {
 

@@ -59,7 +59,7 @@ namespace Game.Graphic_Manager
         private static Texture GetBuildingImage(ExternalEntity building)
         {
             if (buildings.ContainsKey(building)) return buildings[building];
-            var temp = Tuple.Create(new Block((uint)building.Size.Y, (uint)building.Size.X), generateStyle(building.Loyalty));
+            var temp = Tuple.Create(new Block((uint)building.Size.X, (uint)building.Size.Y), generateStyle(building.Loyalty));
             Texture image = null;
             if (templates.ContainsKey(temp))
             {

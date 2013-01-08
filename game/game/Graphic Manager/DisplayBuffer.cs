@@ -89,7 +89,7 @@ namespace Game.Buffers
         public bool Updated
         {
             get { return updated; }
-            set { updated = value; }
+            set { updated = value; System.Threading.Monitor.Pulse(this); }
         }
 
         /************

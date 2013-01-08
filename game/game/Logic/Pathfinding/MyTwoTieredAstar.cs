@@ -7,7 +7,7 @@ namespace Game.Logic.Pathfinding
 {
     class AdvancedAstar
     {
-        const int MIN_DISTANCE = 4;
+        const int MIN_DISTANCE = 5;
 
         static int TILE_SIZE = (int)FileHandler.getUintProperty("tile size", FileAccessor.GENERAL);
         static private Point entry;

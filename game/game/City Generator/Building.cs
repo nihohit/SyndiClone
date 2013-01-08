@@ -45,12 +45,12 @@ namespace Game.City_Generator
             set { _dimensions.StartY = value; }
         }
 
-        public int Length {
+        public int X {
             get { return _dimensions.Length;}
             set { _dimensions.Length = value; }
         }
 
-        public int Depth {
+        public int Y {
             get { return _dimensions.Depth; }
             set { _dimensions.Depth = value; }
         }

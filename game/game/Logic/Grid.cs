@@ -5,34 +5,35 @@ using System;
 
 namespace Game.Logic
 {
-    class Grid //TODO - what do we need to do in order to make the grid threadsafe?
+    class Grid
     {
 
         /******************
         Consts
         ****************/
-        const int randomPathLength = 1000;
-        const int CIV_FLEE_RANGE = 1000;
+        private readonly UInt16 randomPathLength = FileHandler.getUintProperty("random path length", FileAccessor.LOGIC);
+        private readonly UInt16 CIV_FLEE_RANGE = FileHandler.getUintProperty("civilian flee range", FileAccessor.LOGIC);
         delegate Effect CurriedEntityListAdd(UniqueList<Entity> list); //These functions curry a list to an effect which will enter entities into the list
         delegate Effect CurriedDirectionListAdd(List<Direction> list); //These functions curry directions to an effect which will put them in lists
         delegate bool boolPointOperator(Point point); //These functions as a binary question on a Point
         delegate boolPointOperator CurriedPointOperator(Entity entity); //These are the curried version, which curry and entity for the question
 
+
         /******************
         members
         ****************/
 
-        private readonly Dictionary<Entity, ExternalEntity> entities;
-        private readonly Dictionary<Entity, Area> locations;
+        private readonly Dictionary<Entity, ExternalEntity> entities = new Dictionary<Entity, ExternalEntity>();
+        private readonly Dictionary<Entity, Area> locations = new Dictionary<Entity, Area>();
+        private readonly List<Buffers.BufferEvent> actionsDone = new List<Buffers.BufferEvent>();
+        private readonly UniqueList<ExternalEntity> visible = new UniqueList<ExternalEntity>();
+        private readonly UniqueList<Entity> destroyed = new UniqueList<Entity>();
         private readonly Entity[,] gameGrid;
-        private readonly List<Buffers.BufferEvent> actionsDone;
-        private readonly UniqueList<ExternalEntity> visible;
-        private readonly UniqueList<Entity> destroyed;
         private readonly TerrainGrid pathFindingGrid;
         private Entity selected;
         private Pathfinding.pathfindFunction pathfind = Pathfinding.AdvancedAstar.findPath;
-        //TODO - add corporations?
-
+        //TODO - add corporations
+        static Random staticRandom = new Random();
         /******************
         Constructors
         ****************/     
@@ -40,14 +41,10 @@ namespace Game.Logic
         internal Grid(int x, int y)
         {
             this.gameGrid = new Entity[x, y];
-            this.actionsDone = new List<Buffers.BufferEvent>();
-            this.locations = new Dictionary<Entity, Area>();
-            this.entities = new Dictionary<Entity, ExternalEntity>();
-            this.visible = new UniqueList<ExternalEntity>();
-            this.destroyed = new UniqueList<Entity>();
             this.pathFindingGrid = new TerrainGrid(x,y);
         }
 
+        //this function is called after all the buildings have been added to the grid.
         internal void initialiseTerrainGrid()
         {
             for (int i = 0; i < this.gameGrid.GetLength(0); i++)
@@ -60,35 +57,53 @@ namespace Game.Logic
             }
         }
 
-
-            
-
+        //this function is called after all the buildings have been inserted into the grid. 
         internal void initialiseExitPoints()
         {
             foreach (Entity ent in entities.Keys)
             {
-                ((Building)ent).ExitPoint = this.getExitPoint(ent);
+                this.setExitPoint((Building)ent);
             }
         }
 
-        private Vector getExitPoint(Entity ent)
+        /*
+         * This method sets randomly all the exit points of all the buildigns on the map. 
+         */
+        private void setExitPoint(Building ent)
         {
             Point center = this.convertToCentralPoint(ent);
+            List<Vector> options = new List<Vector>();
             int x = center.X;
             int y = center.Y;
-            int i = 1;
-            while (true)
+            int i;
+            i = (ent.Size.X) / 2;
+            if (x + i < this.gameGrid.GetLength(0) && (this.gameGrid[x + i, y] == null))
+                options.Add(new Vector(i, 0));
+            if (x - i >= 0 && (this.gameGrid[x - i, y] == null))
+                options.Add(new Vector(-i, 0));
+            i = (ent.Size.Y) / 2;
+            if (y + i < this.gameGrid.GetLength(1) && (this.gameGrid[x, y + i] == null))
+                options.Add(new Vector(0, i));
+            if (y - i >= 0 && (this.gameGrid[x, y - i] == null))
+                options.Add(new Vector(0, -i));
+            //i = randomGenerator.Next(0, options.Count);
+            if (options.Count > 0)
+                ent.ExitPoint = options[staticRandom.Next(0, options.Count)];
+            else
             {
+                i = ent.Size.X / 2 + 1;
                 if (x + i < this.gameGrid.GetLength(0) && (this.gameGrid[x + i, y] == null))
-                    return new Vector(i, 0);
+                    options.Add(new Vector(i, 0));
                 if (x - i >= 0 && (this.gameGrid[x - i, y] == null))
-                    return new Vector(-i, 0);
+                    options.Add(new Vector(-i, 0));
+                i = (ent.Size.Y) / 2+1;
                 if (y + i < this.gameGrid.GetLength(1) && (this.gameGrid[x, y + i] == null))
-                    return new Vector(0, i);
+                    options.Add(new Vector(0, i));
                 if (y - i >= 0 && (this.gameGrid[x, y - i] == null))
-                    return new Vector(0, -i);
-                i++;
-
+                    options.Add(new Vector(0, -i));
+                if (options.Count > 0)
+                    ent.ExitPoint = options[staticRandom.Next(0, options.Count)];
+                else throw new Exception("can't find exit point");
             }
         }
 
@@ -98,6 +113,7 @@ namespace Game.Logic
 
         //////////COMMUNICATION LOGIC////////
 
+        /// TODO - make this player specific.
         internal List<ExternalEntity> getVisibleEntities()
         {
             return this.visible;
@@ -136,12 +152,9 @@ namespace Game.Logic
          */
         private Point convertToCentralPoint(Entity ent)
         {
-            Point[,] grid = this.locations[ent].getPointArea();
-            int x, y;
-            if (grid.GetLength(0) % 2 == 0) x = grid.GetLength(0) / 2; else x = (grid.GetLength(0) - 1) / 2;
-            if (grid.GetLength(1) % 2 == 0) y = grid.GetLength(1) / 2; else y = (grid.GetLength(1) - 1) / 2;
-            Point ans = grid[x, y];
-            return ans;
+            Area area = this.locations[ent];
+            int x = area.Entry.X + area.Size.X/2, y= area.Entry.Y + area.Size.Y/2;
+            return new Point(x, y);
         } 
 
         /*
@@ -151,11 +164,12 @@ namespace Game.Logic
         {
             this.actionsDone.Add(action);
         }
-
+        
+        //TODO - change sight logic, so that all entities of a single player add their sights instead of going over the same area again and again. 
         //This function checks if any entity in the radius around the point answers the conditions in checker
         internal void whatSees(Entity ent)
         {
-            //TODO - look into Sight simply having a list and the given blast, instead of craeating a new list & blast for every iteration
+            //TODO - look into Sight simply having a list and the given blast, instead of creating a new list & blast for every iteration
             //Get all the relevant variables
             Point location = this.convertToCentralPoint(ent);
             Sight sight = ent.Sight;
@@ -688,7 +702,6 @@ namespace Game.Logic
                 PoliceStation pol = ((PoliceStation)selected);
                 pol.Path = this.getComplexPath(this.getExitPoint(pol), point, new Vector(1,1), MovementType.GROUND, pol.ExitPoint.vectorToDirection());
                 this.actionsDone.Add(new Buffers.BufferSetPathActionEvent(this.entities[pol],((PoliceStation)selected).Path, this.findConstructionSpot(pol, pol.getConstruct()).Entry.toVector2f()));
-                
             }
 
         }

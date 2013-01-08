@@ -4,9 +4,8 @@ namespace Game
 {
     struct Vector
     {
+        static Random staticRandom = new Random();
         private int _x, _y;
-
-        static private Random rand = new Random();
 
         public Vector(int x, int y)
         {
@@ -63,8 +62,8 @@ namespace Game
 
         private int computeNormalProbablity(double mean, double deviation)
         {
-            double u1 = rand.NextDouble(); //these are uniform(0,1) random doubles
-            double u2 = rand.NextDouble();
+            double u1 = staticRandom.NextDouble(); //these are uniform(0,1) random doubles
+            double u2 = staticRandom.NextDouble();
             double randStdNormal = Math.Sqrt(-2.0 * Math.Log(u1)) * Math.Sin(2.0 * Math.PI * u2); //random normal(0,1)
             double randNormal = mean + deviation * randStdNormal; //random normal(mean,stdDev^2)
             return Convert.ToInt16(randNormal);

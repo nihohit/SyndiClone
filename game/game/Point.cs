@@ -5,8 +5,7 @@ namespace Game
 {
     public struct Point
     {
-        static Random rand = new Random();
-        
+        static Random staticRandom = new Random();
         private readonly int _xLoc, _yLoc;
 
         public int Y
@@ -40,8 +39,8 @@ namespace Game
          */
         internal Point(int minX, int maxX, int minY, int maxY)
         {
-            _xLoc = rand.Next(minX, maxX);
-            _yLoc = rand.Next(minY, maxY);
+            _xLoc = staticRandom.Next(minX, maxX);
+            _yLoc = staticRandom.Next(minY, maxY);
         }
 
         public override String ToString()

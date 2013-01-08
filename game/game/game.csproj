@@ -163,13 +163,16 @@
     <Compile Include="Point.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Screen Manager\MainScreen.cs" />
+    <Compile Include="Screen Manager\GameScreen.cs" />
     <Compile Include="Screen Manager\InputBuffer.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Screen Manager\NewGameScreen.cs" />
+    <Compile Include="Screen Manager\Screen.cs" />
     <Compile Include="Screen Manager\ScreenManager.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="testInput.cs" />
     <Compile Include="City Generator\Block.cs" />
     <Compile Include="City Generator\Building.cs" />
     <Compile Include="City Generator\BuildingTile.cs" />
@@ -180,9 +183,19 @@
     <Compile Include="City Generator\GameBoard.cs" />
     <Compile Include="City Generator\RoadTile.cs" />
     <Compile Include="City Generator\Tile.cs" />
+    <Compile Include="testInput.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Vector.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="Gwen">
+      <HintPath>..\..\GwenCS\Gwen\bin\x86\Release\Gwen.dll</HintPath>
+    </Reference>
+    <Reference Include="Gwen.Renderer.SFML, Version=1.0.0.0, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\gwen-dotnet-read-only\GwenCS\Gwen.Renderer.SFML\bin\x86\Release\Gwen.Renderer.SFML.dll</HintPath>
+    </Reference>
     <Reference Include="sfmlnet-audio-2">
       <HintPath>..\..\SFML.Net-2.0-rc\lib\x86\sfmlnet-audio-2.dll</HintPath>
     </Reference>
@@ -194,7 +207,12 @@
       <HintPath>..\..\SFML.Net-2.0-rc\lib\x86\sfmlnet-window-2.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
@@ -225,6 +243,9 @@
       <ProductName>Windows Installer 3.1</ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

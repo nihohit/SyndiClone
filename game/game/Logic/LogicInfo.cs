@@ -25,6 +25,7 @@ namespace Game.Logic
     internal enum Corporations { BIOTECH, STEALTH, ARMS, VEHICLES, VISION }
     internal enum Upgrades { BULLETPROOF_VEST, VISIBILITY_SOLID, BUILDING_BLIND, FLYER, HOVER, CRUSHER }
 
+    //This class is a holder for an array - used so the array won't be transferred by value over functions. 
     internal class TerrainGrid
     {
         private readonly TerrainType[,] grid;
@@ -40,7 +41,7 @@ namespace Game.Logic
         } 
     }
 
-
+    //This interface describes the reaction of an entity to the enemies it sees. 
     internal interface Reaction
     {
         Action action();
@@ -137,6 +138,7 @@ namespace Game.Logic
         }
     }
 
+    //This class represents a list that verifies that entities entered into it only once. 
     class UniqueList<T> : List<T>
     {
         public UniqueList()

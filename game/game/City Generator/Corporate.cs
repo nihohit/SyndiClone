@@ -12,7 +12,7 @@ namespace Game.City_Generator
     class Corporate
     {
         static int counter = 0;
-        static Random rand = new Random();
+        static Random staticRandom = new Random();
 
         /********************************members***************************************/
         private List<Building> _buildings;
@@ -23,7 +23,7 @@ namespace Game.City_Generator
         /********************************Constructor***************************************/        
         internal Corporate() {
 
-           _type = (CorporateNames)rand.Next(Enum.GetValues(typeof(CorporateNames)).Length);
+            _type = (CorporateNames)staticRandom.Next(Enum.GetValues(typeof(CorporateNames)).Length);
             
             _id = counter;
             counter++;
