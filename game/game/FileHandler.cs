@@ -5,68 +5,86 @@ namespace Game
 {
     enum FileAccessor { GENERAL, DISPLAY, SCREEN, LOGIC }
 
+    //TODO - replace all of this complexity with GraphicConfiguration, LogicConfiguration etc. classes which will be loaded from files and written back to them.
+
     static class FileHandler
     {
-        static Dictionary<string, string> general = new Dictionary<string, string>();
-        static Dictionary<string, string> display = new Dictionary<string, string>();
-        static Dictionary<string, string> screen = new Dictionary<string, string>();
-        static Dictionary<string, string> logic = new Dictionary<string, string>();
-        static Dictionary<FileAccessor, Dictionary<string, string>> navigator = new Dictionary<FileAccessor, Dictionary<string, string>>
+        #region static dictionaries
+
+        private static Dictionary<string, string> s_general = new Dictionary<string, string>();
+        private static Dictionary<string, string> s_display = new Dictionary<string, string>();
+        private static Dictionary<string, string> s_screen = new Dictionary<string, string>();
+        private static Dictionary<string, string> s_logic = new Dictionary<string, string>();
+        static Dictionary<FileAccessor, Dictionary<string, string>> s_navigator = new Dictionary<FileAccessor, Dictionary<string, string>>
         {
-            {FileAccessor.SCREEN, screen}, 
-            {FileAccessor.DISPLAY, display},
-            {FileAccessor.GENERAL, general},
-            {FileAccessor.LOGIC, logic}
+            {FileAccessor.SCREEN, s_screen}, 
+            {FileAccessor.DISPLAY, s_display},
+            {FileAccessor.GENERAL, s_general},
+            {FileAccessor.LOGIC, s_logic}
         };
 
-        public static void init()
+        #endregion
+
+        #region public methods
+
+        public static void Init()
         {
-            setupGeneral();
-            setupScreen();
-            setupDisplay();
-            setupLogic();
+            SetupGeneral();
+            SetupScreen();
+            SetupDisplay();
+            SetupLogic();
         }
 
-        private static void readFromFile(string str, FileAccessor access)
+        public static UInt16 GetUintProperty(string str, FileAccessor access)
+        {
+            return Convert.ToUInt16(s_navigator[access][str]);
+        }
+
+        public static Int32 GetIntProperty(string str, FileAccessor access)
+        {
+            return Convert.ToInt32(s_navigator[access][str]);
+        }
+
+        public static float GetFloatProperty(string str, FileAccessor access)
+        {
+            return Convert.ToSingle(s_navigator[access][str]);
+        }
+
+        #endregion
+
+        #region private methods
+
+        private static void ReadFromFile(string str, FileAccessor access)
         {
             char[] delimiters = { '=' };
             string[] text = System.IO.File.ReadAllLines("config/" + str + ".ini");
             foreach (string entry in text)
             {
                 string[] temp = entry.Split(delimiters);
-                navigator[access].Add(temp[0], temp[1]);
+                s_navigator[access].Add(temp[0], temp[1]);
             }
         }
 
-        private static void setupScreen()
+        private static void SetupScreen()
         {
-            readFromFile("screen", FileAccessor.SCREEN);
+            ReadFromFile("screen", FileAccessor.SCREEN);
         }
 
-                private static void setupLogic()
+        private static void SetupLogic()
         {
- 	        readFromFile("logic", FileAccessor.LOGIC);
+ 	        ReadFromFile("logic", FileAccessor.LOGIC);
         }
 
-        private static void setupDisplay()
+        private static void SetupDisplay()
         {
-            readFromFile("display", FileAccessor.DISPLAY);
+            ReadFromFile("display", FileAccessor.DISPLAY);
         }
 
-        private static void setupGeneral()
+        private static void SetupGeneral()
         {
-            readFromFile("config", FileAccessor.GENERAL);
+            ReadFromFile("config", FileAccessor.GENERAL);
         }
 
-        internal static UInt16 getUintProperty(string str, FileAccessor access)
-        {
-            return Convert.ToUInt16(navigator[access][str]);
-        }
-
-
-        public static float getFloatProperty(string str, FileAccessor access)
-        {
-            return Convert.ToSingle(navigator[access][str]);
-        }
+        #endregion
     }
 }

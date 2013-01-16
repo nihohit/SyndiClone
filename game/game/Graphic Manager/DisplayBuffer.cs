@@ -10,110 +10,104 @@ namespace Game.Buffers
 {
     public class DisplayBuffer : Game.Buffers.Buffer
     {
-
-        /******************
-        Class consts
-        ****************/
+        #region consts
         //TODO - debug, remove
         const int amountOfReapeatingSpritesInAnimation = 1;
-        readonly uint amountOfDecals = FileHandler.getUintProperty("decal amount", FileAccessor.DISPLAY);
+        readonly uint amountOfDecals = FileHandler.GetUintProperty("decal amount", FileAccessor.DISPLAY);
 
-        /******************
-        Class members
-        ****************/
-        private readonly Sprite selection = new Sprite(new Texture("images/UI/selection.png"));
+        #endregion
 
-        private HashSet<Sprite> displaySprites = new HashSet<Sprite>();
-        private HashSet<Sprite> removedSprites = new HashSet<Sprite>();
-        private List<Decal> decals = new List<Decal>();
-        private List<Decal> doneDecals = new List<Decal>();
-        private HashSet<Game.Graphic_Manager.Animation> newAnimations = new HashSet<Game.Graphic_Manager.Animation>();
-        private TextureFinder finder = new SpriteFinder();
-        private HashSet<BufferEvent> actions = new HashSet<BufferEvent>();
-        private List<ExternalEntity> visibleEntities = new List<ExternalEntity>();
-        private bool updated = false;
-        private bool selected = false;
-        private bool deselected = false;
-        
-        private ExternalEntity selectedEntity; //For UI purposes
+        #region private members
 
-        /******************
-        Constructors
-        ****************/
+        private readonly Sprite m_selection = new Sprite(new Texture("images/UI/selection.png"));
+        private readonly HashSet<Sprite> m_displaySprites = new HashSet<Sprite>();
+        private readonly HashSet<Sprite> m_removedSprites = new HashSet<Sprite>();
+        private readonly List<Decal> m_decals = new List<Decal>();
+        private readonly List<Decal> m_doneDecals = new List<Decal>();
+        private readonly HashSet<Game.Graphic_Manager.Animation> m_newAnimations = new HashSet<Game.Graphic_Manager.Animation>();
+        private readonly SpriteFinder m_finder = new SpriteFinder();
+        private readonly HashSet<IBufferEvent> m_actions = new HashSet<IBufferEvent>();
+        private List<ExternalEntity> m_visibleEntities = new List<ExternalEntity>();
+        private bool m_updated = false;
+        private bool m_selected = false;
+        private bool m_deselected = false;
+        private ExternalEntity m_selectedEntity; //For UI purposes
+
+        #endregion
+
+        #region constructors
 
         public DisplayBuffer()
         {
-            selection.Origin = new Vector2f(selection.Texture.Size.X/2, selection.Texture.Size.Y/2);
+            m_selection.Origin = new Vector2f(m_selection.Texture.Size.X/2, m_selection.Texture.Size.Y/2);
         }
 
-        /******************
-        Methods
-        ****************/
+        #endregion
 
-        /************
-         * output methods
-         ************/
+        #region public methods
+        #region output methods
 
-        internal void analyzeData()
+        public void AnalyzeData()
         {
-            clearInfo();
-            analyzeEntities();
-            analyzeActions();
-            displayDecals();
+            ClearInfo();
+            AnalyzeEntities();
+            AnalyzeActions();
+            DisplayDecals();
             UIDisplay();
-            removeSprites();
+            RemoveSprites();
         }
 
-        internal HashSet<Sprite> newSpritesToDisplay()
+        public HashSet<Sprite> NewSpritesToDisplay()
         {
-            return displaySprites;
+            return m_displaySprites;
         }
 
-        internal HashSet<Sprite> spritesToRemove()
+        public HashSet<Sprite> SpritesToRemove()
         {
-            return this.removedSprites;
+            return m_removedSprites;
         }
 
-        internal IEnumerable<Animation> getAnimations()
+        public IEnumerable<Animation> GetAnimations()
         {
-            return newAnimations;
+            return m_newAnimations;
         }
 
-        internal void clearInfo()
+        public void ClearInfo()
         {
-            newAnimations.Clear();
-            this.removedSprites.Clear();
-            this.displaySprites.Clear();
+            m_newAnimations.Clear();
+            m_removedSprites.Clear();
+            m_displaySprites.Clear();
         }
 
         public bool Updated
         {
-            get { return updated; }
-            set { updated = value; System.Threading.Monitor.Pulse(this); }
+            get { return m_updated; }
+            set { m_updated = value; System.Threading.Monitor.Pulse(this); }
         }
 
-        /************
-         * input methods
-         ************/
+        #endregion
 
-        internal void receiveVisibleEntities(List<ExternalEntity> visibleExternalEntityList)
+        #region input methods
+
+        public void ReceiveVisibleEntities(List<ExternalEntity> visibleExternalEntityList)
         {
-            this.visibleEntities = visibleExternalEntityList;
+            m_visibleEntities = visibleExternalEntityList;
         }
 
-        internal void receiveActions(List<BufferEvent> _actions)
+        public void ReceiveActions(List<IBufferEvent> actions)
         {
-            this.actions.UnionWith(_actions);
+            m_actions.UnionWith(actions);
         }
 
-        /**********
-         * internal methods
-         *********/
+        #endregion
+        #endregion
+
+        #region private methods
 
         /*
          * This function is a repeat of the Berensham's line algorithm, this time painting a straight line. 
          */
-        private Animation createNewShot(ShotType shot, Point exit, Point target)
+        private Animation CreateNewShot(ShotType shot, Point exit, Point target)
         {
             List<Sprite> ans = new List<Sprite>();
             int x0 = exit.X;
@@ -141,7 +135,7 @@ namespace Game.Buffers
                     y0 = y0 + sy;
                 }
 
-                temp = this.finder.getShot(shot);
+                temp = m_finder.GetShot(shot);
                 //TODO - rotate the shot
                 temp.Position = new Vector2f(x0, y0);
                 for (int i = 0; i < amountOfReapeatingSpritesInAnimation; i++)
@@ -152,25 +146,25 @@ namespace Game.Buffers
             return new Animation(ans);
         }
 
-        private void removeSprites()
+        private void RemoveSprites()
         {
-            foreach (Sprite temp in this.removedSprites)
-                this.displaySprites.Remove(temp);
+            foreach (Sprite temp in m_removedSprites)
+                m_displaySprites.Remove(temp);
         }
 
-        private void analyzeActions()
+        private void AnalyzeActions()
         {
-            foreach (BufferEvent action in actions)
+            foreach (IBufferEvent action in m_actions)
             {
                 switch (action.type())
                 {
                     case BufferType.DESTROY:
-                        ExternalEntity ent = ((DestroyEvent)action).Ent;
-                        Sprite temp = this.finder.remove(ent);
-                        this.removedSprites.Add(temp);
+                        ExternalEntity ent = ((DestroyBufferEvent)action).Ent;
+                        Sprite temp = m_finder.Remove(ent);
+                        m_removedSprites.Add(temp);
                         if (ent.Type != entityType.PERSON)
-                            this.newAnimations.Add(this.finder.generateDestoryResults(((DestroyEvent)action).Area, ent.Type));
-                        Decal decal = new Decal();
+                            m_newAnimations.Add(m_finder.GenerateDestoryResults(((DestroyBufferEvent)action).Area, ent.Type));
+                        Decal decal = null;
                         switch (ent.Type)
                         {
                             case (entityType.BUILDING):
@@ -184,8 +178,8 @@ namespace Game.Buffers
                                 break;
                         }
 
-                        decal.setLocation(ent.Position);
-                        this.addDecal(decal);
+                        decal.SetLocation(ent.Position);
+                        AddDecal(decal);
                         break;
 
                     case BufferType.CREATE:
@@ -193,107 +187,105 @@ namespace Game.Buffers
                         break;
 
                     case BufferType.SHOT:
-                        this.newAnimations.Add(this.createNewShot(((ShotEvent)action).Shot, ((ShotEvent)action).Exit, ((ShotEvent)action).Target));
+                        m_newAnimations.Add(CreateNewShot(((ShotBufferEvent)action).Shot, ((ShotBufferEvent)action).Exit, ((ShotBufferEvent)action).Target));
                         break;
 
                     case BufferType.UNIT_SELECT:
-                        this.selection.Position = ((BufferUnitSelectEvent)action).Coords.toVector2f();
-                        this.selectedEntity = ((BufferUnitSelectEvent)action).Ent;
-                        this.selected = true;
+                        m_selection.Position = ((UnitSelectBufferEvent)action).Coords.ToVector2f();
+                        m_selectedEntity = ((UnitSelectBufferEvent)action).Ent;
+                        m_selected = true;
                         break;
 
                     case BufferType.DESELECT:
-                        this.selected = false;
-                        this.deselected = true;
+                        m_selected = false;
+                        m_deselected = true;
                         break;
 
                     case BufferType.SETPATH:
-                        Sprite toRemove = finder.removePath(((BufferSetPathActionEvent)action).Ent);
+                        Sprite toRemove = m_finder.RemovePath(((SetPathActionBufferEvent)action).Entity);
                         if (toRemove != null)
                         {
-                            this.removedSprites.Add(toRemove);
+                            m_removedSprites.Add(toRemove);
                         }
-                        finder.setPath(((BufferSetPathActionEvent)action).Ent, ((BufferSetPathActionEvent)action).Path, ((BufferSetPathActionEvent)action).Position);
+                        m_finder.SetPath(((SetPathActionBufferEvent)action).Entity, ((SetPathActionBufferEvent)action).Path, ((SetPathActionBufferEvent)action).Position);
                         break;
                 }
             }
-            actions.Clear();
+            m_actions.Clear();
         }
 
-        private void addDecal(Decal decal)
+        private void AddDecal(Decal decal)
         {
-            this.decals.Add(decal);
-            if (decals.Count > amountOfDecals)
+            m_decals.Add(decal);
+            if (m_decals.Count > amountOfDecals)
             {
-                Decal removed = decals[0];
-                decals.Remove(removed);
-                this.removedSprites.Add(removed.getDecal());
+                Decal removed = m_decals[0];
+                m_decals.Remove(removed);
+                m_removedSprites.Add(removed.GetDecal());
             }
         }
 
-        private void displayDecals()
+        private void DisplayDecals()
         {
-            foreach (Decal decal in decals)
+            foreach (Decal decal in m_decals)
             {
-                if (decal.isDone())
+                if (decal.IsDone())
                 {
-                    doneDecals.Add(decal);
-                    this.removedSprites.Add(decal.getDecal());
+                    m_doneDecals.Add(decal);
+                    m_removedSprites.Add(decal.GetDecal());
                 }
                 else
-                    this.displaySprites.Add(decal.getDecal());
+                    m_displaySprites.Add(decal.GetDecal());
             }
-            foreach (Decal decal in doneDecals)
-                decals.Remove(decal);
-            doneDecals.Clear();
+            foreach (Decal decal in m_doneDecals)
+                m_decals.Remove(decal);
+            m_doneDecals.Clear();
         }
 
         private void UIDisplay()
         {
-            if (this.selected)
+            if (m_selected)
             {
-                this.displaySprites.Add(selection);
-                this.displayAdditionalInfo(selectedEntity);
+                m_displaySprites.Add(m_selection);
+                DisplayAdditionalInfo(m_selectedEntity);
                 return;
             }
-            if (this.deselected)
+            if (m_deselected)
             {
-                this.removedSprites.Add(this.selection);
-                this.removeAdditionalInfo(selectedEntity);
-                this.deselected = false;
+                m_removedSprites.Add(m_selection);
+                RemoveAdditionalInfo(m_selectedEntity);
+                m_deselected = false;
             }
         }
 
-        private void removeAdditionalInfo(ExternalEntity selectedEntity)
+        private void RemoveAdditionalInfo(ExternalEntity selectedEntity)
         {
-            if (this.finder.hasPath(selectedEntity))
+            if (m_finder.HasPath(selectedEntity))
             {
-                this.removedSprites.Add(this.finder.getPath(selectedEntity));
+                m_removedSprites.Add(m_finder.GetPath(selectedEntity));
             }
         }
 
-        private void displayAdditionalInfo(ExternalEntity selectedEntity)
+        private void DisplayAdditionalInfo(ExternalEntity selectedEntity)
         {
-            if (this.finder.hasPath(selectedEntity))
+            if (m_finder.HasPath(selectedEntity))
             {
-                this.removedSprites.Add(this.finder.getPath(selectedEntity));
-                this.displaySprites.Add(this.finder.nextPathStep(selectedEntity));
+                m_removedSprites.Add(m_finder.GetPath(selectedEntity));
+                m_displaySprites.Add(m_finder.NextPathStep(selectedEntity));
             }
 
         }
 
-        private void analyzeEntities()
+        private void AnalyzeEntities()
         {
-            foreach (ExternalEntity ent in visibleEntities)
+            foreach (ExternalEntity ent in m_visibleEntities)
             {
-                Sprite temp = finder.getSprite(ent);
+                Sprite temp = m_finder.GetSprite(ent);
                 temp.Position = new Vector2f(ent.Position.X, ent.Position.Y);
-                displaySprites.Add(temp);
+                m_displaySprites.Add(temp);
             }
-            visibleEntities.Clear();
+            m_visibleEntities.Clear();
         }
-
+        #endregion
     }
-
-
 }

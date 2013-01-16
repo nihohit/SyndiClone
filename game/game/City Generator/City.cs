@@ -8,7 +8,7 @@ using System.Collections.Generic;
  * the phases of creating a city are done by this order:
  * 1) Create a city object.
  * 2) Add roads to the city.
- * 3) Collect data ("translate") about the roads created - direction, depth etc. store it in the road-tiles
+ * 3) Collect data ("translate") about the roads created - direction, Depthth etc. store it in the road-tiles
  * 4) Add Buildings.
  * 5) Divide building into corporates.
  */
@@ -16,7 +16,8 @@ namespace Game.City_Generator
 {
     class City : GameBoard
     {
-        /********************************Constants***************************************/
+        #region constants
+
         private const int GAP_RATIO = 6;
         private const double TAKEOVER_CHANCE = 0.2;
         private const int BIG_CORPS = 10; //TODO: maybe later we will want to change this to something related to boardsize.
@@ -24,170 +25,52 @@ namespace Game.City_Generator
         private const char ROAD_GENERIC = '*'; // a generic char for a road, not knowing direction or it's adjacent squares.
         private const int MIN_BLOCK_SIZE = 0; // the smaller block that will have sub-roads is of size 7X6
         private const int CORP_DIM = 20; //see "add corporates()" for use, signifies the size of each initial corporate
-        static Random staticRandom = new Random();
+        static readonly Random s_random = new Random();
 
-        /********************************members***************************************/
-        private char[,] _grid;
-        private BuildingPlacer _bp;
-        
+        #endregion
 
-        /****************************************************************************************************************
-         * ***************************************INNER CLASS************************************************************
-         * **************************************************************************************************************/
-        /*
-         * this class is a tool that helps me create new buildings.
-         * By theory, it was meant to keep a changing probability to decide the length and depth of the building considering the past, so the more buildings there are of a certain
-         * length, the less likely this length to appear. 
-         * However, after testing it a little, I found that in the end the probabilities to get a big building reaches 100% (due to place constraints). 
-         * Maybe I will think of a different strategy later.
-         * */
-        public class BuildingPlacer {
-            /********************************Constants***************************************/
-            private const double DECREASE_FACTOR = 0.01,LOWER_HALF_PROB = 0.25;
-            private const int ARR_SIZE=12;
-            /********************************members***************************************/
-            private double[] _hPlaces,_vPlaces;
+        #region fields
 
-            /********************************Constructor***************************************/
-            internal BuildingPlacer() {
-                _hPlaces = new double[ARR_SIZE];
-                _vPlaces = new double[ARR_SIZE];// these two arrays hold the probability to get an x length wall.
+        private char[,] m_grid;
+        private BuildingPlacer m_buildPlacer;
 
-                //initialize the arrays.
-                _vPlaces[0] = _vPlaces[1] = _hPlaces[0] = _hPlaces[1] = 0;
-                int i;
-                int middle = ARR_SIZE/2;
-                double quota = LOWER_HALF_PROB/(middle-1); //lower half initial probability.
+        #endregion
 
-                for (i = 2; i <= middle; ++i)
-                { 
-                        _hPlaces[i] = _vPlaces[i] = (i-1)*quota;
-                    }
-                quota = (1-LOWER_HALF_PROB)/(middle-1+(ARR_SIZE%2)); //the modulo is to deal with both even and odd sized arrays.
-                for (;i<ARR_SIZE;++i){
-                    _hPlaces[i] = _vPlaces[i] = LOWER_HALF_PROB+(i-middle)*quota;
-                }
-               // print();
-            }
+        #region constructors
 
-            public void print() { //TODO: remove method.
-                Console.Out.Write("HPlaces: ");
-                Console.Out.WriteLine();
-                for (int i = 1; i < ARR_SIZE; ++i)
-                {
-                    Console.Out.Write(i + ":" + String.Format("{0:F2}", _hPlaces[i] - _hPlaces[i - 1]) + "\\ "); //chances
-                    Console.Out.Write(i + ":" + String.Format("{0:F2}", _hPlaces[i]) + ", ");                 //actual values
-                    Console.Out.WriteLine();
-                }
-                Console.Out.Write("\nVPlaces:\n  ");
-                for (int i = 1; i < ARR_SIZE; ++i)
-                {
-                    Console.Out.Write(i + ":" + String.Format("{0:F2}", _vPlaces[i] - _vPlaces[i - 1]) + "\\ "); //chances              
-                    Console.Out.Write(i + ":" + String.Format("{0:F2}", _vPlaces[i]) + ", ");                 //actual values
-                    Console.Out.WriteLine();
-                }
-                Console.Out.WriteLine();
-            }
-
-           
-            internal int getVDimension(int max)
-            {
-                if (max < 1) {
-                  //  MessageBox.Show("line 71, max is:" + max);
-                    return 0; 
-                }
-                int retVal;
-                max = Math.Min(max, ARR_SIZE - 1);
-
-                //double step = DECREASE_FACTOR / (ARR_SIZE - 3);//"-3" is meant to represent the fact that I'm not increasing the size of places 0,1 and x;
-                //double total = 0;
-                double rand = staticRandom.NextDouble() * _vPlaces[Math.Min(max, ARR_SIZE - 1)]; 
-                for (retVal = 2; ((rand > _vPlaces[retVal])&&(retVal<=max)); ++retVal) ; //make sure that retVal is not higher than max (in case of non-positive probabilities)
-               /* for (int y = 2; y < ARR_SIZE; ++y)
-                {
-                    if (y == retVal)
-                    {
-                        total -= (DECREASE_FACTOR + step);
-                        //MessageBox.Show("total = " + total+" STEP="+step);
-                    }
-                    total += step;
-                    _vPlaces[y] += total;
-                    if (_vPlaces[y] < 0) _vPlaces[y] = 0;
-                    
-                }*/
-                //TODO: decide if the code above is useful or not.
-                return retVal;
-            }
-
-            internal int getHDimension(int max)
-            {
-                if (max < 1) return 0;
-             //   if (max >= ARR_SIZE)
-                 //   Console.Out.WriteLine("H: Overshot. max is:" + max + " and the array is just:" + ARR_SIZE);//TODO - remove (debug)
-
-                int retVal;
-                //double step = DECREASE_FACTOR / (ARR_SIZE - 3);//"-3" is meant to represent the fact that I'm not increasing the size of places 0,1 and x;
-                //double total = 0;
-                max = Math.Min(max, ARR_SIZE - 1);
-                double rand = staticRandom.NextDouble() * _hPlaces[max];
-                for (retVal = 2; (rand > _hPlaces[retVal])&&(retVal<=max); ++retVal) ;
-                /*for (int y = 2; y < ARR_SIZE; ++y)
-                {
-                    if (y == retVal)
-                    {
-                        total -= (DECREASE_FACTOR+step);
-                        //MessageBox.Show("total = " + total+" STEP="+step);
-                    }
-                    total += step;
-                    _hPlaces[y] += total;
-                    if (_hPlaces[y] < 0) _hPlaces[y] = 0;
-                }*/
-                //TODO: decide what to do with the code above
-                return retVal;
-            }
-        }
-        /*********************************************************************************************
-         * *************************************END OF INNER CLASS************************************
-         * *******************************************************************************************/
-
-
-
-
-        /********************************Constructor***************************************/
         public City(int gridL, int gridW)
         {
-            _img = null;
-            _bp = new BuildingPlacer();
-            _len = gridL;
-            _dep = gridW;
-            _grid = new char[_len, _dep];
-            _grid2 = new Tile[_len, _dep];
-            for (int i = 0; i < _len; ++i)
-                for (int j = 0; j < _dep; ++j)
-                    _grid2[i, j] = new Tile();
-            _corpList = new Corporate[(1+ (_len / CORP_DIM)), 1+(_dep / CORP_DIM)];
-            for (int i = 0; i < (_len / CORP_DIM)+1 ; ++i)
-                for (int j = 0; j < (_dep / CORP_DIM)+1 ; ++j)
-                {
-                    _corpList[i, j] = new Corporate();
-                }
+            BoardImage = null;
+            m_buildPlacer = new BuildingPlacer();
+            Length = gridL;
+            Depth = gridW;
+            m_grid = new char[Length, Depth];
+            Grid = new Tile[Length, Depth];
+
+            for (int i = 0; i < Length; ++i)
+                for (int j = 0; j < Depth; ++j)
+                    Grid[i, j] = new Tile();
+
+            CorpList = new Corporate[(1+ (Length / CORP_DIM)), 1+(Depth / CORP_DIM)];
+
+            for (int i = 0; i < (Length / CORP_DIM)+1 ; ++i)
+                for (int j = 0; j < (Depth / CORP_DIM)+1 ; ++j)
+                    CorpList[i, j] = new Corporate();
  
-            _buildings = new List<Building>();
-            
+            Buildings = new List<Building>();
         }
 
-        /********************************Properties***************************************/
+        #endregion
 
+        #region adding roads
 
-        /********************************Adding Roads To a City***************************************/
-        
         /**
          * This method adds roads to a city by calling to "add main roads" recursively, first time with the whole grid, and after that it adds roads block by block.
          * */
-        internal void addRoads()
+        public void AddRoads()
         {
             List<Block> blocks = new List<Block>();
-            addMainRoads(0, 0, _len, _dep, ref blocks);
+            AddMainRoads(0, 0, Length, Depth, ref blocks);
 
             Block temp;
             int cond = blocks.Count;
@@ -196,7 +79,7 @@ namespace Game.City_Generator
                 temp = blocks[0];
                 if (temp.Depth * temp.Length > MIN_BLOCK_SIZE)
                 {
-                    addMainRoads(temp.StartX, temp.StartY, temp.Length, temp.Depth, ref blocks);
+                    AddMainRoads(temp.StartX, temp.StartY, temp.Length, temp.Depth, ref blocks);
                 }
                 blocks.RemoveAt(0);
                 cond = blocks.Count;
@@ -206,100 +89,100 @@ namespace Game.City_Generator
         /**
          * this method adds a few roads that cross an entire "block" (whose dimensions are given as parameters)
          * */
-        private void addMainRoads(int startX, int startY, int length, int depth, ref List<Block> blocks)
+        private void AddMainRoads(int startX, int startY, int Lengthgth, int Depthth, ref List<Block> blocks)
         {
 
-            int lenRoadsNum = 0, depRoadsNum = 0;
+            int LengthRoadsNum = 0, DepthRoadsNum = 0;
 
-            //this gives us the max possible road depth for both vertical(length) and horizontal(depth) roads
-            int maxLenRoad = (int)(Math.Log10(length));
-            int maxDepRoad = (int)(Math.Log10(depth));
-            if (maxLenRoad > 0) lenRoadsNum = (depth / maxLenRoad) / GAP_RATIO;
-            if (maxDepRoad > 0) depRoadsNum = (length / maxDepRoad) / GAP_RATIO;
+            //this gives us the max possible road Depthth for both vertical(Lengthgth) and horizontal(Depthth) roads
+            int maxLenRoad = (int)(Math.Log10(Lengthgth));
+            int maxDepRoad = (int)(Math.Log10(Depthth));
+            if (maxLenRoad > 0) LengthRoadsNum = (Depthth / maxLenRoad) / GAP_RATIO;
+            if (maxDepRoad > 0) DepthRoadsNum = (Lengthgth / maxDepRoad) / GAP_RATIO;
 
-            List<int> lenRoads = new List<int>();
-            List<int> depRoads = new List<int>();
+            List<int> LengthRoads = new List<int>();
+            List<int> DepthRoads = new List<int>();
             int gap;
 
             gap = maxDepRoad * GAP_RATIO;
-            for (int i = 0; i < depRoadsNum; ++i)
+            for (int i = 0; i < DepthRoadsNum; ++i)
             {
-                lenRoads.Add(staticRandom.Next(maxDepRoad, gap - maxDepRoad) + (i * gap));
+                LengthRoads.Add(s_random.Next(maxDepRoad, gap - maxDepRoad) + (i * gap));
             }
 
             gap = maxLenRoad * GAP_RATIO;
-            for (int i = 0; i < lenRoadsNum; ++i)
+            for (int i = 0; i < LengthRoadsNum; ++i)
             {
-                depRoads.Add(staticRandom.Next(maxLenRoad, gap - maxLenRoad) + (i * gap));
+                DepthRoads.Add(s_random.Next(maxLenRoad, gap - maxLenRoad) + (i * gap));
             }
 
-            List<int> lenBlockEdge = new List<int>();
-            List<int> depBlockEdge = new List<int>();
+            List<int> LengthBlockEdge = new List<int>();
+            List<int> DepthBlockEdge = new List<int>();
             int m;
-            lenBlockEdge.Add(0);
-            depBlockEdge.Add(0);
+            LengthBlockEdge.Add(0);
+            DepthBlockEdge.Add(0);
             if (maxDepRoad >= 1) //this way the "rand.next()" function will not blow up
             {
-                foreach (int i in lenRoads)
+                foreach (int i in LengthRoads)
                 {
-                    m = staticRandom.Next(1, maxDepRoad);
-                    lenBlockEdge.Add(i);
-                    lenBlockEdge.Add(i + m);
+                    m = s_random.Next(1, maxDepRoad);
+                    LengthBlockEdge.Add(i);
+                    LengthBlockEdge.Add(i + m);
                     for (int j = 0; j < m; ++j)
-                        for (int k = 0; k < depth; ++k)
-                            if ((startY + i + j < _len) && (startX + k) < _dep)
+                        for (int k = 0; k < Depthth; ++k)
+                            if ((startY + i + j < Length) && (startX + k) < Depth)
                             {
-                                _grid[startY + i + j, startX + k] = ROAD_GENERIC;
-                                if (_grid2[startY + i + j, startX + k].Type != ContentType.ROAD)
-                                    _grid2[startY + i + j, startX + k] = new RoadTile();
-                                ((RoadTile)_grid2[startY + i + j, startX + k]).HDepth = m;
-                                ((RoadTile)_grid2[startY + i + j, startX + k]).HOffset = j;
+                                m_grid[startY + i + j, startX + k] = ROAD_GENERIC;
+                                if (Grid[startY + i + j, startX + k].Type != ContentType.ROAD)
+                                    Grid[startY + i + j, startX + k] = new RoadTile();
+                                ((RoadTile)Grid[startY + i + j, startX + k]).HDepth = m;
+                                ((RoadTile)Grid[startY + i + j, startX + k]).HOffset = j;
                             }
                 }
-                lenBlockEdge.Add(length);
+                LengthBlockEdge.Add(Lengthgth);
             }
 
             if (maxLenRoad >= 1) //this way the "rand.next()" function will not blow up
             {
-                foreach (int i in depRoads)
+                foreach (int i in DepthRoads)
                 {
-                    m = staticRandom.Next(1, maxLenRoad);
-                    depBlockEdge.Add(i);
-                    depBlockEdge.Add(i + m);
+                    m = s_random.Next(1, maxLenRoad);
+                    DepthBlockEdge.Add(i);
+                    DepthBlockEdge.Add(i + m);
                     for (int j = 0; j < m; ++j)
-                        for (int k = 0; k < length; ++k)
+                        for (int k = 0; k < Lengthgth; ++k)
                         {
-                            if ((startY + k < _len) && (startX + i + j) < _dep)
+                            if ((startY + k < Length) && (startX + i + j) < Depth)
                             {//make sure we're not out of the grid
-                                _grid[startY + k, startX + i + j] = ROAD_GENERIC;
-                                if (_grid2[startY + k, startX + i + j].Type != ContentType.ROAD)
-                                    _grid2[startY + k, startX + i + j] = new RoadTile();
-                                ((RoadTile)_grid2[startY + k, startX + i + j]).VDepth = m;
-                                ((RoadTile)_grid2[startY + k, startX + i + j]).VOffset = j;
+                                m_grid[startY + k, startX + i + j] = ROAD_GENERIC;
+                                if (Grid[startY + k, startX + i + j].Type != ContentType.ROAD)
+                                    Grid[startY + k, startX + i + j] = new RoadTile();
+                                ((RoadTile)Grid[startY + k, startX + i + j]).VDepth = m;
+                                ((RoadTile)Grid[startY + k, startX + i + j]).VOffset = j;
                             }
                         }
                 }
-                depBlockEdge.Add(depth);
+                DepthBlockEdge.Add(Depthth);
             }
             // List<Block> blocks = new List<Block>();
             if (blocks.Count == 0)
             {
-                int blockLength = 0, blockdepth = 0;
-                for (int i = 0; i < lenBlockEdge.Count - 1; i += 2)
+                int blockLength = 0, blockDepthth = 0;
+                for (int i = 0; i < LengthBlockEdge.Count - 1; i += 2)
                 {
-                    for (int j = 0; j < depBlockEdge.Count - 1; j += 2)
+                    for (int j = 0; j < DepthBlockEdge.Count - 1; j += 2)
                     {
-                        if (lenBlockEdge.Count > 1)
-                            blockLength = lenBlockEdge[i + 1] - lenBlockEdge[i];
-                        else blockLength = length;
+                        if (LengthBlockEdge.Count > 1)
+                            blockLength = LengthBlockEdge[i + 1] - LengthBlockEdge[i];
+                        else blockLength = Lengthgth;
 
-                        if (depBlockEdge.Count > 1)
-                            blockdepth = depBlockEdge[j + 1] - depBlockEdge[j];
-                        else blockdepth = depth;
-                        if ((blockdepth < 0) || (blockLength < 0))
+                        if (DepthBlockEdge.Count > 1)
+                            blockDepthth = DepthBlockEdge[j + 1] - DepthBlockEdge[j];
+                        else blockDepthth = Depthth;
+                        if ((blockDepthth < 0) || (blockLength < 0))
                             Console.Error.WriteLine(startX + " ERROR!!! " + startY); //TODO - remove (debug)
-                        else blocks.Add(new Block(depBlockEdge[j],lenBlockEdge[i], blockLength, blockdepth));
-                        // Console.Out.WriteLine(lenBlockEdge[x]+"-"+lenBlockEdge[x+1]+"X"+depBlockEdge[y]+"-"+depBlockEdge[y+1]+" legnthXdep =" +blockLength+"X"+blockdepth);
+                        else blocks.Add(new Block(DepthBlockEdge[j],LengthBlockEdge[i], blockLength, blockDepthth));
+                        // Console.Out.WriteLine(LengthBlockEdge[x]+"-"+LengthBlockEdge[x+1]+"X"+DepthBlockEdge[y]+"-"+DepthBlockEdge[y+1]+" legnthXDepth =" +blockLength+"X"+blockDepthth);
                     }
                 }
             }
@@ -309,40 +192,40 @@ namespace Game.City_Generator
         /**
          * this method adds some info to the road tiles to determine thier type and their rotate attribute.
          * */
-        internal void translateRoads()
+        public void TranslateRoads()
         {
             RoadTile current;
-            for (int j = 0; j < _dep; ++j)
+            for (int j = 0; j < Depth; ++j)
           
             {
-                for (int i = 0; i < _len; ++i)
+                for (int i = 0; i < Length; ++i)
                 {
-                    if (_grid2[i, j].Type == ContentType.ROAD)
+                    if (Grid[i, j].Type == ContentType.ROAD)
                     {
-                        _grid2[i, j].Rotate = 0;
+                        Grid[i, j].Rotate = 0;
                         //System.Console.WriteLine("new point: (" + x + "," + y + ")");
 
-                        current = (RoadTile)_grid2[i, j];
+                        current = (RoadTile)Grid[i, j];
                         //set number of exits from the tile
 
-                        if (isConnected(i, j, Directions.N, current.HOffset))
+                        if (IsConnected(i, j, Directions.NORTH, current.HOffset))
                         {
-                            current.addExit(Directions.N);
+                            current.AddExit(Directions.NORTH);
                             //System.Console.WriteLine("North!");
                         }
-                        if (isConnected(i, j, Directions.W, current.VOffset))
+                        if (IsConnected(i, j, Directions.WEST, current.VOffset))
                         {
-                            current.addExit(Directions.W);
+                            current.AddExit(Directions.WEST);
                             //System.Console.WriteLine("West!");
                         }
-                        if (isConnected(i, j, Directions.S, current.HDepth - current.HOffset - 1))//the "-1" part is so that the offset will lead to the edge of the road
+                        if (IsConnected(i, j, Directions.SOUTH, current.HDepth - current.HOffset - 1))//the "-1" part is so that the offset will lead to the edge of the road
                         {
-                            current.addExit(Directions.S);
+                            current.AddExit(Directions.SOUTH);
                             //System.Console.WriteLine("South!");
                         }
-                        if (isConnected(i, j, Directions.E, current.VDepth - current.VOffset - 1))
+                        if (IsConnected(i, j, Directions.EAST, current.VDepth - current.VOffset - 1))
                         {
-                            current.addExit(Directions.E);
+                            current.AddExit(Directions.EAST);
                             //System.Console.WriteLine("East!");
                         }
                     }
@@ -350,188 +233,185 @@ namespace Game.City_Generator
             }
         }
 
+        #endregion
 
+        #region adding Buildings
 
-
-        /********************************Adding Buildings To a City***************************************/
-        
         /**
          * Adds building to a city using the "add building" method.
          * */
-        internal void addBuildings()
+        public void AddBuildings()
         {
             int id = 0;
-            for (int i = 0; i < _len; ++i)
-                for (int j = 0; j < _dep; ++j)
-                    if (_grid2[i, j].Type == ContentType.EMPTY)
+            for (int i = 0; i < Length; ++i)
+                for (int j = 0; j < Depth; ++j)
+                    if (Grid[i, j].Type == ContentType.EMPTY)
                     {
-                        addBuilding(i, j, id); //y will be bigger in the depth of the new building
+                        AddBuilding(i, j, id); //y will be bigger in the Depthth of the new building
                         id++;
                     }
-            //Console.Out.WriteLine("buildings num=" + _buildings.Count);
-           connectBuildings2Roads();
+            //Console.Out.WriteLine("Buildings num=" + Buildings.Count);
+           ConnectBuildings2Roads();
             //_bp.print();
         }
 
 
         /*
-         * creates a building, adds it to the buildings list
+         * creates a building, adds it to the Buildings list
          * */
-        private void addBuilding(int y, int x, int id)
+        private void AddBuilding(int y, int x, int id)
         {
             Block buildingSize;
             Building b;
-            int length, depth;
-            depth = 0;
-            length = 0;
-            for (; ((x + depth < _dep) && (_grid2[y, x + depth].Type == ContentType.EMPTY)); ++depth) ;
-            depth--; //no matter why we've stopped, we need to go one step backwards
-            for (; ((y + length < _len) && (_grid2[y + length, x + depth].Type == ContentType.EMPTY)); ++length) ;
-            length--;
+            int Lengthgth, Depthth;
+            Depthth = 0;
+            Lengthgth = 0;
 
+            for (; ((x + Depthth < Depth) && (Grid[y, x + Depthth].Type == ContentType.EMPTY)); ++Depthth) ;
 
-            if (length < 1)
+            Depthth--; //no matter why we've stopped, we need to go one step backwards
+
+            for (; ((y + Lengthgth < Length) && (Grid[y + Lengthgth, x + Depthth].Type == ContentType.EMPTY)); ++Lengthgth) ;
+
+            Lengthgth--;
+
+            if (Lengthgth < 1)
                 return;
-            if (depth < 1)
+            if (Depthth < 1)
                 return;
 
-            buildingSize = new Block(x, y, _bp.getVDimension(length), _bp.getHDimension(depth));
+            buildingSize = new Block(x, y, m_buildPlacer.GetVDimension(Lengthgth), m_buildPlacer.GetHDimension(Depthth));
             b = new Building(buildingSize, id);
+
             for (int i = y; i < y + buildingSize.Length; ++i)
                 for (int j = x; j < x + buildingSize.Depth; ++j)
                 {
-                    if (_grid2[i, j].Type != ContentType.EMPTY)
+                    if (Grid[i, j].Type != ContentType.EMPTY)
                         continue;
-                    _grid2[i, j] = new BuildingTile(b);
+                    Grid[i, j] = new BuildingTile(b);
                 }
-            _buildings.Add(b);
 
+            Buildings.Add(b);
         }
 
 
         /**
+        * this method is helping me find out whether a RoadTile is connected to another road in a certain direction.
+        * */
 
-* this method is helping me find out whether a RoadTile is connected to another road in a certain direction.
-
-* */
-
-        private bool isConnected(int y, int x, Directions dir, int offset)
+        private bool IsConnected(int y, int x, Directions dir, int offset)
         {
-
             switch (dir)
             {
-
-                case Directions.N:
+                case Directions.NORTH:
 
                     if (x - offset < 0) return false; //error. print?
 
                     if (x - offset == 0) return false; //legit.
 
-                    if (_grid2[y, x - offset - 1].Type == ContentType.ROAD)
+                    if (Grid[y, x - offset - 1].Type == ContentType.ROAD)
 
                         return true;
 
                     return false;
 
-                case Directions.W:
+                case Directions.WEST:
 
                     if (y - offset < 0) return false; //error.
 
                     if (y - offset == 0) return false; //legit.
 
-                    if (_grid2[y - offset - 1, x].Type == ContentType.ROAD)
+                    if (Grid[y - offset - 1, x].Type == ContentType.ROAD)
 
                         return true;
 
                     return false;
 
-                case Directions.S:
+                case Directions.SOUTH:
 
-                    if (x + offset + 1 > _dep) return false; //error
+                    if (x + offset + 1 > Depth) return false; //error
 
-                    if (x + offset + 1 == _dep) return false; //legit
+                    if (x + offset + 1 == Depth) return false; //legit
 
-                    return (_grid2[y, x + offset + 1].Type == ContentType.ROAD);
+                    return (Grid[y, x + offset + 1].Type == ContentType.ROAD);
 
-                case Directions.E:
+                case Directions.EAST:
 
-                    if (y + offset + 1 > _len) return false;//error
+                    if (y + offset + 1 > Length) return false;//error
 
-                    if (y + offset + 1 == _len) return false;//legit
+                    if (y + offset + 1 == Length) return false;//legit
 
-                    return (_grid2[y + offset + 1, x].Type == ContentType.ROAD);
+                    return (Grid[y + offset + 1, x].Type == ContentType.ROAD);
 
                 default: return false; //error
-
             }
-
         }
 
         /**
          * if there's a building that is one row remote from a road - enlarge this building so that it reaches a road.
          * */
-        private void connectBuildings2Roads()
+        private void ConnectBuildings2Roads()
         {
             bool cond = true;
             bool connected;
-            while (cond) //this while allows me to wreak havoc to the _buildings list without ruining my iterator.
+            while (cond) //this while allows me to wreak havoc to the Buildings list without ruining my iterator.
             {
                 cond = false;
-                foreach (Building b in _buildings)
+                foreach (Building b in Buildings)
                 {
                     connected = false;
-                    if (b.StartY + b.X < _len)
+                    if (b.Dimensions.StartY + b.Dimensions.Length < Length)
                     {
-                        if (_grid2[b.StartY + b.X, b.StartX].Type == ContentType.ROAD)
+                        if (Grid[b.Dimensions.StartY + b.Dimensions.Length, b.Dimensions.StartX].Type == ContentType.ROAD)
                         {
-                            //Console.Out.WriteLine("(" + b.StartY + "," + b.StartX + ") ---ROAD Below");
+                            //Console.Out.WriteLine("(" + b.Dimensions.StartY + "," + b.Dimensions.StartX + ") ---ROAD Below");
                             //continue;
                             b.ExitDirection = 3;
                             connected = true;
                         }
                     }
 
-                    if (b.StartY > 0)
+                    if (b.Dimensions.StartY > 0)
                     {
-                        if (_grid2[b.StartY - 1, b.StartX].Type == ContentType.ROAD)
+                        if (Grid[b.Dimensions.StartY - 1, b.Dimensions.StartX].Type == ContentType.ROAD)
                         {
-                           // Console.Out.WriteLine("("+b.StartY+","+b.StartX+") ---ROAD above");
+                           // Console.Out.WriteLine("("+b.Dimensions.StartY+","+b.Dimensions.StartX+") ---ROAD above");
                             //continue;
                             b.ExitDirection = 2;
                             connected = true;
                         }
                     }
-                    if (b.StartX > 0)
+                    if (b.Dimensions.StartX > 0)
                     {
-                        if (_grid2[b.StartY, b.StartX - 1].Type == ContentType.ROAD)
+                        if (Grid[b.Dimensions.StartY, b.Dimensions.StartX - 1].Type == ContentType.ROAD)
                         {
-                            //Console.Out.WriteLine("(" + b.StartY + "," + b.StartX + ") ---ROAD to Left");
+                            //Console.Out.WriteLine("(" + b.Dimensions.StartY + "," + b.Dimensions.StartX + ") ---ROAD to Left");
                             //continue;
                             b.ExitDirection = 0;
                             connected = true;
                         }
                     }
 
-                    if (b.StartX + b.Y < _dep)
+                    if (b.Dimensions.StartX + b.Dimensions.Depth < Depth)
                     {
-                        if (_grid2[b.StartY, b.StartX + b.Y].Type == ContentType.ROAD)
+                        if (Grid[b.Dimensions.StartY, b.Dimensions.StartX + b.Dimensions.Depth].Type == ContentType.ROAD)
                         {
-                            // Console.Out.WriteLine("(" + b.StartY + "," + b.StartX + ") ---ROAD to Right");
+                            // Console.Out.WriteLine("(" + b.Dimensions.StartY + "," + b.Dimensions.StartX + ") ---ROAD to Right");
                             //continue;
                             b.ExitDirection = 1;
                             connected = true;
                         }
                     }
-                    if (expandToRoad(b)||connected)
+                    if (ExpandToRoad(b)||connected)
                         continue;
-                
-                   for (int i = 0; i < b.X; ++i)
-                        for (int j = 0; j < b.Y; ++j)
+
+                    for (int i = 0; i < b.Dimensions.Length; ++i)
+                        for (int j = 0; j < b.Dimensions.Depth; ++j)
                         {
-                            _grid2[b.StartY + i, b.StartX + j] = new Tile();
-                            _grid[b.StartY + i, b.StartX + j] = '/';
+                            Grid[b.Dimensions.StartY + i, b.Dimensions.StartX + j] = new Tile();
+                            m_grid[b.Dimensions.StartY + i, b.Dimensions.StartX + j] = '/';
                         }
-                    _buildings.Remove(b);
+                    Buildings.Remove(b);
                     cond = true;
                     break;
                 }
@@ -541,127 +421,258 @@ namespace Game.City_Generator
         /**
          * this method connects a building to all roads within 1 step of it.
          * */
-        private bool expandToRoad(Building b)
+        private bool ExpandToRoad(Building b)
         {
             bool retVal = false;
 
-            if (b.StartX + b.Y + 1 < _dep)
-                if ((_grid2[b.StartY, b.StartX + b.Y].Type == ContentType.EMPTY) && (_grid2[b.StartY, b.StartX + b.Y + 1].Type == ContentType.ROAD))
+            if (b.Dimensions.StartX + b.Dimensions.Depth + 1 < Depth)
+                if ((Grid[b.Dimensions.StartY, b.Dimensions.StartX + b.Dimensions.Depth].Type == ContentType.EMPTY) && (Grid[b.Dimensions.StartY, b.Dimensions.StartX + b.Dimensions.Depth + 1].Type == ContentType.ROAD))
                 {
-                    for (int i = b.StartY; i < b.StartY + b.X; ++i)
+                    for (int i = b.Dimensions.StartY; i < b.Dimensions.StartY + b.Dimensions.Length; ++i)
                     {
-                        if (_grid2[i, b.StartX + b.Y].Type != ContentType.EMPTY)
-                            Console.Out.WriteLine("trying to overwrite (" + (b.StartY - 1) + "," + i + ")");
+                        if (Grid[i, b.Dimensions.StartX + b.Dimensions.Depth].Type != ContentType.EMPTY)
+                            Console.Out.WriteLine("trying to overwrite (" + (b.Dimensions.StartY - 1) + "," + i + ")");
                         else
                         {
-                            _grid2[i, b.StartX + b.Y] = new BuildingTile(b);
-                            _grid[i, b.StartX + b.Y] = '#';//_grid[b.StartY, b.StartX];
+                            Grid[i, b.Dimensions.StartX + b.Dimensions.Depth] = new BuildingTile(b);
+                            m_grid[i, b.Dimensions.StartX + b.Dimensions.Depth] = '#';//_grid[b.Dimensions.StartY, b.Dimensions.StartX];
                         }
                     }
-                    b.Y++;
+                    b.Dimensions.Depth++;
                     retVal = true;
                     
                 }
 
-            if (b.StartY > 1)
-                if ((_grid2[b.StartY - 1, b.StartX].Type == ContentType.EMPTY) && (_grid2[b.StartY - 2, b.StartX].Type == ContentType.ROAD))
+            if (b.Dimensions.StartY > 1)
+                if ((Grid[b.Dimensions.StartY - 1, b.Dimensions.StartX].Type == ContentType.EMPTY) && (Grid[b.Dimensions.StartY - 2, b.Dimensions.StartX].Type == ContentType.ROAD))
                 {
-                    for (int i = b.StartX; i < b.StartX + b.Y; ++i)
+                    for (int i = b.Dimensions.StartX; i < b.Dimensions.StartX + b.Dimensions.Depth; ++i)
                     {
-                        if (_grid2[b.StartY - 1, i].Type != ContentType.EMPTY)
-                            Console.Out.WriteLine("trying to override (" + (b.StartY - 1) + "," + i + ")");
+                        if (Grid[b.Dimensions.StartY - 1, i].Type != ContentType.EMPTY)
+                            Console.Out.WriteLine("trying to override (" + (b.Dimensions.StartY - 1) + "," + i + ")");
                         else
                         {
-                            _grid2[b.StartY - 1, i] = new BuildingTile(b);
-                            _grid[b.StartY - 1, i] = '#';//_grid[b.StartY, x];
+                            Grid[b.Dimensions.StartY - 1, i] = new BuildingTile(b);
+                            m_grid[b.Dimensions.StartY - 1, i] = '#';//_grid[b.Dimensions.StartY, x];
                         }
                     }
-                    b.X++;
-                    b.StartY--;
+                    b.Dimensions.Length++;
+                    b.Dimensions.StartY--;
                     retVal = true;
-                    
                 }
 
-            if (b.StartX > 1)
-                if ((_grid2[b.StartY, b.StartX - 1].Type == ContentType.EMPTY) && (_grid2[b.StartY, b.StartX - 2].Type == ContentType.ROAD))
+            if (b.Dimensions.StartX > 1)
+                if ((Grid[b.Dimensions.StartY, b.Dimensions.StartX - 1].Type == ContentType.EMPTY) && (Grid[b.Dimensions.StartY, b.Dimensions.StartX - 2].Type == ContentType.ROAD))
                 {
-                    for (int i = b.StartY; i < b.StartY + b.X; ++i)
+                    for (int i = b.Dimensions.StartY; i < b.Dimensions.StartY + b.Dimensions.Length; ++i)
                     {
-                        if (_grid2[i, b.StartX - 1].Type != ContentType.EMPTY)
-                            Console.Out.WriteLine("trying to override (" + (b.StartY - 1) + "," + i + ")");
+                        if (Grid[i, b.Dimensions.StartX - 1].Type != ContentType.EMPTY)
+                            Console.Out.WriteLine("trying to override (" + (b.Dimensions.StartY - 1) + "," + i + ")");
                         else
                         {
-                            _grid2[i, b.StartX - 1] = new BuildingTile(b);
-                            _grid[i, b.StartX - 1] = '#';// _grid[b.StartY, b.StartX];
+                            Grid[i, b.Dimensions.StartX - 1] = new BuildingTile(b);
+                            m_grid[i, b.Dimensions.StartX - 1] = '#';// grid[b.Dimensions.StartY, b.Dimensions.StartX];
                         }
                     }
-                    b.Y++;
-                    b.StartX--;
+                    b.Dimensions.Depth++;
+                    b.Dimensions.StartX--;
                     retVal =  true;
-                
                 }
 
-
-
-            if (b.StartY + b.X + 1 < _len)
-                if ((_grid2[b.StartY + b.X, b.StartX].Type == ContentType.EMPTY) && (_grid2[b.StartY + b.X + 1, b.StartX].Type == ContentType.ROAD))
+            if (b.Dimensions.StartY + b.Dimensions.Length + 1 < Length)
+                if ((Grid[b.Dimensions.StartY + b.Dimensions.Length, b.Dimensions.StartX].Type == ContentType.EMPTY) && (Grid[b.Dimensions.StartY + b.Dimensions.Length + 1, b.Dimensions.StartX].Type == ContentType.ROAD))
                 {
-                    for (int i = b.StartX; i < b.StartX + b.Y; ++i)
+                    for (int i = b.Dimensions.StartX; i < b.Dimensions.StartX + b.Dimensions.Depth; ++i)
                     {
-                        if (_grid2[b.StartY + b.X, i].Type != ContentType.EMPTY)
-                            Console.Out.WriteLine("trying to override (" + (b.StartY - 1) + "," + i + ")");
+                        if (Grid[b.Dimensions.StartY + b.Dimensions.Length, i].Type != ContentType.EMPTY)
+                            Console.Out.WriteLine("trying to override (" + (b.Dimensions.StartY - 1) + "," + i + ")");
                         else
                         {
-                            _grid2[b.StartY + b.X, i] = new BuildingTile(b);
-                            _grid[b.StartY + b.X, i] = '#';//_grid[b.StartY, b.StartX];
+                            Grid[b.Dimensions.StartY + b.Dimensions.Length, i] = new BuildingTile(b);
+                            m_grid[b.Dimensions.StartY + b.Dimensions.Length, i] = '#';//_grid[b.Dimensions.StartY, b.Dimensions.StartX];
                         }
                     }
-                    b.X++;
+                    b.Dimensions.Length++;
                     retVal = true;
-                   
                 }
             return retVal;
         }
 
+        #endregion
 
+        #region adding corporations
 
-
-        /********************************Adding Corporations To a City***************************************/
-    /**
-     * divides the buildings between corporates according to geographical location
-     * TODO: not tested (waiting for graphical interface)
-     * */
-        internal void addCorporates() {
+        /**
+         * divides the Buildings between corporates according to geographical location
+         * TODO: not tested (waiting for graphical interface)
+         * */
+        public void AddCorporates() {
             Building b;
-            foreach (Tile t in _grid2)
+            foreach (Tile t in Grid)
                 if (t.Type == ContentType.BUILDING) {
                     b = ((BuildingTile)t).Building;
-                    if (!b.hasCorp()) {
-                        b.joinCorp(_corpList[(b.StartY + (b.X / 2)) / CORP_DIM, (b.StartX + (b.Y / 2)) / CORP_DIM]);
+                    if (!b.HasCorp()) {
+                        b.JoinCorp(CorpList[(b.Dimensions.StartY + (b.Dimensions.Length / 2)) / CORP_DIM, (b.Dimensions.StartX + (b.Dimensions.Depth / 2)) / CORP_DIM]);
                     }
                 }
             for (int i = 0; i < BIG_CORPS; ++i)
-                takeover(staticRandom.Next(_len / CORP_DIM), staticRandom.Next(_dep / CORP_DIM));
+                Takeover(s_random.Next(Length / CORP_DIM), s_random.Next(Depth / CORP_DIM));
         }
 
         /**
          * it's a way to make some corporates bigger then the others.
          * */
-        private void takeover(int iLoc, int jLoc) {
+        private void Takeover(int iLoc, int jLoc) {
 
             for (int i = iLoc - 1; i <= iLoc + 1; ++i) {
                 if (i < 0) continue;
-                if (i>= _corpList.GetLength(0)) break;
+                if (i>= CorpList.GetLength(0)) break;
                 for (int j = jLoc - 1; j <= jLoc + 1; ++j) {
                     if (j < 0) continue;
-                    if (j >= _corpList.GetLength(1)) break;
-                    if (staticRandom.NextDouble() < TAKEOVER_CHANCE)
+                    if (j >= CorpList.GetLength(1)) break;
+                    if (s_random.NextDouble() < TAKEOVER_CHANCE)
                     {
-                        _corpList[iLoc, jLoc].takeover(_corpList[i, j]);
-                        _corpList[i, j] = _corpList[iLoc, jLoc];
+                        CorpList[iLoc, jLoc].Takeover(CorpList[i, j]);
+                        CorpList[i, j] = CorpList[iLoc, jLoc];
                     }
                 }
             }
-        }  
+        }
+
+        #endregion
+
+        #region BuildingPlacer
+        /*
+         * this class is a tool that helps me create new Buildings.
+         * By theory, it was meant to keep a changing probability to decide the Lengthgth and Depthth of the building considering the past, so the more Buildings there are of a certain
+         * Lengthgth, the less likely this Lengthgth to appear. 
+         * However, after testing it a little, I found that in the end the probabilities to get a big building reaches 100% (due to place constraints). 
+         * Maybe I will think of a different strategy later.
+         * */
+        public class BuildingPlacer
+        {
+            #region constants
+
+            private const double DECREASE_FACTOR = 0.01, LOWER_HALF_PROB = 0.25;
+            private const int ARR_SIZE = 12;
+
+            #endregion
+
+            #region fields
+
+            private double[] hPlaces, vPlaces;
+
+            #endregion
+
+            #region constructor
+
+            public BuildingPlacer()
+            {
+                hPlaces = new double[ARR_SIZE];
+                vPlaces = new double[ARR_SIZE];// these two arrays hold the probability to get an x Lengthgth wall.
+
+                //initialize the arrays.
+                vPlaces[0] = vPlaces[1] = hPlaces[0] = hPlaces[1] = 0;
+                int i;
+                int middle = ARR_SIZE / 2;
+                double quota = LOWER_HALF_PROB / (middle - 1); //lower half initial probability.
+
+                for (i = 2; i <= middle; ++i)
+                {
+                    hPlaces[i] = vPlaces[i] = (i - 1) * quota;
+                }
+                quota = (1 - LOWER_HALF_PROB) / (middle - 1 + (ARR_SIZE % 2)); //the modulo is to deal with both even and odd sized arrays.
+                for (; i < ARR_SIZE; ++i)
+                {
+                    hPlaces[i] = vPlaces[i] = LOWER_HALF_PROB + (i - middle) * quota;
+                }
+                // print();
+            }
+
+            #endregion
+
+            #region public methods
+
+            public void Print()
+            { //TODO: remove method.
+                Console.Out.Write("HPlaces: ");
+                Console.Out.WriteLine();
+                for (int i = 1; i < ARR_SIZE; ++i)
+                {
+                    Console.Out.Write(i + ":" + String.Format("{0:F2}", hPlaces[i] - hPlaces[i - 1]) + "\\ "); //chances
+                    Console.Out.Write(i + ":" + String.Format("{0:F2}", hPlaces[i]) + ", ");                 //actual values
+                    Console.Out.WriteLine();
+                }
+                Console.Out.Write("\nVPlaces:\n  ");
+                for (int i = 1; i < ARR_SIZE; ++i)
+                {
+                    Console.Out.Write(i + ":" + String.Format("{0:F2}", vPlaces[i] - vPlaces[i - 1]) + "\\ "); //chances              
+                    Console.Out.Write(i + ":" + String.Format("{0:F2}", vPlaces[i]) + ", ");                 //actual values
+                    Console.Out.WriteLine();
+                }
+                Console.Out.WriteLine();
+            }
+
+            public int GetVDimension(int max)
+            {
+                if (max < 1)
+                {
+                    //  MessageBox.Show("line 71, max is:" + max);
+                    return 0;
+                }
+                int retVal;
+                max = Math.Min(max, ARR_SIZE - 1);
+
+                //double step = DECREASE_FACTOR / (ARR_SIZE - 3);//"-3" is meant to represent the fact that I'm not increasing the size of places 0,1 and x;
+                //double total = 0;
+                double rand = s_random.NextDouble() * vPlaces[Math.Min(max, ARR_SIZE - 1)];
+                for (retVal = 2; ((rand > vPlaces[retVal]) && (retVal <= max)); ++retVal) ; //make sure that retVal is not higher than max (in case of non-positive probabilities)
+                /* for (int y = 2; y < ARR_SIZE; ++y)
+                 {
+                     if (y == retVal)
+                     {
+                         total -= (DECREASE_FACTOR + step);
+                         //MessageBox.Show("total = " + total+" STEP="+step);
+                     }
+                     total += step;
+                     vPlaces[y] += total;
+                     if (vPlaces[y] < 0) vPlaces[y] = 0;
+                    
+                 }*/
+                //TODO: decide if the code above is useful or not.
+                return retVal;
+            }
+
+            public int GetHDimension(int max)
+            {
+                if (max < 1) return 0;
+                //   if (max >= ARR_SIZE)
+                //   Console.Out.WriteLine("H: Overshot. max is:" + max + " and the array is just:" + ARR_SIZE);//TODO - remove (debug)
+
+                int retVal;
+                //double step = DECREASE_FACTOR / (ARR_SIZE - 3);//"-3" is meant to represent the fact that I'm not increasing the size of places 0,1 and x;
+                //double total = 0;
+                max = Math.Min(max, ARR_SIZE - 1);
+                double rand = s_random.NextDouble() * hPlaces[max];
+                for (retVal = 2; (rand > hPlaces[retVal]) && (retVal <= max); ++retVal) ;
+                /*for (int y = 2; y < ARR_SIZE; ++y)
+                {
+                    if (y == retVal)
+                    {
+                        total -= (DECREASE_FACTOR+step);
+                        //MessageBox.Show("total = " + total+" STEP="+step);
+                    }
+                    total += step;
+                    hPlaces[y] += total;
+                    if (hPlaces[y] < 0) hPlaces[y] = 0;
+                }*/
+                //TODO: decide what to do with the code above
+                return retVal;
+            }
+
+            #endregion
+        }
+
+        #endregion
     }
 }

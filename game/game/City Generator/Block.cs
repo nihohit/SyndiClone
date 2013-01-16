@@ -9,44 +9,28 @@ using System.Text;
  * */
 namespace Game.City_Generator
 {
-    class Block
+    public class Block
     {
-        /********************************members***************************************/
-        private  int _len, _dep,_startX,_startY;
 
-        /********************************Constructor***************************************/
-        internal Block(int x, int y, int len, int dep)
+        public Block(int x, int y, int len, int dep)
         {
-            _startX = x;
-            _startY = y;
-            _len = len;
-            _dep = dep;
+            StartX = x;
+            StartY = y;
+            Length = len;
+            Depth = dep;
         }
 
-        /********************************Properties***************************************/
-        public int Length
-        {
-          get { return _len; }
-          set { _len = value; }
-        } 
+        #region properties
 
-        public int Depth
-        {
-          get { return _dep; }
-          set { _dep = value; }
-        } 
+        public int Length { get; set; }
 
-        public int StartY
-        {
-          get { return _startY; }
-          set { _startY = value; }
-        }
+        public int Depth { get; set; }
 
-        public int StartX
-        {
-          get { return _startX; }
-          set { _startX = value; }
-        }
+        public int StartY { get; set; }
+
+        public int StartX { get; set; }
+
+        #endregion
 
 
         /********************************Methods***************************************/
@@ -56,7 +40,7 @@ namespace Game.City_Generator
          */
         public bool EqualSize(Block b)
         {
-            return (this._len == b.Length && this._dep == b.Depth);
+            return (Length == b.Length && Depth == b.Depth);
         }
 
     }

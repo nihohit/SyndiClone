@@ -5,11 +5,13 @@ using System.Text;
 
 namespace Game.Logic.Pathfinding
 {
+
+    //TODO - support using the same board several times.
     class AdvancedAstar
     {
         const int MIN_DISTANCE = 5;
 
-        static int TILE_SIZE = (int)FileHandler.getUintProperty("tile size", FileAccessor.GENERAL);
+        static int TILE_SIZE = (int)FileHandler.GetUintProperty("tile size", FileAccessor.GENERAL);
         static private Point entry;
         static private Point goal;
         static private Vector size;
@@ -31,7 +33,7 @@ namespace Game.Logic.Pathfinding
             origianlDirection = dir;
 
             //if it's a short route, don't bother with the two tiers.
-            if (entry.getDiffVector(goal).length() < MIN_DISTANCE * TILE_SIZE) 
+            if (entry.GetDiffVector(goal).Length() < MIN_DISTANCE * TILE_SIZE) 
                 return Astar.findPath(entry, goal, _size, _grid, _traversalMethod, _heuristic, dir);
 
             Logic.TerrainGrid newGrid = minimiseGrid(_grid);
@@ -79,7 +81,7 @@ namespace Game.Logic.Pathfinding
                         {
                             newList.Insert(0, dir);
                         }
-                        end = new Point(end, Vector.directionToVector(dir).multiply(-MIN_DISTANCE * TILE_SIZE));
+                        end = new Point(end, Vector.DirectionToVector(dir).Multiply(-MIN_DISTANCE * TILE_SIZE));
                     }
                     else
                     {
@@ -92,7 +94,7 @@ namespace Game.Logic.Pathfinding
             }
             newList.InsertRange(0,Astar.findPath(entry, end, size, gridHolder, traversalMethod, heuristic, origianlDirection));
             timer.Stop();
-            Console.Out.WriteLine("for distance ," + entry.getDiffVector(goal).length() + ", time was ," + timer.ElapsedTicks + ", and length was ," + newList.Count);
+            Console.Out.WriteLine("for distance ," + entry.GetDiffVector(goal).Length() + ", time was ," + timer.ElapsedTicks + ", and length was ," + newList.Count);
             return newList;
         }
 

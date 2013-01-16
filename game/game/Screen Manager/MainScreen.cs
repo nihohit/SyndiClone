@@ -5,6 +5,9 @@ using Gwen.Input;
 
 namespace Game.Screen_Manager
 {
+    /// <summary>
+    /// This screen is the main screen - the first interactive screen that the game loads.
+    /// </summary>
     class MainScreen : IScreen
     {
         #region static members
@@ -17,7 +20,7 @@ namespace Game.Screen_Manager
 
         #region constructors
 
-        internal static MainScreen Instance
+        public static MainScreen Instance
         {
             get { if (s_instance == null) s_instance = new MainScreen();  return MainScreen.s_instance; }
         }
@@ -26,15 +29,15 @@ namespace Game.Screen_Manager
 
         #endregion
 
-        #region IScreen
+        #region IScreen Implementation
 
-        public void GainControl(SFML.Graphics.RenderWindow _window, Gwen.Control.Canvas _canvas)
+        public void GainControl(SFML.Graphics.RenderWindow window, Gwen.Control.Canvas canvas)
         {
             System.Console.Out.WriteLine("entered main");
             if (s_instance == null) s_instance = new MainScreen();
             ScreenManager.CurrentScreen = s_instance;
-            s_window = _window;
-            s_canvas = _canvas;
+            s_window = window;
+            s_canvas = canvas;
             InitialiseUI();
         }
 

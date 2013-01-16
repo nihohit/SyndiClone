@@ -3,27 +3,13 @@ using Game.Logic;
 
 namespace Game.Logic.Entities
 {
-    class BlastEffect : Shot
+    public class BlastEffect : Shot
     {
+        static Dictionary<BlastType, BlastEffect> s_blasts = new Dictionary<BlastType, BlastEffect>();
 
-        /******************
-        class consts
-        ****************/
-
-        static Dictionary<BlastType, BlastEffect> _blasts = new Dictionary<BlastType, BlastEffect>();
-
-        /******************
-        class members
-        ****************/
-        private readonly int _radius;
-
-        /******************
-        constructors
-        ****************/
-
-        internal static BlastEffect instance(BlastType type)
+        public static BlastEffect Instance(BlastType type)
         {
-            if (!_blasts.ContainsKey(type))
+            if (!s_blasts.ContainsKey(type))
             {
                 switch (type)
                 {
@@ -33,34 +19,26 @@ namespace Game.Logic.Entities
                 }
             }
 
-            return _blasts[type];
+            return s_blasts[type];
         }
 
-        internal static BlastEffect instance(int radius, Effect effect, wasBlocked blocked, ShotType type)
+        //TODO - do we really need to use this?
+        public static BlastEffect Instance(int radius, ShotEffect effect, WasBlocked blocked, ShotType type)
         {
             return new BlastEffect(radius, effect, blocked, type);
         }
 
-
-        protected BlastEffect(int radius, Effect effect, wasBlocked blocked, ShotType type) : base(null, effect, blocked, type)
+        protected BlastEffect(int radius, ShotEffect effect, WasBlocked blocked, ShotType type) : base(null, effect, blocked, type)
         {
-            this._radius = radius;
+            Radius = radius;
         }
 
-        protected BlastEffect(BlastEffect blast,int radius, Effect effect, wasBlocked blocked, ShotType type)
+        protected BlastEffect(BlastEffect blast,int radius, ShotEffect effect, WasBlocked blocked, ShotType type)
             : base(blast, effect, blocked, type)
         {
-            this._radius = radius;
+            Radius = radius;
         }
 
-        /******************
-        Getters & setters
-        ****************/
-
-        internal int Radius
-        {
-            get { return _radius; }
-        }
-
+        public int Radius { get;  private set; }
     }
 }

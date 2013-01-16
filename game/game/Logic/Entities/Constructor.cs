@@ -6,14 +6,14 @@ using System.Text;
 namespace Game.Logic.Entities
 {
 
-    interface Constructor
+    interface IConstructor
     {           
 
-        MovingEntity getConstruct();
+        MovingEntity GetConstruct();
 
-        Vector exitPoint();
+        Vector ExitPoint();
 
-        bool readyToConstruct();
+        bool ReadyToConstruct();
 
     }
 }

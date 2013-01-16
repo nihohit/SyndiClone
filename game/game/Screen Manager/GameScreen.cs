@@ -7,6 +7,10 @@ using Gwen.Renderer;
 
 namespace Game.Screen_Manager
 {
+    /// <summary>
+    /// This screen is meant to represent a new game, including creating the game. 
+    /// </summary>
+    //TODO - add a loading screen
     class GameScreen : IScreen
     {
         #region fields
@@ -25,23 +29,21 @@ namespace Game.Screen_Manager
 
         #endregion
 
-        #region consts
+        #region file read values
         //currently, at least.
 
-        float AMOUNT_OF_PIXEL_ALLOWED_OFFSCREEN = FileHandler.getFloatProperty("pixels allowed off background", FileAccessor.SCREEN);
-        uint SCREEN_EDGE_PERCENT_FOR_MOUSE_SCROLLING = FileHandler.getUintProperty("mouse scroll range", FileAccessor.SCREEN);
-        uint SCREEN_EDGE_MOUSE_SCROLL_RELATION = FileHandler.getUintProperty("mouse scroll relation", FileAccessor.SCREEN);
-        uint SPEED_OF_MOUSE_SCROLL = FileHandler.getUintProperty("mouse scroll speed", FileAccessor.SCREEN);
-        uint SCREEN_WIDTH = FileHandler.getUintProperty("screen width", FileAccessor.SCREEN);
-        uint SCREEN_HEIGHT = FileHandler.getUintProperty("screen height", FileAccessor.SCREEN);
-        uint FRAME_RATES = FileHandler.getUintProperty("frame rates", FileAccessor.SCREEN);
-        float MIN_X = FileHandler.getFloatProperty("minimal view size", FileAccessor.SCREEN); //these represent the bounds on the size of the view
+        float AMOUNT_OF_PIXEL_ALLOWED_OFFSCREEN = FileHandler.GetFloatProperty("pixels allowed off background", FileAccessor.SCREEN);
+        uint SCREEN_EDGE_PERCENT_FOR_MOUSE_SCROLLING = FileHandler.GetUintProperty("mouse scroll range", FileAccessor.SCREEN);
+        uint SCREEN_EDGE_MOUSE_SCROLL_RELATION = FileHandler.GetUintProperty("mouse scroll relation", FileAccessor.SCREEN);
+        uint SPEED_OF_MOUSE_SCROLL = FileHandler.GetUintProperty("mouse scroll speed", FileAccessor.SCREEN);
+        uint SCREEN_WIDTH = FileHandler.GetUintProperty("screen width", FileAccessor.SCREEN);
+        uint SCREEN_HEIGHT = FileHandler.GetUintProperty("screen height", FileAccessor.SCREEN);
+        uint FRAME_RATES = FileHandler.GetUintProperty("frame rates", FileAccessor.SCREEN);
+        float MIN_X = FileHandler.GetFloatProperty("minimal view size", FileAccessor.SCREEN); //these represent the bounds on the size of the view
 
         #endregion
 
-
-
-        #region IScreen
+        #region IScreen Implementation
 
         public void GainControl(SFML.Graphics.RenderWindow window, Gwen.Control.Canvas canvas)
         {
@@ -57,7 +59,7 @@ namespace Game.Screen_Manager
             ScrollScreen();
             if (m_inGame)
             {
-                m_gameScreen.loop();
+                m_gameScreen.Loop();
             }
         }
 
@@ -96,22 +98,27 @@ namespace Game.Screen_Manager
 
         #endregion
 
+        #region constructors
 
-        public GameScreen(int _mapX, int _mapY, int _civAmount)
+        public GameScreen(int mapX, int mapY, int civAmount)
         {
-            this.m_mapY = _mapY;
-            this.m_mapX = _mapX;
-            this.m_civAmount = _civAmount;
+            m_mapY = mapY;
+            m_mapX = mapX;
+            m_civAmount = civAmount;
         }
+
+        #endregion
+
+        #region starting new game
 
         private void StartNewGame()
         {
-            City_Generator.GameBoard city = City_Generator.CityFactory.createCity(m_mapX, m_mapY);
+            City_Generator.GameBoard city = City_Generator.CityFactory.CreateCity(m_mapX, m_mapY);
             Buffers.DisplayBuffer disp = new Buffers.DisplayBuffer();
             m_input = new Buffers.InputBuffer();
             Buffers.SoundBuffer sound = new Buffers.SoundBuffer();
             Logic.GameLogic logic = new Logic.GameLogic(disp, m_input, sound, city, m_civAmount);
-            Texture background = city.Img;
+            Texture background = city.BoardImage;
             m_gameScreen = new Graphic_Manager.GameDisplay(disp, background, m_mainWindow, m_input);
             m_topX = background.Size.X;
             m_topY = (background.Size.X / m_mainWindow.Size.X) * m_mainWindow.Size.Y;
@@ -119,19 +126,19 @@ namespace Game.Screen_Manager
             m_backgroundY = background.Size.Y;
             m_inGame = true;
             m_activeGame = true;
-            m_logicThread = new Thread(new ThreadStart(logic.run));
+            m_logicThread = new Thread(new ThreadStart(logic.Run));
             m_logicThread.Start();
         }
 
         //TODO - remove, this is a debug tool
         public Logic.GameLogic StartNewGameThreadless(int mapX, int mapY, int civAmount)
         {
-            City_Generator.GameBoard city = City_Generator.CityFactory.createCity(mapX, mapY);
+            City_Generator.GameBoard city = City_Generator.CityFactory.CreateCity(mapX, mapY);
             Buffers.DisplayBuffer disp = new Buffers.DisplayBuffer();
             m_input = new Buffers.InputBuffer();
             Buffers.SoundBuffer sound = new Buffers.SoundBuffer();
             Logic.GameLogic logic = new Logic.GameLogic(disp, m_input, sound, city, civAmount);
-            Texture background = city.Img;
+            Texture background = city.BoardImage;
             m_gameScreen = new Graphic_Manager.GameDisplay(disp, background, m_mainWindow, m_input);
             m_topX = background.Size.X;
             m_topY = (background.Size.X / m_mainWindow.Size.X) * m_mainWindow.Size.Y;
@@ -142,18 +149,11 @@ namespace Game.Screen_Manager
             return logic;
         }
 
-        private void ScrollScreen()
-        {
-            if (m_mouseScrollAmount < 100)
-                m_mouseScrollAmount = m_mouseScrollAmount + SPEED_OF_MOUSE_SCROLL;
-            else
-            {
-                CenterNew(m_xMove, m_yMove);
-                m_mouseScrollAmount =  m_mouseScrollAmount - 100;
-            }
-        }
+        #endregion
 
-        void OnKeyPressed(object sender, KeyEventArgs e)
+        #region control
+
+        private void OnKeyPressed(object sender, KeyEventArgs e)
         {
             if (e.Code == Keyboard.Key.Left)
             {
@@ -181,9 +181,9 @@ namespace Game.Screen_Manager
                 lock (m_input)
                 {
                     if (m_activeGame)
-                        m_input.enterEvent(new PauseEvent());
+                        m_input.EnterEvent(new PauseBufferEvent());
                     else
-                        m_input.enterEvent(new UnPauseEvent());
+                        m_input.EnterEvent(new UnPauseBufferEvent());
                     m_activeGame = !m_activeGame;
                 }
                 return;
@@ -201,7 +201,55 @@ namespace Game.Screen_Manager
             }*/
         }
 
-        void Resizing(object sender, SizeEventArgs e)
+        /// <summary>
+        /// Function called when the window is closed
+        /// </summary>
+        void OnClosed(object sender, EventArgs e)
+        {
+            Window window = (Window)sender;
+            window.Close();
+            m_input.EnterEvent(new EndGameBufferEvent());
+            m_logicThread.Join();
+            //ScreenManager.Active = false;
+        }
+
+        //TODO - why can't we return from alt-tabbing?
+        void OnGainingFocus(object sender, EventArgs e)
+        {
+            if (m_input != null)
+            {
+                m_input.EnterEvent(new UnPauseBufferEvent());
+                m_activeGame = true;
+            }
+        }
+
+        void OnLosingFocus(object sender, EventArgs e)
+        {
+            if (m_input != null)
+            {
+                m_input.EnterEvent(new PauseBufferEvent());
+                m_activeGame = false;
+            }
+        }
+
+        void MouseClick(object sender, MouseButtonEventArgs e)
+        {
+            if (e.Button == Mouse.Button.Left)
+            {
+                Vector2f temp = m_mainWindow.ConvertCoords(new Vector2i(e.X, e.Y));
+                Vector result = new Vector(Convert.ToInt16(temp.X), Convert.ToInt16(temp.Y));
+                //Console.Out.WriteLine("clicked on " + result.X + " , " + result.Y);
+                m_input.EnterEvent(new MouseSelectBufferEvent(result));
+                return;
+            }
+            if (e.Button == Mouse.Button.Right) { m_input.EnterEvent(new CancelActionBufferEvent()); }
+        }
+
+        #endregion
+
+        #region view
+
+        private void Resizing(object sender, SizeEventArgs e)
         {
             Resize(e.Width, e.Height);
         }
@@ -212,6 +260,16 @@ namespace Game.Screen_Manager
             temp.Size = new Vector2f(width, height);
         }
 
+        private void ScrollScreen()
+        {
+            if (m_mouseScrollAmount < 100)
+                m_mouseScrollAmount = m_mouseScrollAmount + SPEED_OF_MOUSE_SCROLL;
+            else
+            {
+                CenterNew(m_xMove, m_yMove);
+                m_mouseScrollAmount = m_mouseScrollAmount - 100;
+            }
+        }
 
         void Zooming(object sender, MouseWheelEventArgs e)
         {
@@ -246,50 +304,7 @@ namespace Game.Screen_Manager
             }
         }
 
-        void OnLosingFocus(object sender, EventArgs e)
-        {
-            if (m_input != null)
-            {
-                m_input.enterEvent(new PauseEvent());
-                m_activeGame = false;
-            }
-        }
-
-        /// <summary>
-        /// Function called when the window is closed
-        /// </summary>
-        void OnClosed(object sender, EventArgs e)
-        {
-            Window window = (Window)sender;
-            window.Close();
-            m_input.enterEvent(new EndGameEvent());
-            m_logicThread.Join();
-            //ScreenManager.Active = false;
-        }
-
-        //TODO - why can't we return from alt-tabbing?
-        void OnGainingFocus(object sender, EventArgs e)
-        {
-            if (m_input != null)
-            {
-                m_input.enterEvent(new UnPauseEvent());
-                m_activeGame = true;
-            }
-        }
-
-        void MouseClick(object sender, MouseButtonEventArgs e)
-        {
-            if (e.Button == Mouse.Button.Left)
-            {
-                Vector2f temp = m_mainWindow.ConvertCoords(new Vector2i(e.X, e.Y));
-                Vector result = new Vector(Convert.ToInt16(temp.X), Convert.ToInt16(temp.Y));
-                //Console.Out.WriteLine("clicked on " + result.X + " , " + result.Y);
-                m_input.enterEvent(new BufferMouseSelectEvent(result));
-                return;
-            }
-            if (e.Button == Mouse.Button.Right) { m_input.enterEvent(new BufferCancelActionEvent()); }
-        }
-
+        //TODO - known bug, after mouse exits screen, scrolling gets stuck in one direction.
         void MouseMoved(object sender, MouseMoveEventArgs e)
         {
             m_mouseX = e.X;
@@ -335,5 +350,7 @@ namespace Game.Screen_Manager
             currentView.Center = new Vector2f(x, y);
             m_mainWindow.SetView(currentView);
         }
+
+        #endregion
     }
 }

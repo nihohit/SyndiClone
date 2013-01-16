@@ -7,11 +7,11 @@ namespace Game.City_Generator
     
     class CityImageGenerator
     {
+        static readonly uint TILE_SIZE = FileHandler.GetUintProperty("tile size", FileAccessor.GENERAL);
 
+        #region public methods
 
-        static readonly uint TILE_SIZE = FileHandler.getUintProperty("tile size", FileAccessor.GENERAL);
-        
-        public static SFML.Graphics.Texture convert_to_image(GameBoard city){
+        public static SFML.Graphics.Texture ConvertToImage(GameBoard city){
             //TODO - set up all the images ahead of time in a dictionary, so we won't load them all the time.
 
             Tile[,] grid = city.Grid; 
@@ -28,12 +28,12 @@ namespace Game.City_Generator
                     {
                         case ContentType.ROAD:
                         {
-                            images.Add(get_road_image((RoadTile)grid[i, j]));
+                            images.Add(GetRoadImage((RoadTile)grid[i, j]));
                             break;
                         }
                         case ContentType.BUILDING:
                         {
-                            images.Add(generateBuildingTile((BuildingTile)grid[i,j]));
+                            images.Add(GenerateBuildingTile((BuildingTile)grid[i,j]));
                             break;
                         }
                         //TODO - other tiles?
@@ -61,7 +61,11 @@ namespace Game.City_Generator
             return new Texture(img);
         }
 
-        private static Image generateBuildingTile(BuildingTile buildingTile)
+        #endregion
+
+        #region private methods
+
+        private static Image GenerateBuildingTile(BuildingTile buildingTile)
         {
             int num = buildingTile.Building.Id;
             Image img = new Image(32, 32);
@@ -140,10 +144,10 @@ namespace Game.City_Generator
             return img;
         }
 
-        private static Image get_road_image(RoadTile tile)
+        private static Image GetRoadImage(RoadTile tile)
         {
             Image img = null;
-            switch (tile.Image)
+            switch (tile.TileImage)
             {
                 case Images.R_LINE: //it's the same as dead-end, so no breaking here.
                 case Images.R_DEAD_END:
@@ -163,7 +167,7 @@ namespace Game.City_Generator
                             else
                                 img = img = new Image("images/City/7_road3middle.jpg");
                         }
-                        img = rotate90(img);
+                        img = Rotate90(img);
                     }
                     else { //Vertical road
                         if (tile.VDepth == 1)
@@ -213,7 +217,7 @@ namespace Game.City_Generator
                                 img = new Image("images/City/2_road1intersect.jpg");
 
                                 //img.RotateFlip(RotateFlipType.Rotate90FlipNone);
-                                img = rotate90(img);
+                                img = Rotate90(img);
                             }
 
                             else
@@ -221,18 +225,18 @@ namespace Game.City_Generator
                                 //System.Console.WriteLine("rotate is 1!");
                                 if (tile.HOffset == 0) {
                                     img = new Image("images/City/4_road2intersect.jpg");
-                                    img = rotate90(img);
+                                    img = Rotate90(img);
                                 }
                                 else if (tile.HOffset == tile.HDepth - 1)
                                 {
                                     img = new Image("images/City/5_road2side.jpg");
                                     //img.RotateFlip(RotateFlipType.Rotate270FlipNone);
-                                    img = rotate270(img);
+                                    img = Rotate270(img);
                                 }
                                 else {
                                     img = new Image("images/City/7_road3middle.jpg");
                                     //img.RotateFlip(RotateFlipType.Rotate90FlipNone);
-                                    img = rotate90(img);
+                                    img = Rotate90(img);
                                 }
                             }
                             break;
@@ -264,7 +268,7 @@ namespace Game.City_Generator
                             {
                                 img = new Image("images/City/2_road1intersect.jpg");
                                 //img.RotateFlip(RotateFlipType.Rotate270FlipNone);
-                                img = rotate270(img);
+                                img = Rotate270(img);
                             }
                             else {
                                 //System.Console.WriteLine("rotate is 3!");
@@ -272,29 +276,28 @@ namespace Game.City_Generator
                                 {
                                     img = new Image("images/City/4_road2intersect.jpg");
                                     //img.RotateFlip(RotateFlipType.Rotate270FlipNone);
-                                    img = rotate270(img);
+                                    img = Rotate270(img);
                                 }
                                 else if (tile.HOffset == 0)
                                 {
                                     img = new Image("images/City/5_road2side.jpg");
                                     //img.RotateFlip(RotateFlipType.Rotate90FlipNone); 
-                                    img = rotate90(img);
+                                    img = Rotate90(img);
                                 }
                                 else
                                 {
                                     img = new Image("images/City/7_road3middle.jpg");
                                     //img.RotateFlip(RotateFlipType.Rotate270FlipNone);
-                                    img = rotate270(img);
+                                    img = Rotate270(img);
                                 }
                             }
                             break;
                         default: img = new Image("images/City/0_empty.jpg"); break;
                     }
-
-                    
                     break;
+
                 case Images.R_CORNER: 
-                    img = new Image("images/City/0_buildingTemp1.jpg");//TODO: draw corners and fix this.
+                    img = new Image("images/City/0_buildingTemp1.jpg");//TODO: draw corners and fix 
                     break;
                 case Images.R_FOURWAY:
                     img = new Image("images/City/3_road1mid.jpg");//TODO: test. I think we need to draw another 4way images with other sidewalk formations.
@@ -308,7 +311,7 @@ namespace Game.City_Generator
             return img;
         }
 
-        private static Image rotate270(Image temp)
+        private static Image Rotate270(Image temp)
         {
             uint maxY = temp.Size.Y;
             uint maxX = temp.Size.X;
@@ -323,7 +326,7 @@ namespace Game.City_Generator
             return val;
         }
 
-        private static Image rotate90(Image temp)
+        private static Image Rotate90(Image temp)
         {
             uint maxY = temp.Size.Y;
             uint maxX = temp.Size.X;
@@ -338,7 +341,7 @@ namespace Game.City_Generator
             return val;
         }
 
-        private static Image rotate180(Image temp)
+        private static Image Rotate180(Image temp)
         {
             uint maxY = temp.Size.Y;
             uint maxX = temp.Size.X;
@@ -353,5 +356,6 @@ namespace Game.City_Generator
             return val;
         }
 
+        #endregion
     }
 }

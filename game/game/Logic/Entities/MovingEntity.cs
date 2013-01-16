@@ -1,107 +1,116 @@
 ﻿using System.Collections.Generic;
 namespace Game.Logic.Entities
 {
-    abstract class MovingEntity : Entity
+    public abstract class MovingEntity : Entity
     {
-        /******************
-        class consts
-        ****************/
-        
+        #region consts
+
         const int AMOUNT_OF_MOVES_FOR_STEP = 70;
 
-        /******************
-        class members
-        ****************/
+        #endregion
 
-        private readonly int _speed;
-        private int _steps = 0;
-        private List<Direction> _path;
-        private Direction _headed;
-        private MovementType _wayToMove = MovementType.GROUND;
+        #region fields
 
-        /******************
-        constructors
-        ****************/
+        private int m_steps = 0;
+        private Direction m_headed;
+
+        #endregion
+
+        #region properties
+
+        public int Speed { get; private set; }
+
+        public List<Direction> Path { get; set; }
+
+        public MovementType WayToMove { get; private set; }
+
+        #endregion
+
+        #region constructor
 
         protected MovingEntity(int reactionTime, reactionFunction reaction, int health, entityType type, Vector size, Affiliation loyalty, Visibility visibility, Sight sight, int speed, List<Direction> path, Direction headed)
             : base(reactionTime, reaction, health, type, size, loyalty)
         {
-            this._speed = speed;
-            this._path = path;
-            this._headed = headed;
+            Speed = speed;
+            Path = path;
+            m_headed = headed;
+            WayToMove = MovementType.GROUND;
         }
 
-        /******************
-        Getters & setters
-        ****************/
+        #endregion
 
-        internal int Speed
+        #region Entity overrides
+
+        protected override void Upgrade(System.Collections.Generic.List<Upgrades> list)
         {
-            get { return _speed; }
+            foreach (Upgrades upgrade in list)
+            {
+                switch (upgrade)
+                {
+                    case (Upgrades.FLYER):
+                        WayToMove = MovementType.FLYER;
+                        break;
+                    case (Upgrades.HOVER):
+                        WayToMove = MovementType.HOVER;
+                        break;
+                    case (Upgrades.CRUSHER):
+                        WayToMove = MovementType.CRUSHER;
+                        break;
+                }
+            }
+            base.Upgrade(list);
         }
 
-        internal List<Direction> Path
+        #endregion
+
+        #region public methods
+
+        public bool ReadyToMove(int speed)
         {
-            get { return _path; }
-            set { _path = value; }
-        }
-
-
-        /******************
-        Methods
-        ****************/
-
-        internal bool ReadyToMove(int speed)
-        {
-            bool ans =  reachAffect(AMOUNT_OF_MOVES_FOR_STEP, _steps, speed);
+            bool ans =  ReachAffect(AMOUNT_OF_MOVES_FOR_STEP, m_steps, speed);
             if (ans)
             {
-                _steps -= AMOUNT_OF_MOVES_FOR_STEP;
+                m_steps -= AMOUNT_OF_MOVES_FOR_STEP;
             }
             else
             {
-                _steps += speed;
+                m_steps += speed;
             }
             return ans;
         }
 
         //TODO - incorrect
-        internal virtual Direction getDirection()
+        public virtual Direction GetDirection()
         {
-            if (this.Path.Count > 0 ) return this.Path[0];
-            return this._headed;
+            if (Path.Count > 0 ) return Path[0];
+            return m_headed;
         }
 
-        internal virtual void moveResult(bool result)
+        public virtual void MoveResult(bool result)
         {
             if (result)
             {
-                _steps -= AMOUNT_OF_MOVES_FOR_STEP;
-                this._headed = this.getDirection();
+                m_steps -= AMOUNT_OF_MOVES_FOR_STEP;
+                m_headed = GetDirection();
                 Path.RemoveAt(0);
             }
             else
             {
-                _steps -= _speed;
+                m_steps -= Speed;
             }
 
         }
 
-        internal bool needFlip()
+        public bool NeedFlip()
         {
-            return this._headed != this.getDirection();
+            return m_headed != GetDirection();
         }
 
-        internal void flip()
+        public void Flip()
         {
-            this._size = new Vector(this._size.Y, this._size.X);
+            Size = new Vector(Size.Y, Size.X);
         }
 
-        internal MovementType WayToMove
-        {
-            get { return _wayToMove; }
-            set { _wayToMove = value; }
-        }
-
+        #endregion
     }
 }

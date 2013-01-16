@@ -5,78 +5,68 @@ using System.Text;
 
 namespace Game.Logic.Entities
 {
-    internal class ExternalEntity
+    public class ExternalEntity
     {
-        private readonly Vector _size;
-        private readonly entityType _type;
-        private readonly Affiliation _loyalty;
-        private SFML.Window.Vector2f _position;
-        private readonly Entity _ent;
+        #region properties
 
-        internal ExternalEntity(Entity ent, SFML.Window.Vector2f position)
+        public entityType Type { get; private set; }
+
+        public SFML.Window.Vector2f Position { get; set; }
+
+        public Affiliation Loyalty { get; private set; }
+
+        public Vector Size { get; private set; }
+
+        public Entity InternalEntity { get; private set; }
+
+        #endregion
+
+        #region constructors
+
+        public ExternalEntity(Entity ent, SFML.Window.Vector2f position)
         {
-            this._loyalty = ent.Loyalty;
-            this._position = position;
-            this._size = ent.Size;
-            this._type = ent.Type;
-            this._ent = ent;
+            Loyalty = ent.Loyalty;
+            Position = position;
+            Size = ent.Size;
+            Type = ent.Type;
+            InternalEntity = ent;
         }
 
-        internal ExternalEntity(Entity ent)
+        public ExternalEntity(Entity ent)
         {
             if (ent != null)
             {
-                this._loyalty = ent.Loyalty;
-                this._size = ent.Size;
-                this._type = ent.Type;
-                this._ent = ent;
+                Loyalty = ent.Loyalty;
+                Size = ent.Size;
+                Type = ent.Type;
+                InternalEntity = ent;
             }
         }
+
+        #endregion
+
+        #region comparison methods
 
         public override bool Equals(object obj)
         {
             if (obj is ExternalEntity)
             {
-                if (this._ent == null) return (((ExternalEntity)obj).Ent == null);
-                return (this.Ent.Equals(((ExternalEntity)obj).Ent));
+                if (InternalEntity == null) return (((ExternalEntity)obj).InternalEntity == null);
+                return (InternalEntity.Equals(((ExternalEntity)obj).InternalEntity));
             }
             else return false;
         }
 
-        internal entityType Type
-        {
-            get { return _type; }
-        }
-
-        internal SFML.Window.Vector2f Position
-        {
-            get { return _position; }
-            set { _position = value; }
-        }
-
-        internal Affiliation Loyalty
-        {
-            get { return _loyalty; }
-        }
-
-        internal Vector Size
-        {
-            get { return _size; }
-        }
-
-        internal Entity Ent
-        {
-            get { return _ent; }
-        } 
-
         public bool Equals(ExternalEntity obj)
         {
-            return this.Ent.Equals(obj.Ent);
+            return InternalEntity.Equals(obj.InternalEntity);
         }
 
         public override int GetHashCode()
         {
             return base.GetHashCode();
         }
+
+        #endregion
     }
 }

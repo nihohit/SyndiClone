@@ -4,94 +4,72 @@ using Game.Logic;
 
 namespace Game.Logic.Entities
 {
-    class Shot
+    public class Shot
     {
-
-        /******************
-        class statics
-        ****************/
-        static Dictionary<ShotType, Shot> _shots = new Dictionary<ShotType, Shot>();
-
-        static bool bulletBlocked(Entity ent)
-        {
-            if (ent == null) return false;
-            return true;
-        }
-
-        static void pistolBulletEffect(Entity ent)
-        {
-            ent.hit(PISTOL_BULLET_DAMAGE);
-        }
-
-        /************
-         * class consts
-         *************/
+        static Dictionary<ShotType, Shot> s_shots = new Dictionary<ShotType, Shot>();
 
         const int PISTOL_BULLET_DAMAGE = 3;
 
-        /******************
-        class members
-        ****************/
-        private readonly BlastEffect _blast;
-        private readonly Effect _effect;
-        private readonly wasBlocked _blocked;
-        private readonly ShotType _type;
+        #region constructors
 
-        /******************
-        constructors
-        ****************/
-        internal static Shot instance(ShotType type)
+        public static Shot instance(ShotType type)
         {
-            if (!_shots.ContainsKey(type))
+            if (!s_shots.ContainsKey(type))
             {
                 switch (type)
                 {
                     case(ShotType.SIGHT):
                         break;
                     case(ShotType.PISTOL_BULLET):
-                        _shots.Add(type, new Shot(null, pistolBulletEffect, bulletBlocked, type));
+                        s_shots.Add(type, new Shot(null, PistolBulletEffect, BulletBlocked, type));
                         break;
                     //TODO - missing types
 
                 }
             }
 
-            return _shots[type];
+            return s_shots[type];
         }
 
-        protected Shot(BlastEffect blast, Effect effect, wasBlocked blocked, ShotType type)
+        protected Shot(BlastEffect blast, ShotEffect effect, WasBlocked blocked, ShotType type)
         {
-            this._blast = blast;
-            this._blocked = blocked;
-            this._effect = effect;
-            this._type = type;
+            Blast = blast;
+            Blocked = blocked;
+            Effect = effect;
+            Type = type;
         }
 
-        /******************
-        Getters & setters
-        ****************/
+        #endregion
 
-        internal ShotType Type
+        #region properties
+
+        public ShotType Type { get; set; }
+
+        public BlastEffect Blast { get; set; }
+
+        public ShotEffect Effect { get; set; }
+
+        public WasBlocked Blocked { get; set; }
+
+        #endregion
+
+        #region shots effects
+
+        static void PistolBulletEffect(Entity ent)
         {
-            get { return _type; }
+            ent.Hit(PISTOL_BULLET_DAMAGE);
         }
 
+        #endregion
 
-        internal BlastEffect Blast
+        #region blocked methods
+
+        static bool BulletBlocked(Entity ent)
         {
-            get { return _blast; }
+            if (ent == null) return false;
+            return true;
         }
 
-        internal Effect Effect
-        {
-            get { return _effect; }
-        }
-
-        internal wasBlocked Blocked
-        {
-            get { return _blocked; }
-        }
-
-
+        #endregion
     }
 }

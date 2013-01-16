@@ -8,7 +8,7 @@ namespace Game.Logic.Entities
         private Weapon weapon;
         private HitFunction hitFunc;
 
-        internal void setup(List<Effect> changes)
+        public void setup(List<Effect> changes)
         {
             foreach (Effect effect in changes)
                 effect(this);
@@ -16,12 +16,12 @@ namespace Game.Logic.Entities
 
         Weapon Shooter.weapon()
         {
-            return this.weapon;
+            return weapon;
         }
 
         HitFunction Shooter.hitFunc()
         {
-            return this.hitFunc;
+            return hitFunc;
         }
 
         bool Shooter.readyToShoot()

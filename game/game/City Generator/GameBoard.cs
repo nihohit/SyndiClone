@@ -9,41 +9,22 @@ namespace Game.City_Generator
     /**
      * Gameboard is the basic interface we will need for all kind of maps. the functions here are mostly info-getters. 
      * */
-    abstract class GameBoard
+    public abstract class GameBoard
     {
-        /********************************members***************************************/
-        protected Tile[,] _grid2; // this is the initial grid. TODO: after we'll have a graphical interface, change this to "_grid" and remove the textual one.
+        #region properties
 
-        protected List<Building> _buildings;
-        protected Corporate[,] _corpList;
-        protected Texture _img;
-        protected int _len, _dep;
+        public Tile[,] Grid  { get; protected set; }
 
-        /********************************Properties***************************************/
-        internal Tile[,] Grid 
-        {
-            get { return _grid2; }
-        }
+        public int Length { get; protected set; }
 
-        internal int Length
-        {
-            get { return _len; }
-        }
+        public int Depth { get; protected set; }
 
-        internal int Depth
-        {
-            get { return _dep; }
-        }
+        public Texture BoardImage { get; set; }
 
-        internal Texture Img
-        {
-            get { return _img; }
-            set { _img = value; }
-        }
+        public List<Building> Buildings { get; protected set; }
 
-        internal List<Building> Buildings {
-            get { return _buildings; }
-        }
+        public Corporate[,] CorpList { get; protected set; }
 
+        #endregion
     }
 }

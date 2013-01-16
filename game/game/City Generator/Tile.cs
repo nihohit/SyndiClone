@@ -9,48 +9,45 @@ using System.Text;
  * */
 namespace Game.City_Generator
 {
-    internal enum ContentType { ROAD, BUILDING, EMPTY, SPECIAL };
-    internal enum Images {EMPTY,R_DEAD_END,R_CORNER, R_LINE,R_3WAY,R_FOURWAY,B_INNER,B_OUTER};//R means "road", B is building.
-    class Tile
+    #region enumerators
+
+    public enum ContentType { ROAD, BUILDING, EMPTY, SPECIAL };
+    public enum Images {EMPTY,R_DEAD_END,R_CORNER, R_LINE,R_3WAY,R_FOURWAY,B_INNER,B_OUTER};//R means "road", B is building.
+    public enum Directions { NORTH, SOUTH, EAST, WEST } //just for passing directions.
+
+    #endregion
+
+    public class Tile
     {
-        /********************************members***************************************/
-        protected ContentType _type;
-        protected int _rotate;
-        protected Building _building;
-        protected Images _img;
+        #region constructors
 
-        /********************************Constructor***************************************/
-        public Tile()
+        public Tile() : this (ContentType.EMPTY, null)
+        { }
+
+        public Tile(ContentType contentType) : this(contentType, null)
+        { }
+
+        public Tile(ContentType contentType, Building b)
         {
-            _type = ContentType.EMPTY;
-            _rotate = 0;
-            _building = null;
-            _img = Images.EMPTY;
+            // TODO: Complete member initialization
+            Type = contentType;
+            Building = b;
+            Rotate = 0;
+            TileImage = Images.EMPTY;
         }
 
-        /********************************Properties***************************************/
-        internal ContentType Type
-        {
-            get { return _type; }
-            set { }//this way I'm hoping to make "type" immutable. HACK(amit): do you think it'll work?
-        }
+        #endregion
 
-        internal virtual Building Building
-        {
-            get { return _building; }
-            set { }
-        }
+        #region properties 
 
-        internal int Rotate {
-            set { _rotate = value; }
-            get { return _rotate; }
-        }
+        public ContentType Type { get; private set; }
 
-        internal Images Image {
-           get { return _img;}
-            set { _img = value; }
+        public Building Building { get; private set; }
 
-        }
+        public int Rotate { get; set; }
 
+        public Images TileImage { get; protected set; }
+
+        #endregion
     }
 }

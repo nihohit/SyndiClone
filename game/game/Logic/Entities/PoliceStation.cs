@@ -3,107 +3,101 @@ using System.Collections.Generic;
 
 namespace Game.Logic.Entities 
 {
-    class PoliceStation : Building, Constructor
+    class PoliceStation : ConstructorBuilding, IConstructor
     {
-        /******************
-        class consts
-        ****************/
+        #region consts
+
         const int POLICE_SIZE_MODIFIER = 3;
 
-        /******************
-        class members
-        ****************/
+        #endregion
 
-        private readonly int policemenCap;
-        private int amountOfPolicemen;
-        private bool onAlert;
-        private Cop toConstruct;
-        private List<Direction> _path = new List<Direction>(); //TODO - delete after I won't need to control the plice
+        #region fields
+
+        private readonly int m_policemenCap;
+        private int m_amountOfPolicemen;
+        private Cop m_toConstruct;
+
+        #endregion
+
+        #region properties
+
+        public List<Direction> Path { get; set; } //TODO - delete after I won't need to control the plice
+        public bool Alert { get; set; }
+
+        #endregion
 
         //TODO - set the whole alert operation. another idea - after alert wanes, begin "destroying" cops?
 
-        /***********
-         * constructor
-         **********/
-        internal PoliceStation(Game.Vector realSize, int sizeModifier, Vector exit)
-            : base(sizeModifier, Entity.reactionPlaceHolder, realSize, Affiliation.INDEPENDENT)
+        #region cosntructor
+
+        public PoliceStation(Game.Vector realSize, int sizeModifier, Vector exit)
+            : base(sizeModifier, Entity.ReactionPlaceHolder, realSize, Affiliation.INDEPENDENT)
         {
-            
-            base.ExitPoint = exit;
-            this.policemenCap = sizeModifier / POLICE_SIZE_MODIFIER;
-            this.amountOfPolicemen = 0;
-            this.onAlert = false;
+            Path = new List<Direction>();
+            base.Exit = exit;
+            m_policemenCap = sizeModifier / POLICE_SIZE_MODIFIER;
+            m_amountOfPolicemen = 0;
+            Alert = false;
             reactionFunction react = delegate(List<Entity> ent)
                 {
-                    if (toConstruct == null) toConstruct = new Cop(this, this._path);
-                    this._readyToBuild = true;
-                    return new ConstructReaction(toConstruct);
+                    if (m_toConstruct == null) m_toConstruct = new Cop(this, Path);
+                    m_readyToBuild = true;
+                    return new ConstructReaction(m_toConstruct);
                 };
-            this.ReactionFunction = react;
+            ReactionFunction = react;
         }
 
-        /******************
-        Methods
-        ****************/
+        #endregion
 
-        public MovingEntity getConstruct()
+        #region public methods
+
+        public MovingEntity GetConstruct()
         {
-            Cop temp = this.toConstruct;
-            this.toConstruct = new Cop(this, this._path);
-            this.amountOfPolicemen++;
+            Cop temp = m_toConstruct;
+            m_toConstruct = new Cop(this, Path);
+            m_amountOfPolicemen++;
             return temp;
         }
-
-        internal List<Direction> Path
-        {
-            get { return _path; }
-            set { _path = value; }
-        }
-
-        bool Constructor.readyToConstruct()
+        
+        bool IConstructor.ReadyToConstruct()
         {
             if (Path.Count > 0)
             {
-                if (onAlert)
+                if (Alert)
                 {
-                    if (this.amountOfPolicemen < this.policemenCap * 3)
+                    if (m_amountOfPolicemen < m_policemenCap * 3)
                     {
-                        return base.readyToConstruct();
+                        return base.ReadyToConstruct();
                     }
                     else //TODO - this is the only place where we remove the policestation's alert. should this be so?
                     {
-                        this.onAlert = false;
+                        Alert = false;
                         return false;
                     }
                 }
                 else
                 {
-                    return (base.readyToConstruct() && (this.amountOfPolicemen <= this.policemenCap));
+                    return (base.ReadyToConstruct() && (m_amountOfPolicemen <= m_policemenCap));
                 }
             }
             return false;
         }
 
-        public Vector exitPoint()
+        public Vector ExitPoint()
         {
-            return base.ExitPoint;
+            return base.Exit;
         }
 
-        public bool Alert
+        public void PolicemanDestroyed()
         {
-            get { return onAlert; }
-            set { onAlert = value; }
-        }
-
-        internal void policemanDestroyed()
-        {
- 	        this.amountOfPolicemen--;
-            this.Alert = true;
+ 	        m_amountOfPolicemen--;
+            Alert = true;
         }
 
         public override string ToString()
         {
             return "Police station, " + base.ToString();
         }
-}
+        #endregion
+    }
 }

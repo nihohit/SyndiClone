@@ -3,65 +3,55 @@ using System.Collections.Generic;
 
 namespace Game.Logic.Entities
 {
-    internal class CivilianBuilding :  Building, Constructor
+    public class CivilianBuilding :  ConstructorBuilding, IConstructor
     {
 
-        /******************
-        class members
-        ****************/
-
-        private readonly int _sizeModifier;
-
-        /***********
-         * constructor
-         **********/
-        internal CivilianBuilding(Game.Vector realSize, int sizeModifier, Vector exit)
-            : base(sizeModifier, Entity.reactionPlaceHolder, realSize, Affiliation.CIVILIAN)
+        public CivilianBuilding(Game.Vector realSize, int sizeModifier, Vector exit)
+            : base(sizeModifier, Entity.ReactionPlaceHolder, realSize, Affiliation.CIVILIAN)
         {
-            base.ExitPoint = exit;
-            this._sizeModifier = sizeModifier;
+            base.Exit = exit;
             reactionFunction react = delegate(List<Entity> ent)
             {
-                Civilian temp = new Civilian(exit.vectorToDirection());
-                this._readyToBuild = true;
+                Civilian temp = new Civilian(exit.VectorToDirection());
+                m_readyToBuild = true;
                 return new ConstructReaction(temp);
             };
-            this.ReactionFunction = react;
+            ReactionFunction = react;
         }
 
-        /******************
-        Methods
-        ****************/
+        #region public methods
 
         /*
          * This function is just the basic reaction function for the basic civic buildings.
          */
         public Reaction civBuildReact(List<Entity> ent)
         {
-            Civilian temp = new Civilian(base.ExitPoint.vectorToDirection());
-            this._readyToBuild = true;
+            Civilian temp = new Civilian(base.Exit.VectorToDirection());
+            m_readyToBuild = true;
             return new ConstructReaction(temp);
         }
 
-        public MovingEntity getConstruct()
+        public MovingEntity GetConstruct()
         {
-            return ((ConstructReaction)this.Reaction).Focus;
+            return ((ConstructReaction)Reaction).Focus;
         }
 
-        bool Constructor.readyToConstruct()
+        public override bool ReadyToConstruct()
         {
-            return base.readyToConstruct();
+            return base.ReadyToConstruct();
         }
 
-        public Vector exitPoint()
+        public Vector ExitPoint()
         {
-            return base.ExitPoint;
+            return base.Exit;
         }
 
         public override string ToString()
         {
             return "Civilian Building, " + base.ToString();
         }
+
+        #endregion
     }
 
         

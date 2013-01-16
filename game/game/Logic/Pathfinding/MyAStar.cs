@@ -6,7 +6,8 @@ namespace Game.Logic.Pathfinding
 {
     static class Astar
     {
-        
+        //TODO - support using the same board several times.
+
         static private readonly Dictionary<Point, AstarNode> points = new Dictionary<Point, AstarNode>();
         static private readonly PriorityQueueB<AstarNode> openSet = new PriorityQueueB<AstarNode>();
         //static private readonly HashSet<AstarNode> closedSet = new HashSet<AstarNode>();
@@ -191,16 +192,16 @@ namespace Game.Logic.Pathfinding
             int g = 0, tempG = 0;
             
             AstarNode newNode = null;
-            double costToMove = current.G + moveCostDirection(current.Direction, current.Point, temp);
+            double costToMove = current.GValue + moveCostDirection(current.Direction, current.Point, temp);
             if (points.ContainsKey(temp))
             {
                 newNode = points[temp];
                 if (!newNode.Open) return;
-                if (costToMove < newNode.G) 
+                if (costToMove < newNode.GValue) 
                 {
                     newNode.Parent = current;
-                    newNode.G = costToMove;
-                    //TODO - find a more elegant way to do this.
+                    newNode.GValue = costToMove;
+                    //TODO - find a more elegant way to do 
                     openSet.RemoveLocation(newNode);
                     openSet.Push(newNode);
                 }
@@ -211,7 +212,7 @@ namespace Game.Logic.Pathfinding
                 points.Add(temp, newNode);
                 Area area = new Area(temp, size);
                 g = 0;
-                foreach (Point point in area.getPointArea())
+                foreach (Point point in area.GetPointArea())
                 {
                     tempG = costOfMovement(point);
                     if (tempG == -1)
@@ -227,7 +228,7 @@ namespace Game.Logic.Pathfinding
 
         private static double moveCostDirection(Direction direction, Point point, Point temp)
         {
-            Direction newDir = Vector.vectorToDirection(point, temp);
+            Direction newDir = Vector.VectorToDirection(point, temp);
             double check = directionalMovementCost(newDir);
             if (directionCritical) check += switchDirectionCost(direction, newDir);
             return check;

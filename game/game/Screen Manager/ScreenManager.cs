@@ -7,13 +7,15 @@ using Gwen;
 
 namespace Game.Screen_Manager
 {
+    /// <summary>
+    /// This is the manager of the screens - it checks which screen is currently loaded, and loops through it.
+    /// </summary>
     static class ScreenManager
     {
         #region static members
 
         private static Gwen.Input.SFML s_Input;
         private static RenderWindow s_window;
-        private static IScreen s_currentScreen;
 
         #endregion
 
@@ -22,6 +24,8 @@ namespace Game.Screen_Manager
         public static IScreen CurrentScreen { get; set;}
 
         #endregion
+
+        #region public methods
 
         public static void Run()
         {
@@ -48,13 +52,15 @@ namespace Game.Screen_Manager
             }
         }
 
-        static void WindowClosed(object sender, System.EventArgs e)
-        {
-            s_window.Close();
-        }
+        #endregion
 
         #region input handlers
         // input handlers - just pass mouse data to Gwen
+
+        private static void WindowClosed(object sender, System.EventArgs e)
+        {
+            s_window.Close();
+        }
 
         static void WindowMouseMoved(object sender, MouseMoveEventArgs e)
         {

@@ -9,72 +9,73 @@ using System.Text;
 namespace Game.City_Generator
 {
     enum CorporateNames { ZOMBIE_LTD,BRAINS,UPGRADES,MINING,ARMORY,RND,DEFENCE,DIGGING}; //TODO: figure out what kinds of corporates do we want.
-    class Corporate
+
+    public class Corporate
     {
-        static int counter = 0;
-        static Random staticRandom = new Random();
+        #region static fields
 
-        /********************************members***************************************/
-        private List<Building> _buildings;
-        private int _id;
-        private CorporateNames _type;
-      
+        static int s_counter = 0;
+        static Random s_random = new Random();
 
-        /********************************Constructor***************************************/        
-        internal Corporate() {
+        #endregion
 
-            _type = (CorporateNames)staticRandom.Next(Enum.GetValues(typeof(CorporateNames)).Length);
-            
-            _id = counter;
-            counter++;
-            _buildings = new List<Building>();
-        }
+        #region fields
 
+        private CorporateNames m_type;
 
-        /********************************Simple Methods***************************************/
+        #endregion
 
-        public int Id
+        #region constructor
+
+        public Corporate() 
         {
-            get { return _id; }
-        }
-        
-        internal void addBuilding (Building b){
-            _buildings.Add(b);
-        }
-
-        internal void removeBuilding(Building b) {
-            _buildings.Remove(b);
+            m_type = (CorporateNames)s_random.Next(Enum.GetValues(typeof(CorporateNames)).Length);
+            Id = s_counter;
+            s_counter++;
+            Buildings = new List<Building>();
         }
 
-        internal bool CanBuild(Building b) { 
+        #endregion
+
+        #region properties
+
+        public List<Building> Buildings { get; private set; }
+
+        public int Id { get; private set; }
+
+        #endregion
+
+        #region public methods
+
+        public void AddBuilding (Building b){
+            Buildings.Add(b);
+        }
+
+        public void RemoveBuilding(Building b) {
+            Buildings.Remove(b);
+        }
+
+        public bool CanBuild(Building b) { 
             if (b.Corp != this) return false;
-            foreach (Building other in _buildings)
+            foreach (Building other in Buildings)
                 if (b.Owner != other.Owner)
                     return false;
             return true;
         }
-      /*  internal static void print() {
-            Console.Out.WriteLine("count: " + counter);
-        }*/
-        internal List<Building> Buildings{
-            get { return _buildings; }
-        }
-
 
         /**
          * This method merges the "other" corporate into the current one.
          * after this method is done, other corporate will still exist, but will be empty (so it's better to remove him)
          * */
-        internal void takeover(Corporate other) {
+        public void Takeover(Corporate other) {
             if (other == this)
                 return;
          //   Console.Out.WriteLine("merging!");
           //  counter--;
             while (other.Buildings.Count>0)
-                other.Buildings.First().joinCorp(this);
+                other.Buildings.First().JoinCorp(this);
         }
 
-        
-
+        #endregion
     }
 }

@@ -12,7 +12,7 @@ namespace Game
 
         static int Main(string[] args)
         {
-            FileHandler.init();
+            FileHandler.Init();
             Screen_Manager.ScreenManager.Run();
             return 1;
         }

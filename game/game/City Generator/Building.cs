@@ -10,86 +10,48 @@ using SFML.Graphics;
  * */
 namespace Game.City_Generator
 {
-    class Building
+    public class Building
     {
-        //members:
-        Block _dimensions; //holding the location and dimensions of the building in the already existing block type;
-        Corporate _corp;
-        int _owner;
-        private int _exitDirection;
-        int _id;
+        #region properties
 
-       /********************************constructor***************************************/
-        internal Building(Block dim, int id) {
-            _dimensions = dim;
-            _corp = null;
-            _owner = -1;
-            this._exitDirection = 0;
-            this._id = id;
-        }
+        public int Id { get; set; }
 
-        /********************************Properties***************************************/
-        public int StartX { 
-            get {return _dimensions.StartX;}
-            set { _dimensions.StartX = value; }
-        }
+        public int Owner { get; set; }
 
-        public int Id
-        {
-            get { return _id; }
-            set { _id = value; }
-        }
+        public Block Dimensions { get; set; }
 
-        public int StartY {
-            get {return _dimensions.StartY;}
-            set { _dimensions.StartY = value; }
-        }
-
-        public int X {
-            get { return _dimensions.Length;}
-            set { _dimensions.Length = value; }
-        }
-
-        public int Y {
-            get { return _dimensions.Depth; }
-            set { _dimensions.Depth = value; }
-        }
-
-        public int Owner {
-            get { return _owner; }
-            set { _owner = value; }
-        }
-
-        internal Block Dimensions
-        {
-            get { return _dimensions; }
-            set { _dimensions = value; }
-        }
-
-        public Corporate Corp{
-            set { _corp = value;}
-            get { return _corp; }
-        }
+        public Corporate Corp { get; set; }
 
         //TODO - known bug - sometimes the exit spot isn't on a road. Currently overridden elsewhere.
-        public int ExitDirection
-        {
-            get { return _exitDirection; }
-            set { _exitDirection = value; }
+        public int ExitDirection { get; set; }
+
+        #endregion
+
+        #region constructor
+
+        public Building(Block dim, int id) {
+            Dimensions = dim;
+            Corp = null;
+            Owner = -1;
+            ExitDirection = 0;
+            Id = id;
         }
 
+        #endregion
 
-        /**********************************Simple methods*********************************/
-        internal bool hasCorp() { return _corp != null; }
+        #region public methods
 
-        internal void joinCorp(Corporate c)
+        public bool HasCorp() { return Corp != null; }
+
+        public void JoinCorp(Corporate c)
         {
-            if (_corp != null)
-                _corp.removeBuilding(this);
-            _corp = c;
-            if (_corp != null)
-                _corp.addBuilding(this);
+            if (Corp != null)
+                Corp.RemoveBuilding(this);
+            Corp = c;
+            if (Corp != null)
+                Corp.AddBuilding(this);
         }
 
+        #endregion
     }
 }

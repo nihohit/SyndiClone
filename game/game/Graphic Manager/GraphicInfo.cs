@@ -5,130 +5,152 @@ using System;
 
 namespace Game.Graphic_Manager
 {
+    #region enumerators
+    public enum DisplayCommand { MOVE_VIEW, ZOOM_VIEW, ADD_ENTITY, MOVE_ENTITY, ADD_SHOT, DESTROY_ENTITY }
+    public enum DecalType { WRECKAGE, BLOOD, RUBBLE } //TODO - different vehicles wreckages for different vehicles?
+    #endregion
 
+    #region Decal
 
-    internal enum DisplayCommand { MOVE_VIEW, ZOOM_VIEW, ADD_ENTITY, MOVE_ENTITY, ADD_SHOT, DESTROY_ENTITY }
-    internal enum DecalType { WRECKAGE, BLOOD, RUBBLE } //TODO - different vehicles wreckages for different vehicles?
-    
     //this struct represents decals - temporary static pictures.
-    internal struct Decal
+    public class Decal
     {
-        static readonly uint DECAL_STAY_TIME = FileHandler.getUintProperty("decal stay time", FileAccessor.DISPLAY);
-        static Dictionary<DecalType, Texture> decals = new Dictionary<DecalType,Texture>
+        #region fields
+
+        static readonly uint DECAL_STAY_TIME = FileHandler.GetUintProperty("decal stay time", FileAccessor.DISPLAY);
+        static readonly Dictionary<DecalType, Texture> s_decals = new Dictionary<DecalType,Texture>
             {
                 //{DecalType.EXPLOSION, 
                 {DecalType.BLOOD, new Texture("images/Decals/bloodsplatter.png")}
                 //{DecalType.RUBBLE, 
             };
 
-        private readonly Sprite _sprite;
-        private uint _stayTime;
+        private readonly Sprite m_sprite;
+        private uint m_stayTime;
 
-        internal Decal(DecalType type)
+        #endregion
+
+        #region public methods
+
+        public Decal(DecalType type)
         {
-            this._sprite = new Sprite(decals[type]);
-            this._stayTime = DECAL_STAY_TIME;
+            m_sprite = new Sprite(s_decals[type]);
+            m_stayTime = DECAL_STAY_TIME;
         }
 
-        internal bool isDone()
+        public bool IsDone()
         {
-            return this._stayTime == 0;
+            return m_stayTime == 0;
         }
 
-        internal Sprite getDecal()
+        public Sprite GetDecal()
         {
-            this._stayTime--;
-            return this._sprite;
+            m_stayTime--;
+            return m_sprite;
         }
 
-        internal void setLocation(SFML.Window.Vector2f vector)
+        public void SetLocation(SFML.Window.Vector2f vector)
         {
-            this._sprite.Position= vector;
+            m_sprite.Position= vector;
         }
+
+        #endregion
     }
+
+    #endregion
+
+    #region Animation
 
     //this struct is in charge of changing Sprites with a limited amount of appearances. Also, supposed not to be connected to an ExternalEntity, but held in a different list. 
     //TODO - replace with a spriteloop and a timer? 
-    internal struct Animation
+    public struct Animation
     {
-        List<Sprite> order;
+        private readonly List<Sprite> m_order;
 
-        internal Animation(List<Sprite> _list)
+        public Animation(List<Sprite> list)
         {
-            this.order = new List<Sprite>(_list);
+            m_order = new List<Sprite>(list);
         }
 
-        internal Animation(Area area, Logic.entityType type)
+        public Animation(Area area, Logic.entityType type)
         {
             // TODO - missing function. The basic idea is to generate an explosion sprite based on size, and whether it's a person, building or vehicle
-            order = null;
+            m_order = null;
         }
 
-        internal Sprite getNext()
+        public Sprite GetNext()
         {
-            order.RemoveAt(0);
-            Sprite temp = order[0];
+            m_order.RemoveAt(0);
+            Sprite temp = m_order[0];
             return temp;
         }
 
-        internal Sprite current()
+        public Sprite Current()
         {
-            Sprite temp = order[0];
+            Sprite temp = m_order[0];
             return temp;
         }
 
-        internal bool isDone()
+        public bool IsDone()
         {
-            return order.Count <= 1;
+            return m_order.Count <= 1;
         }
     }
+
+    #endregion
+
+    #region SpriteLoop
 
     //this represents a series of Sprites that are repeated one after the other. 
-    internal struct SpriteLoop
+    public struct SpriteLoop
     {
-        private readonly LoopedList<SFML.Graphics.Sprite> _list;
+        private readonly LoopedList<SFML.Graphics.Sprite> m_list;
 
-        internal SpriteLoop(List<SFML.Graphics.Sprite> list)
+        public SpriteLoop(List<SFML.Graphics.Sprite> list)
         {
-            this._list = new LoopedList<SFML.Graphics.Sprite>(list);
+            m_list = new LoopedList<SFML.Graphics.Sprite>(list);
         }
 
-        internal SFML.Graphics.Sprite nextSprite()
+        public SFML.Graphics.Sprite nextSprite()
         {
-            this._list.next();
-            return this.CurrentSprite();
+            m_list.Next();
+            return CurrentSprite();
         }
 
-        internal SFML.Graphics.Sprite CurrentSprite()
+        public SFML.Graphics.Sprite CurrentSprite()
         {
-            return this._list.getValue();
+            return m_list.GetValue();
         }
 
     }
 
-    internal class LoopedList<T> 
+    #endregion
+
+    #region LoopedList
+
+    public class LoopedList<T> 
     {
-        private int currentIndex;
-        private readonly List<T> list;
+        private int m_currentIndex;
+        private readonly List<T> m_list;
         
-        internal LoopedList(List<T> _list)
+        public LoopedList(List<T> list)
         {
-            currentIndex = 0;
-            this.list = new List<T>(_list);
+            m_currentIndex = 0;
+            m_list = new List<T>(list);
         }
 
-        internal T getValue()
+        public T GetValue()
         {
-            return list[currentIndex];
+            return m_list[m_currentIndex];
         }
 
-        internal void next()
+        public void Next()
         {
-            this.currentIndex = currentIndex+1;
-            if (this.currentIndex == list.Count)
-                this.currentIndex = 0;
+            m_currentIndex = m_currentIndex+1;
+            if (m_currentIndex == m_list.Count)
+                m_currentIndex = 0;
         }
-
     }
 
+    #endregion
 }

@@ -5,17 +5,6 @@ namespace Game.Buffers
 {
     public abstract class Buffer
     {
-        /******************
-        Class members
-        ****************/
-
-        /******************
-        Constructors
-        ****************/
-
-        /******************
-        Methods
-        ****************/
-
+        ///TBD
     }
 }

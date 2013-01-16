@@ -6,31 +6,30 @@ using System;
 namespace Game.Logic
 {
 
-    class GameLogic
+    public class GameLogic
     {
 
-        /******************
-        Class members
-        ****************/
-        static private readonly uint FRAMES_PER_SECOND = FileHandler.getUintProperty("logic frames per second", FileAccessor.LOGIC); //determines the amount of repeats the system can have in a second
+        #region fields
+
+        static private readonly uint FRAMES_PER_SECOND = FileHandler.GetUintProperty("logic frames per second", FileAccessor.LOGIC); //determines the amount of repeats the system can have in a second
         private readonly uint MIN_MILLISECONDS_PER_FRAME = 1000 / FRAMES_PER_SECOND;
 
-        private List<Entity> activeEntities = new List<Entity>(); //TODO - readonly uniquelist?
-        private readonly UniqueList<MovingEntity> movers = new UniqueList<MovingEntity>();
-        private readonly UniqueList<Entity> playerUnits = new UniqueList<Entity>();
-        private readonly UniqueList<Shooter> shooters = new UniqueList<Shooter>();
-        private readonly UniqueList<Constructor> constructors = new UniqueList<Constructor>();
-        private readonly UniqueList<Entity> alwaysActive;
+        private List<Entity> m_activeEntities = new List<Entity>(); //TODO - readonly uniquelist?
+        private readonly UniqueList<MovingEntity> m_movingEntities = new UniqueList<MovingEntity>();
+        private readonly UniqueList<Entity> m_playerUnits = new UniqueList<Entity>();
+        private readonly UniqueList<IShooter> m_shootingEntities = new UniqueList<IShooter>();
+        private readonly UniqueList<IConstructor> m_constructingEntities = new UniqueList<IConstructor>();
+        private readonly UniqueList<Entity> m_alwaysActiveEntities;
 
-        private readonly int civAmountGoal;
-        private int civAmount;
-        private readonly Grid _grid;
-        private readonly DisplayBuffer displayBuffer;
-        private readonly InputBuffer inputBuffer;
-        private readonly SoundBuffer soundBuffer;
-        private bool active;
-        private bool gameRunning;
-        System.Diagnostics.Stopwatch frameTimer = new System.Diagnostics.Stopwatch();
+        private readonly int m_maximumAmountOfCivilians;
+        private int m_currentCivilianAmount;
+        private readonly Grid m_grid;
+        private readonly DisplayBuffer m_displayBuffer;
+        private readonly InputBuffer m_inputBuffer;
+        private readonly SoundBuffer m_soundBuffer;
+        private bool m_unpaused;
+        private bool m_gameRunning;
+        System.Diagnostics.Stopwatch m_frameTimer = new System.Diagnostics.Stopwatch();
 
         //TODO - debug, remove.
         int runs = 0;
@@ -43,204 +42,205 @@ namespace Game.Logic
         System.Diagnostics.Stopwatch sight = new System.Diagnostics.Stopwatch();
         System.Diagnostics.Stopwatch totalWatch = new System.Diagnostics.Stopwatch();
 
-        /******************
-        Constructors
-        ****************/
+        #endregion
 
-        public void run()
+        #region constructor
+
+        public GameLogic(DisplayBuffer disp, InputBuffer input, SoundBuffer sound, Game.City_Generator.GameBoard city, int civAmount)
         {
-            while (gameRunning)
+            m_displayBuffer = disp;
+            m_inputBuffer = input;
+            m_soundBuffer = sound;
+            m_maximumAmountOfCivilians = civAmount;
+            civAmount = 0;
+            m_grid = GameBoardToGameGridConverter.ConvertBoard(city);
+            m_alwaysActiveEntities = new UniqueList<Entity>(m_grid.GetAllEntities());
+            m_unpaused = true;
+            m_gameRunning = true;
+            totalWatch.Start();
+            m_frameTimer.Start();
+        }
+
+        #endregion
+
+        #region public methods
+
+        public void Run()
+        {
+            while (m_gameRunning)
             {
                 //Console.Out.WriteLine("logic loop");
-                loop();
+                Loop();
             }
         }
-
-        public GameLogic(DisplayBuffer disp, InputBuffer input, SoundBuffer sound, Game.City_Generator.GameBoard city, int _civAmount)
-        {
-            this.displayBuffer = disp;
-            this.inputBuffer = input;
-            this.soundBuffer = sound;
-            this.civAmountGoal = _civAmount;
-            this.civAmount = 0;
-            this._grid = GameBoardToGameGridConverter.convert(city);
-            this.alwaysActive = new UniqueList<Entity>(this._grid.getAllRealEntities());
-            this.active = true;
-            this.gameRunning = true;
-            this.totalWatch.Start();
-            this.frameTimer.Start();
-        }
-
-        /******************
-        Methods
-        ****************/
 
         /*
          * This is the main loop of the logic
          */
-        public void loop()
+        public void Loop()
         {
-            this.synch.Start();
-            this.handleInput();
-            this.synch.Stop();
-            if (!gameRunning)
+            synch.Start();
+            HandleInput();
+            synch.Stop();
+            if (!m_gameRunning)
             {
-                this.totalWatch.Stop();
+                totalWatch.Stop();
                 Console.Out.WriteLine("synch was " + synch.Elapsed);
                 Console.Out.WriteLine("move was " + other.Elapsed);
                 Console.Out.WriteLine("shoot was " + shoot.Elapsed);
                 Console.Out.WriteLine("construct was " + construct.Elapsed);
                 Console.Out.WriteLine("orders was " + orders.Elapsed);
                 Console.Out.WriteLine("sight was " + sight.Elapsed);
-                Console.Out.WriteLine("amount of graphic loops: " + runs + " average milliseconds per frame: " + this.totalWatch.ElapsedMilliseconds / runs);
+                Console.Out.WriteLine("amount of graphic loops: " + runs + " average milliseconds per frame: " + totalWatch.ElapsedMilliseconds / runs);
             }
-            if (active)
+            if (m_unpaused)
             {
-                this.other.Start();
+                other.Start();
 
-                    
-                    this.populateActionLists();
-                    this.resolveOrders();
+                    PopulateActionLists();
+                    ResolveOrders();
 
-                this.other.Stop();
+                other.Stop();
 
-                this.move.Start();
+                move.Start();
 
-                    this.handleMovement();
+                    HandleMovement();
 
-                this.move.Stop();
+                move.Stop();
 
-                this.shoot.Start();
+                shoot.Start();
 
-                    this.handleShooting();
+                    HandleShooting();
 
-                this.shoot.Stop();
+                shoot.Stop();
 
-                this.construct.Start();
+                construct.Start();
 
-                    this.handleUnitCreation();
+                    HandleUnitCreation();
 
-                this.construct.Stop();
+                construct.Stop();
 
-                this.synch.Start();
+                synch.Start();
 
-                    this.updateOutput();
+                    UpdateOutput();
 
-                this.synch.Stop();
+                synch.Stop();
 
-                this.clearData();
+                ClearData();
             }
-            this.frameLimit();
+            FrameLimit();
             runs++;
         }
+
+        #endregion
+
+        #region private methods
 
         /*
          * This method limits the amount of logic frames per second. 
          */
-        private void frameLimit()
+        private void FrameLimit()
         {
-            while (frameTimer.ElapsedMilliseconds < MIN_MILLISECONDS_PER_FRAME) { }
-            this.frameTimer.Restart();
+            while (m_frameTimer.ElapsedMilliseconds < MIN_MILLISECONDS_PER_FRAME) { }
+            m_frameTimer.Restart();
         }
 
-
-        private void handleUnitCreation()
+        private void HandleUnitCreation()
         {
-            int civAmountToCreate = this.civAmountGoal - this.civAmount;
-            foreach(Constructor constructor in constructors)
+            int civAmountToCreate = m_maximumAmountOfCivilians - m_currentCivilianAmount;
+            foreach(IConstructor constructor in m_constructingEntities)
             {
                 switch (((Entity)constructor).Loyalty)
                 {
                     case (Affiliation.CIVILIAN):
                         if (civAmountToCreate > 0)
                         {
-                            this._grid.resolveConstruction(constructor, constructor.getConstruct());
+                            m_grid.ResolveConstruction(constructor, constructor.GetConstruct());
                             civAmountToCreate--;
-                            this.civAmount++;
+                            m_currentCivilianAmount++;
                         }
                         break;
                     default:
-                        this._grid.resolveConstruction(constructor, constructor.getConstruct());
+                        m_grid.ResolveConstruction(constructor, constructor.GetConstruct());
                         break;
                 }
             }
         }
 
-        private void clearData()
+        private void ClearData()
         {
-            this.shooters.Clear();
-            this.movers.Clear();
-            this.constructors.Clear();
-            this.activeEntities.Clear();
-            this._grid.clear();
+            m_shootingEntities.Clear();
+            m_movingEntities.Clear();
+            m_constructingEntities.Clear();
+            m_activeEntities.Clear();
+            m_grid.ClearLists();
         }
 
-        private void updateOutput()
+        private void UpdateOutput()
         {
-            List<BufferEvent> actions = _grid.returnActions();
-            foreach (BufferEvent action in actions)
+            List<IBufferEvent> actions = m_grid.ReturnCommitedActions();
+            foreach (IBufferEvent action in actions)
             {
                 switch(action.type())
                 {
                     case(BufferType.DESTROY):
-                        this.alwaysActive.Remove(((DestroyEvent)action).Ent.Ent);
-                        this.playerUnits.Remove(((DestroyEvent)action).Ent.Ent);
-                        if ((((DestroyEvent)action).Ent.Type == entityType.PERSON) && ((DestroyEvent)action).Ent.Loyalty == Affiliation.CIVILIAN)
+                        m_alwaysActiveEntities.Remove(((DestroyBufferEvent)action).Ent.InternalEntity);
+                        m_playerUnits.Remove(((DestroyBufferEvent)action).Ent.InternalEntity);
+                        if ((((DestroyBufferEvent)action).Ent.Type == entityType.PERSON) && ((DestroyBufferEvent)action).Ent.Loyalty == Affiliation.CIVILIAN)
                         {
-                            this.civAmount--;
+                            m_currentCivilianAmount--;
                         }
                         break;
                     case(BufferType.CREATE):
                         //TODO - recreate
-                        this.alwaysActive.Add(((CreateEvent)action).Mover.Ent);
+                        m_alwaysActiveEntities.Add(((CreateUnitBufferEvent)action).Mover.InternalEntity);
                         break;
                     //TODO - missing cases?
                 }
 
-
             }
             //TODO - try smarter threading, with waiting only a limited time on entering. 
-            lock (displayBuffer)
+            lock (m_displayBuffer)
             {
-                //List<ExternalEntity> newPath = this._grid.getVisibleEntities();
-                List<ExternalEntity> newList = new List<ExternalEntity>(this._grid.getAllEntities());
-                displayBuffer.receiveVisibleEntities(newList);
+                //List<ExternalEntity> newPath = grid.getVisibleEntities();
+                List<ExternalEntity> newList = new List<ExternalEntity>(m_grid.GetAllExternalEntities());
+                m_displayBuffer.ReceiveVisibleEntities(newList);
                 if (actions.Count > 0)
                 {
-                    List<BufferEvent> actionList = new List<BufferEvent>(actions);
-                    displayBuffer.receiveActions(actionList);
+                    List<IBufferEvent> actionList = new List<IBufferEvent>(actions);
+                    m_displayBuffer.ReceiveActions(actionList);
                 }
-                displayBuffer.Updated = true;
+                m_displayBuffer.Updated = true;
             }
             
         }
 
-        private void handleInput()
+        private void HandleInput()
         {
-            lock (inputBuffer)
+            lock (m_inputBuffer)
             {
-                if (inputBuffer.LogicInput)
+                if (m_inputBuffer.LogicInput)
                 {
-                    List<BufferEvent> events = inputBuffer.logicEvents();
-                    foreach (BufferEvent action in events)
+                    List<IBufferEvent> events = m_inputBuffer.GetEvents(InputModuleAccessors.Logic);
+                    foreach (IBufferEvent action in events)
                     {
                         switch (action.type())
                         {
                             case BufferType.PAUSE:
-                                this.active = false;
+                                m_unpaused = false;
                                 break;
                             case BufferType.UNPAUSE:
-                                this.active = true;
+                                m_unpaused = true;
                                 break;
                             case BufferType.ENDGAME:
-                                this.active = false;
-                                this.gameRunning = false;
+                                m_unpaused = false;
+                                m_gameRunning = false;
                                 break;
                             case BufferType.SELECT:
-                                this._grid.select(((BufferMouseSelectEvent)action).Coords.toPoint());
+                                m_grid.SelectUnit(((MouseSelectBufferEvent)action).Coords.ToPoint());
                                 break;
                             case BufferType.DESELECT:
-                                this._grid.deselect();
+                                m_grid.DeselectUnit();
                                 break;
                         }
                     }
@@ -252,33 +252,33 @@ namespace Game.Logic
         /*
          * This function iterates over every active entity, checks if they need to act, and if they do, finds their new reaction.
          */
-        private void resolveOrders()
+        private void ResolveOrders()
         {
-            foreach (Entity ent in activeEntities)
+            foreach (Entity ent in m_activeEntities)
             {
-                this.orders.Start();
-                if (ent.doesReact())
+                orders.Start();
+                if (ent.DoesReact())
                 {
                     if (ent.WhatSees.Count == 0)
                     {
-                        this.orders.Stop();
-                        this.sight.Start();
-                        this._grid.whatSees(ent);
-                        this.sight.Stop();
+                        orders.Stop();
+                        sight.Start();
+                        m_grid.WhatSees(ent);
+                        sight.Stop();
                     }
-                    this.orders.Start();
-                    ent.resolveOrders();
+                    orders.Start();
+                    ent.ResolveOrders();
                     ent.WhatSees.Clear();
                 }
                 Reaction react = ent.Reaction;
-                Action action = react.action();
+                Action action = react.Action();
 
                 if (action == Action.FIRE_AT || action == Action.MOVE_WHILE_SHOOT)
                 {
-                    Shooter temp = (Shooter)ent;
-                    if (temp.readyToShoot())
+                    IShooter temp = (IShooter)ent;
+                    if (temp.ReadyToShoot())
                     {
-                        this.shooters.Add(temp);
+                        m_shootingEntities.Add(temp);
                     } 
                 }
 
@@ -288,61 +288,61 @@ namespace Game.Logic
                     MovingEntity temp = (MovingEntity)ent;
                     if (temp.ReadyToMove(temp.Speed))
                     {
-                        this.movers.Add(temp);
+                        m_movingEntities.Add(temp);
                     }
                 }
 
                 if (action == Action.CONSTRUCT_ENTITY)
                 {
-                    Constructor temp = (Constructor)ent;
-                    bool check = temp.readyToConstruct();
+                    IConstructor temp = (IConstructor)ent;
+                    bool check = temp.ReadyToConstruct();
                     if (check) //TODO - for structures, to make sure they update their building order. other solution?
                     {
-                        this.constructors.Add(temp);
+                        m_constructingEntities.Add(temp);
                     }
                 }
-                this.orders.Stop();
+                orders.Stop();
             }
         }
 
-        private void handleMovement()
+        private void HandleMovement()
         {
-            foreach (MovingEntity ent in movers)
+            foreach (MovingEntity ent in m_movingEntities)
             {
-                _grid.resolveMove(ent);
+                m_grid.ResolveMove(ent);
             }
         }
 
-        private void handleShooting()
+        private void HandleShooting()
         {
-            foreach (Shooter ent in shooters)
+            foreach (IShooter ent in m_shootingEntities)
             {
-                _grid.resolveShoot(ent, ent.target());
+                m_grid.ResolveShoot(ent, ent.Target());
             }
         }
 
         /*
          * This function populates the active entities for this round, by the logic of - all player units, and every entity they see 
          */
-        private void populateActionLists()
+        private void PopulateActionLists()
         {
             /*
             activeEntities.listAdd(alwaysActive);
             foreach (Entity t in playerUnits)
             {
                 activeEntities.uniqueAdd(t);
-                _grid.whatSees(t);
+                grid.whatSees(t);
                 foreach (Entity temp in t.WhatSees)
                 {
                     activeEntities.uniqueAdd(temp);
                 }
             }
              */
-            activeEntities = this._grid.getAllRealEntities();
+            m_activeEntities = m_grid.GetAllEntities();
             
         }
 
         //TODO - add blocks, add the whole player logic, add research
-
+        #endregion
     }
 }

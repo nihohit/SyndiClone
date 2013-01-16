@@ -3,17 +3,15 @@ using System.Collections.Generic;
 
 namespace Game.Logic.Entities
 {
-   class Cop : Person, Shooter
-    {
+   class Cop : Person, IShooter
+   {
 
-       /*********
-        * class statics
-        *********/
+       #region static members
 
        //TODO - change back to threatTargeterHigh
        static private Reaction copReact(List<Entity> list)
        {
-           Entity temp = Targeters.simpleTestTargeter(list, Affiliation.INDEPENDENT);
+           Entity temp = Targeters.SimpleTestTargeter(list, Affiliation.INDEPENDENT);
            if (temp == null)
            {
                return new IgnoreReaction();
@@ -25,85 +23,88 @@ namespace Game.Logic.Entities
        //TODO - change back to threatTargeterHigh
        static Entity copTargeter(List<Entity> list)
        {
-           return Targeters.threatTargeterLow(list, Affiliation.INDEPENDENT);
+           return Targeters.ThreatTargeterLow(list, Affiliation.INDEPENDENT);
        }
 
-       private static Weapon copWeapon = Weapon.instance(WeaponType.PISTOL);
+       private static Weapons copWeapon = Weapons.Instance(WeaponType.PISTOL);
 
-       /**********
-        * class consts
-        **********/
+       #endregion
+
+       #region consts
     
        private const int COP_SHOOT_TIME = 2000;
 
-       /************
-         * class members
-         ***********/
-       private int timeBeforeShot;
-       private readonly PoliceStation station;
+       #endregion
 
-       /***********
-        * constructor
-        ***********/
+       #region fields 
+
+       private int m_timeBeforeShot;
+       private readonly PoliceStation m_station;
+
+       #endregion
+
+       #region constructors
 
        public Cop(PoliceStation station) :
-           base(copReact, Affiliation.INDEPENDENT, new List<Direction>(), station.ExitPoint.vectorToDirection())
+           base(copReact, Affiliation.INDEPENDENT, new List<Direction>(), station.ExitPoint().VectorToDirection())
        {
-           this.station = station;
-           this.timeBeforeShot = 0;
+           m_station = station;
+           m_timeBeforeShot = 0;
            List<Upgrades> list = new List<Upgrades>();
            list.Add(Upgrades.BULLETPROOF_VEST);
-           base.upgrade(list);
+           base.Upgrade(list);
        }
 
        public Cop(PoliceStation station, List<Direction> path) :
-           base(copReact, Affiliation.INDEPENDENT, new List<Direction>(path), station.ExitPoint.vectorToDirection())
+           base(copReact, Affiliation.INDEPENDENT, new List<Direction>(path), station.ExitPoint().VectorToDirection())
        {
-           this.station = station;
-           this.timeBeforeShot = 0;
+           m_station = station;
+           m_timeBeforeShot = 0;
            List<Upgrades> list = new List<Upgrades>();
            list.Add(Upgrades.BULLETPROOF_VEST);
-           base.upgrade(list);
+           base.Upgrade(list);
        }
 
-       /***********
-        * methods
-        ********/
+       #endregion
 
-        Weapon Shooter.weapon()
-        {
-            return copWeapon;
-        }
+       #region IShooter
 
-       internal override void destroy()
-        {
- 	       base.destroy();
-           station.policemanDestroyed();
-        }
-
-       bool Shooter.readyToShoot()
+       public Weapons Weapon()
        {
-           bool result = reachAffect(COP_SHOOT_TIME, this.timeBeforeShot, copWeapon.RateOfFire);
+           return copWeapon;
+       }
+
+       public bool ReadyToShoot()
+       {
+           bool result = ReachAffect(COP_SHOOT_TIME, m_timeBeforeShot, copWeapon.RateOfFire);
            if (result)
            {
-               this.timeBeforeShot -= COP_SHOOT_TIME;
+               m_timeBeforeShot -= COP_SHOOT_TIME;
            }
            else
            {
-               this.timeBeforeShot += copWeapon.RateOfFire;
+               m_timeBeforeShot += copWeapon.RateOfFire;
            }
            return result;
        }
 
-       Entity Shooter.target()
+       public Entity Target()
        {
-           return ((ShootReaction)this.Reaction).Focus;
+           return ((ShootReaction)Reaction).Focus;
        }
 
-       targetChooser Shooter.targeter()
+       public targetChooser Targeter()
        {
            return copTargeter;
        }
+
+       #endregion
+
+       public override void Destroy()
+        {
+ 	       base.Destroy();
+           m_station.PolicemanDestroyed();
+        }
 
        public override string ToString()
        {

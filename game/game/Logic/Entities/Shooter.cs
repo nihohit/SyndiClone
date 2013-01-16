@@ -2,16 +2,16 @@
 
 namespace Game.Logic.Entities
 {
-    interface Shooter
+    public interface IShooter
     {
 
-        Weapon weapon();
+        Weapons Weapon();
 
-        bool readyToShoot();
+        bool ReadyToShoot();
 
-        Entity target();
+        Entity Target();
 
-        targetChooser targeter();
+        targetChooser Targeter();
 
     }
 }

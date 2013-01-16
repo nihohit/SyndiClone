@@ -9,34 +9,34 @@ using System.Text;
  * */
 namespace Game.City_Generator
 {
-    
     static class CityFactory
     {
-        /********************************Constants***************************************/
+        #region constants
+
         private const int DEF_LEN =100;
         private const int DEF_WID=100; //default city length and depth
 
+        #endregion
 
-
-        /********************************simple methods***************************************/
+        #region public methods
 
         /**
          * a city factory method.
          * */
-        public static GameBoard createCity(int length=DEF_LEN,int depth=DEF_WID){
+        public static GameBoard CreateCity(int length=DEF_LEN,int depth=DEF_WID){
             City retVal = new City(length,depth);
-            retVal.addRoads();
-            retVal.translateRoads();
-            retVal.addBuildings();
-            retVal.addCorporates();
-            retVal.Img = CityImageGenerator.convert_to_image(retVal);
+            retVal.AddRoads();
+            retVal.TranslateRoads();
+            retVal.AddBuildings();
+            retVal.AddCorporates();
+            retVal.BoardImage = CityImageGenerator.ConvertToImage(retVal);
             
            // Corporate.print();
 
             return retVal;
         }
 
-        public static GameBoard debugCity() {
+        public static GameBoard DebugCity() {
             City retVal = new City(10, 10);
 
            // retVal.Grid[2, 0] = new RoadTile();
@@ -72,14 +72,12 @@ namespace Game.City_Generator
             //retVal.Grid[3, 3] = new RoadTile();
             //((RoadTile)retVal.Grid[3, 3]).VOffset = 2;
             //((RoadTile)retVal.Grid[3, 3]).VDepth = 3;
-            
-            
+             
            // retVal.Grid[0, 2] = new RoadTile();
             retVal.Grid[3, 2] = new RoadTile();
             
-            
             //retVal.addRoads();
-            retVal.translateRoads();
+            retVal.TranslateRoads();
             for (int i = 0; i < retVal.Length; ++i)
             {
                 for (int j = 0; j < retVal.Depth; ++j)
@@ -92,7 +90,8 @@ namespace Game.City_Generator
             }
             //System.Console.ReadKey();
             return retVal;
-        
         }
+
+        #endregion
     }
 }

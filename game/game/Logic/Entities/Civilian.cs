@@ -6,42 +6,39 @@ namespace Game.Logic.Entities
 {
     class Civilian : Person
     {
-
-        /******************
-        Class consts
-        ****************/
+        #region consts
 
         const int CIV_RUNNING_TIME = 100;
 
-        /******************
-        Class members
-        ****************/
+        #endregion
 
-        private bool fleeing;
-        private int timeRunning = 0;
+        #region fields
 
-        /******************
-        Constructors
-        ****************/
+        private bool m_fleeing;
+        private int m_timeRunning = 0;
 
-        internal Civilian(Direction headed) :
-            base(civReact, Affiliation.CIVILIAN, new List<Direction>(), headed)
+        #endregion
+
+        #region constructors
+
+        public Civilian(Direction headed) :
+            base(CivReact, Affiliation.CIVILIAN, new List<Direction>(), headed)
         {
-            this.fleeing = false;
+            m_fleeing = false;
         }
 
-        /******************
-        Methods
-        ****************/
+        #endregion
 
-        internal void runningAway()
+        #region public methods
+
+        public void RunningAway()
         {
-            this.fleeing = true;
+            m_fleeing = true;
         }
 
-        public static Reaction civReact(List<Entity> entities)
+        public static Reaction CivReact(List<Entity> entities)
         {
-            Entity threat = Targeters.threatTargeterHigh(entities, Affiliation.CIVILIAN);
+            Entity threat = Targeters.ThreatTargeterHigh(entities, Affiliation.CIVILIAN);
             Reaction react;
 
             if (threat == null) //TODO - add ignoring cops
@@ -58,27 +55,29 @@ namespace Game.Logic.Entities
         }
 
 
-        internal override bool doesReact()
+        public override bool DoesReact()
         {
-            if (this.fleeing)
+            if (m_fleeing)
             {
-                if (this.timeRunning < CIV_RUNNING_TIME)
+                if (m_timeRunning < CIV_RUNNING_TIME)
                 {
-                    this.timeRunning += this.ReactionTime;
+                    m_timeRunning += ReactionTime;
                     return false;
                 }
                 else
                 {
-                    this.timeRunning = 0;
-                    this.fleeing = false;
+                    m_timeRunning = 0;
+                    m_fleeing = false;
                 }
             }
-            return base.doesReact();
+            return base.DoesReact();
         }
 
         public override string ToString()
         {
             return "Civilian, " + base.ToString();
         }
+
+        #endregion
     }
 }

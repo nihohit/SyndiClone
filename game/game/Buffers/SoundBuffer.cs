@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Game.Buffers
 {
-    class SoundBuffer : Buffer
+    public class SoundBuffer : Buffer
     {
 
     }

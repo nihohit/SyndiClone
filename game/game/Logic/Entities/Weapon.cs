@@ -3,87 +3,58 @@ using System.Collections.Generic;
 
 namespace Game.Logic.Entities
 {
-    class Weapon
+    public class Weapons
     {
-        /******************
-        class consts
-        ****************/
-        static Dictionary<WeaponType, Weapon> _weapons = new Dictionary<WeaponType, Weapon>();
+        #region consts
+        private static Dictionary<WeaponType, Weapons> s_weapons = new Dictionary<WeaponType, Weapons>();
         const int PISTOL_ROF = 20;
         const int PISTOL_RANGE = 12;
         const int PISTOL_THREAT = 1;
         const double PISTOL_ACC = 8;
 
+        #endregion
 
-        /******************
-        class members
-        ****************/
+        #region constructor
 
-        private readonly int _range;
-        private readonly Shot _shot; //This property represents the shot type of the weapon. notice that different weapons can have the same kind of shot, but with different ranges & rates of fire
-        private readonly int _rateOfFire;
-        private readonly int _threat;
-        private readonly double _accuracy;
-
-        /******************
-        constructors
-        ****************/
-
-        private Weapon(int range, int ROF, double acc, Shot shot, int threat)
+        private Weapons(int range, int ROF, double acc, Shot shot, int threat)
         {
-            this._accuracy = acc;
-            this._range = range;
-            this._rateOfFire = ROF;
-            this._shot = shot;
-            this._threat = threat;
+            Accuracy = acc;
+            Range = range;
+            RateOfFire = ROF;
+            Shot = shot;
+            Threat = threat;
         }
 
-        internal static Weapon instance(WeaponType type)
+        public static Weapons Instance(WeaponType type)
         {
-            if (!_weapons.ContainsKey(type))
+            if (!s_weapons.ContainsKey(type))
             {
                 switch (type)
                 {
                     case(WeaponType.PISTOL):
-                        _weapons.Add(type, new Weapon(PISTOL_RANGE, PISTOL_ROF, PISTOL_ACC, Shot.instance(ShotType.PISTOL_BULLET) , PISTOL_THREAT));
+                        s_weapons.Add(type, new Weapons(PISTOL_RANGE, PISTOL_ROF, PISTOL_ACC, Shot.instance(ShotType.PISTOL_BULLET) , PISTOL_THREAT));
                         break;
                     //TODO - missing types
 
                 }
             }
-
-            return _weapons[type];
+            return s_weapons[type];
         }
 
+        #endregion
 
+        #region properties
 
-        /******************
-        Getters & setters
-        ****************/
+        public int Threat { get; set; }
 
-        public int Threat
-        {
-            get { return _threat; }
-        } 
+        public int Range { get; set; }
 
-        internal int Range
-        {
-          get { return _range; }  
-        } 
+        public Shot Shot { get; set; }
 
-        internal Shot Shot
-        {
-          get { return _shot; }  
-        } 
+        public int RateOfFire { get; set; }
 
-        public int RateOfFire
-        {
-          get { return _rateOfFire; }  
-        } 
+        public double Accuracy { get; set; }
 
-        internal double Acc
-        {
-          get { return _accuracy; }  
-        }
+        #endregion
     }
 }

@@ -3,6 +3,7 @@ using SFML.Window;
 using System.Collections.Generic;
 using System;
 using Game.Buffers;
+using System.Linq;
 
 namespace Game.Graphic_Manager
 {
@@ -13,208 +14,192 @@ namespace Game.Graphic_Manager
          * and some by the buffer (basically, what depends on whether they demand knowledge of logic events is handled by the buffer and what 
          * demands knowledge of screen events is handled by the manager). 
          * This should be remedied - maybe move everything to the buffer. 
+         */
 
-        /************
-         * class members
-         ***************/
-        private Sprite crosshair = new Sprite(new Texture("images/UI/crosshairs.png"));
-        private HashSet<Sprite> displayedSprites = new HashSet<Sprite>();
-        private HashSet<Sprite> removedSprites = new HashSet<Sprite>();
-        private HashSet<Animation> animations = new HashSet<Animation>();
-        private HashSet<Animation> doneAnimations = new HashSet<Animation>();
+        #region fields
 
-        private RenderWindow _mainWindow;
-        private Game.Buffers.DisplayBuffer _buffer;
-        private InputBuffer input; //HACK - is this needed? maybe put that in the display buffer too?
-        private Sprite background;
-        private View UIview;
+        private Sprite m_crosshair = new Sprite(new Texture("images/UI/crosshairs.png"));
+        private HashSet<Sprite> m_displayedSprites = new HashSet<Sprite>();
+        private HashSet<Sprite> m_removedSprites = new HashSet<Sprite>();
+        private HashSet<Animation> m_animations = new HashSet<Animation>();
+
+        private RenderWindow m_mainWindow;
+        private Game.Buffers.DisplayBuffer m_buffer;
+        private InputBuffer m_input; //HACK - is this needed? maybe put that in the display buffer too?
+        private Sprite m_background;
+        private View m_UIview;
 
         //DEBUG & PERFORMANCE TOOLS
         //TODO - remove.
         System.Diagnostics.Stopwatch remove = new System.Diagnostics.Stopwatch();
-        System.Diagnostics.Stopwatch displayWatch = new System.Diagnostics.Stopwatch();
+        System.Diagnostics.Stopwatch DisplayWatch = new System.Diagnostics.Stopwatch();
         System.Diagnostics.Stopwatch synch = new System.Diagnostics.Stopwatch();
         System.Diagnostics.Stopwatch update = new System.Diagnostics.Stopwatch();
         System.Diagnostics.Stopwatch other = new System.Diagnostics.Stopwatch();
         int runs = 0;
 
-        /************
-         * constructor
-         * 
-         ***************/
-        public GameDisplay(Game.Buffers.DisplayBuffer buffer, Texture _background, RenderWindow window, InputBuffer _input)
+        #endregion
+
+        #region constructor
+
+        public GameDisplay(Game.Buffers.DisplayBuffer buffer, Texture background, RenderWindow window, InputBuffer input)
         {
-            this._buffer = buffer;
-            this.input = _input;
-            background = new Sprite(_background);
-            this._mainWindow = window;
-            this.crosshair.Origin = new Vector2f(this.crosshair.Texture.Size.X / 2, this.crosshair.Texture.Size.Y / 2);
-            this.UIview = new View(new Vector2f(_background.Size.X/2, _background.Size.Y/2), new Vector2f(_background.Size.X, _background.Size.Y));
-            this.displayWatch.Start();
+            m_buffer = buffer;
+            m_input = input;
+            m_background = new Sprite(background);
+            m_mainWindow = window;
+            m_crosshair.Origin = new Vector2f(m_crosshair.Texture.Size.X / 2, m_crosshair.Texture.Size.Y / 2);
+            m_UIview = new View(new Vector2f(background.Size.X/2, background.Size.Y/2), new Vector2f(background.Size.X, background.Size.Y));
+            DisplayWatch.Start();
         }
 
-        /************
-         * Class methods
-         *************/
+        #endregion
 
-        /***********
-          * main loop
-          ***********/
-        /*
-        public void run()
-        {
-            while (active)
-            {
-                loop();
-            }
-        }*/
+        #region public methods
 
-        public void loop()
+        public void Loop()
         {
-            this.other.Start();
-            this._mainWindow.Clear();
-            this._mainWindow.Draw(background);
-            this.other.Stop();
-            this.updateInfo();
-            this.displayWatch.Start();
-            this.display();
-            this.displayWatch.Stop();
+            other.Start();
+            m_mainWindow.Clear();
+            m_mainWindow.Draw(m_background);
+            other.Stop();
+            UpdateInfo();
+            DisplayWatch.Start();
+            Display();
+            DisplayWatch.Stop();
             runs++;
         }
 
-        /***********
-         * communication
-         ************/
+        public void Display()
+        {
+            m_mainWindow.Display();
+        }
+
+        //TODO - debug, remove
+        public void DisplayStats()
+        {
+            DisplayWatch.Stop();
+            Console.Out.WriteLine("synch was " + synch.Elapsed + " , display was " + DisplayWatch.Elapsed + " , update was " + update.Elapsed + " , remove was " + remove.Elapsed + " , other was " + other.Elapsed);
+            Console.Out.WriteLine("amount of graphic loops: " + runs + " average milliseconds per frame: " + DisplayWatch.ElapsedMilliseconds / runs);
+        }
+
+        #endregion
+
+        #region private methods
+
+        #region communication
 
         //This is the central 
-        private void updateInfo()
+        private void UpdateInfo()
         {
-            handleInputBuffer();
-            handleDisplayBuffer();
-            this.remove.Start();
-            removeSprites();
-            this.remove.Stop();
-            this.update.Start();
-            enterAnimations();
-            displaySprites();
-            drawUI();
-            this.update.Stop();
+            HandleInputBuffer();
+            HandleDisplayBuffer();
+            remove.Start();
+            RemoveSprites();
+            remove.Stop();
+            update.Start();
+            EnterAnimations();
+            DisplaySprites();
+            DrawUI();
+            update.Stop();
         }
 
-        private void handleDisplayBuffer()
+        private void HandleDisplayBuffer()
         {
-            this.synch.Start();
+            synch.Start();
 
-            lock (this._buffer)
+            lock (m_buffer)
             {
-                if (!this._buffer.Updated)
+                if (m_buffer.Updated)
                 {
                     //TODO - needs reviewing
-                    System.Threading.Monitor.Wait(this._buffer);
+                    m_buffer.AnalyzeData();
+                    FindSpritesToRemove();
+                    FindSpritesToDisplay();
+                    UpdateAnimations();
+                    m_buffer.Updated = false;
                 }
-                this._buffer.analyzeData();
-                this.findSpritesToRemove();
-                this.findSpritesToDisplay();
-                this.updateAnimations();
-                this._buffer.Updated = false;
             }
-            this.synch.Stop();
+            synch.Stop();
         }
 
-        private void handleInputBuffer()
+        private void HandleInputBuffer()
         {
-            lock (input)
+            lock (m_input)
             {
-                if (input.GraphicInput)
+                if (m_input.GraphicInput)
                 {
-                    List<BufferEvent> list = input.graphicEvents();
-                    foreach (BufferEvent action in list)
+                    List<IBufferEvent> list = m_input.GetEvents(InputModuleAccessors.Graphics);
+                    foreach (IBufferEvent action in list)
                     {
                         if (action.type() == BufferType.ENDGAME)
-                            displayStats();
+                            DisplayStats();
                     }
-
                 }
             }
         }
 
-        private void drawUI()
+        private void DrawUI()
         {
-            crosshair.Position = _mainWindow.ConvertCoords(Mouse.GetPosition(_mainWindow));
-            this._mainWindow.Draw(crosshair);
+            m_crosshair.Position = m_mainWindow.ConvertCoords(Mouse.GetPosition(m_mainWindow));
+            m_mainWindow.Draw(m_crosshair);
         }
 
-        private void findSpritesToDisplay()
+        private void FindSpritesToDisplay()
         {
-            this.displayedSprites.UnionWith(this._buffer.newSpritesToDisplay());
+            m_displayedSprites.UnionWith(m_buffer.NewSpritesToDisplay());
         }
 
-        private void findSpritesToRemove()
+        private void FindSpritesToRemove()
         {
-            this.removedSprites.UnionWith(this._buffer.spritesToRemove());
+            m_removedSprites.UnionWith(m_buffer.SpritesToRemove());
         }
 
-        private void updateAnimations()
+        private void UpdateAnimations()
         {
-            this.animations.UnionWith(this._buffer.getAnimations());
+            m_animations.UnionWith(m_buffer.GetAnimations());
         }
 
-        /***********
-         * info handling
-         ***********/
+        #endregion
 
-        private void displaySprites()
+        #region info handling
+
+        private void DisplaySprites()
         {
-            foreach (Sprite sprite in this.displayedSprites)
+            foreach (Sprite sprite in m_displayedSprites)
             {
-                this._mainWindow.Draw(sprite);
+                m_mainWindow.Draw(sprite);
             }
         }
 
-        private void enterAnimations()
+        private void EnterAnimations()
         {
             
-            foreach (Animation animation in this.animations)
+            foreach (Animation animation in m_animations.ToList())
             {
-                this.removedSprites.Add(animation.current());
-                if (animation.isDone())
+                m_removedSprites.Add(animation.Current());
+                if (animation.IsDone())
                 {
-                    doneAnimations.Add(animation);
+                    m_animations.Remove(animation);
                 }
                 else
                 {
-                    this.displayedSprites.Add(animation.getNext());
+                    m_displayedSprites.Add(animation.GetNext());
                 }
             }
+        }
 
-            foreach (Animation animation in doneAnimations)
+        private void RemoveSprites()
+        {
+            foreach (Sprite sprite in m_removedSprites)
             {
-                this.animations.Remove(animation);
+                m_displayedSprites.Remove(sprite);
             }
-            doneAnimations.Clear();
+            m_removedSprites.Clear();
         }
 
-        private void removeSprites()
-        {
-            foreach (Sprite sprite in this.removedSprites)
-            {
-                this.displayedSprites.Remove(sprite);
-            }
-            this.removedSprites.Clear();
-        }
+        #endregion
 
-        public void display()
-        {
-            _mainWindow.Display();
-        }
-
-
-        //TODO - debug, remove
-        internal void displayStats()
-        {
-            this.displayWatch.Stop();
-            Console.Out.WriteLine("synch was " + this.synch.Elapsed + " , display was " + this.displayWatch.Elapsed + " , update was " + this.update.Elapsed + " , remove was " + this.remove.Elapsed + " , other was " + other.Elapsed);
-            Console.Out.WriteLine("amount of graphic loops: " + runs + " average milliseconds per frame: " + this.displayWatch.ElapsedMilliseconds/runs);
-        }
+        #endregion
     }
 }

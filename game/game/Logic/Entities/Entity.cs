@@ -1,196 +1,141 @@
 ﻿
 namespace Game.Logic.Entities
 {
-    internal abstract class Entity
-
+    public abstract class Entity
     {
-        /******************
-        class consts
-        ****************/        
-        
-        const int timeToReact = 1000;
+        #region consts
 
-        /******************
-        class members
-        ****************/        
-        
-        private int _health;
-        protected Vector _size;
-        private readonly entityType _type;
-        private Reaction _reaction;
-        private Affiliation _loyalty;
-        private Sight _sight;
-        private Visibility _visible;
-        protected reactionFunction _howReact;
-        private UniqueList<Entity> _whatSees;
-        private int _threat = 0;
-        private readonly int _reactionTime;
-        private int _timeAcc = 0;
+        const int TIME_TO_REACT = 1000;
 
-        /******************
-        constructors
-        ****************/
+        #endregion
+
+        #region fields
+
+        private int m_timeAcc = 0;
+
+        #endregion
+
+        #region properties
+
+        public int ReactionTime { get; private set; }
+
+        public Reaction Reaction { get; set; }
+
+        public int Threat { get; set; }
+
+        public int Health { get; private set; }
+
+        public reactionFunction ReactionFunction { get; set; }
+
+        public UniqueList<Entity> WhatSees { get; set; }
+
+        public Affiliation Loyalty { get; set; }
+
+        public Visibility Visible { get; set; }
+
+        public Sight Sight { get; private set; }
+
+        public entityType Type { get; private set; }
+
+        public Vector Size { get; set; }
+
+        #endregion
+
+        #region constructor
 
         protected Entity(int reactionTime, reactionFunction reaction, int health,entityType type, Vector size, Affiliation loyalty)
         {
-            this._health = health;
-            this._size = size;
-            this._type = type;
-            this._loyalty = loyalty;
-            this._sight = Sight.instance(SightType.DEFAULT_SIGHT);
-            this._reaction = new IgnoreReaction();
-            this._visible = Visibility.REVEALED;
-            this._howReact = reaction;
-            this._reactionTime = reactionTime;
-            this.WhatSees = new UniqueList<Entity>();
+            Health = health;
+            Size = size;
+            Type = type;
+            Loyalty = loyalty;
+            Sight = Sight.instance(SightType.DEFAULT_SIGHT);
+            Reaction = new IgnoreReaction();
+            Visible = Visibility.REVEALED;
+            ReactionFunction = reaction;
+            ReactionTime = reactionTime;
+            WhatSees = new UniqueList<Entity>();
         }
 
-        /******************
-        Methods
-        ****************/
+        #endregion
 
-        internal virtual void hit(int damage)
-        {
-            this._health -= damage;
-        }
+        #region public methods
 
-        virtual internal void resolveOrders()
-        {
-            this.Reaction = this.ReactionFunction(this.WhatSees);
-        }
-
-        internal virtual bool doesReact()
-        {
-            bool ans = reachAffect(timeToReact, _timeAcc, _reactionTime);
-            if (ans)
-            {
-                _timeAcc -= timeToReact;
-            }
-            else
-            {
-                _timeAcc += _reactionTime;
-            }
-            return ans;
-        }
-
-        public bool reachAffect(int topLevel, int currentAcc, int increaseBy)
+        public bool ReachAffect(int topLevel, int currentAcc, int increaseBy)
         {
             return (currentAcc + increaseBy >= topLevel); 
         }
 
-        internal bool destroyed()
+        public bool Destroyed()
         {
-            return this._health <= 0;
+            return Health <= 0;
         }
 
-        internal virtual void destroy()
+        public override string ToString()
+        {
+            return "Health: " + Health + " size: " + Size.ToString();
+        }
+
+        #region virtual methods
+
+        public virtual void Hit(int damage)
+        {
+            Health -= damage;
+        }
+
+        virtual public void ResolveOrders()
+        {
+            Reaction = ReactionFunction(WhatSees);
+        }
+
+        public virtual bool DoesReact()
+        {
+            bool ans = ReachAffect(TIME_TO_REACT, m_timeAcc, ReactionTime);
+            if (ans)
+            {
+                m_timeAcc -= TIME_TO_REACT;
+            }
+            else
+            {
+                m_timeAcc += ReactionTime;
+            }
+            return ans;
+        }
+
+        public virtual void Destroy()
         {
         }
 
-        protected static Reaction reactionPlaceHolder(System.Collections.Generic.List<Entity> list)
-        {
-            return new IgnoreReaction();
-        }
-
-        protected virtual void upgrade(System.Collections.Generic.List<Upgrades> list)
+        protected virtual void Upgrade(System.Collections.Generic.List<Upgrades> list)
         {
             foreach (Upgrades upgrade in list)
             {
                 switch (upgrade)
                 {
                     case(Upgrades.BULLETPROOF_VEST):
-                        this._health += 7;
+                        Health += 7;
                         break;
                     case(Upgrades.VISIBILITY_SOLID):
-                        this._visible = Visibility.SOLID;
+                        Visible = Visibility.SOLID;
                         break;
                     case(Upgrades.BUILDING_BLIND):
-                        this._sight = Sight.instance(SightType.BLIND);
+                        Sight = Sight.instance(SightType.BLIND);
                         break;
-                    case(Upgrades.FLYER):
-                        ((MovingEntity)this).WayToMove = MovementType.FLYER;
-                        break;
-                    case (Upgrades.HOVER):
-                        ((MovingEntity)this).WayToMove = MovementType.HOVER;
-                        break;
-                    case (Upgrades.CRUSHER):
-                        ((MovingEntity)this).WayToMove = MovementType.CRUSHER;
-                        break;
-
                 }
-
             }
         }
+        
+        #endregion
 
-        /******************
-        Getters & setters
-        ****************/
-        public int ReactionTime
+        #region static methods
+
+        protected static Reaction ReactionPlaceHolder(System.Collections.Generic.List<Entity> list)
         {
-            get { return _reactionTime; }
-        } 
-
-
-        internal Reaction Reaction
-        {
-            get { return _reaction; }
-            set { _reaction = value; }
+            return new IgnoreReaction();
         }
 
-        public int Threat
-        {
-            get { return _threat; }
-            set { _threat = value; }
-        }
+        #endregion
 
-        public int Health
-        {
-            get { return _health; }
-        }
-
-        internal reactionFunction ReactionFunction
-        {
-            get { return _howReact; }
-            set { _howReact = value; }
-        }
-
-        internal UniqueList<Entity> WhatSees
-        {
-            get { return _whatSees; }
-            set { _whatSees = value; }
-        }
-
-        internal Affiliation Loyalty
-        {
-            get { return _loyalty; }
-            set { _loyalty = value; }
-        }
-
-        internal Visibility Visible
-        {
-            get { return _visible; }
-            set { _visible = value; }
-        }
-
-        internal Sight Sight
-        {
-            get { return _sight; }
-        } 
-
-        internal entityType Type
-        {
-            get { return _type; }
-        }
-
-        internal Vector Size
-        {
-            get { return _size; }
-        }
-
-        public override string ToString()
-        {
-            return "Health: " + this._health + " size: " + this.Size.ToString();
-        }
-
+        #endregion
     }
 }

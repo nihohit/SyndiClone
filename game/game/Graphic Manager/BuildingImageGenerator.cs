@@ -4,78 +4,95 @@ using Game.Logic.Entities;
 using Game.Logic;
 using SFML.Graphics;
 
-
 namespace Game.Graphic_Manager
 {
-    //Just some random stuff for the class
-    enum BuildingStyle { BLUE, RED, GREEN, YELLOW }
+    #region Block
 
     //this converts a Vector to smaller sized vectors, based on a set tile size. 
     //Didn't use vector, in order to make sure this is used only in this palce.
-    internal struct Block
+    public struct Block
     {
-        static readonly uint TILE_SIZE = FileHandler.getUintProperty("tile size", FileAccessor.GENERAL);
+        static readonly uint TILE_SIZE = FileHandler.GetUintProperty("tile size", FileAccessor.GENERAL);
 
-        private readonly uint x, y;
+        uint m_x, m_y;
 
-        internal Block(uint _x, uint _y)
+        public Block(uint x, uint y)
         {
-            this.x = _x / TILE_SIZE;
-            this.y = _y / TILE_SIZE;
+            m_x = x / TILE_SIZE;
+            m_y = y / TILE_SIZE;
         }
 
-        internal uint Y
-        {
-            get { return y; }
-        }
+        public uint Y { get { return m_y; } }
 
-        internal uint X
-        {
-            get { return x; }
-        }
+        public uint X { get { return m_x; } }
 
-        internal bool EqualSize(Block check)
+        public bool EqualSize(Block check)
         {
-            return ((this.X == check.X) && (this.y == check.Y));
+            return ((X == check.X) && (Y == check.Y));
         }
     }
 
-    //this class creates the building images
-    internal static class BuildingImageGenerator
-    {
-        enum BuildingParts {EDGE, CORNER, CENTER}
+    #endregion
 
-        static readonly uint TILE_SIZE = FileHandler.getUintProperty("tile size", FileAccessor.GENERAL);
-        private static Dictionary<ExternalEntity, Texture> buildings = new Dictionary<ExternalEntity, Texture>(new externalEntityEqualityComparer());
-        private static Dictionary<Tuple<Block, BuildingStyle>, Texture> templates = new Dictionary<Tuple<Block, BuildingStyle>, Texture>(new tupleEqualityComparer());
-        private static Dictionary<BuildingParts, Texture> parts = new Dictionary<BuildingParts, Texture>
+    #region BuildingImageGenerator
+
+    //this class creates the building images
+    public static class BuildingImageGenerator
+    {
+        #region enumerators
+
+        private enum BuildingParts {EDGE, CORNER, CENTER}
+        internal enum BuildingStyle { BLUE, RED, GREEN, YELLOW }
+
+        #endregion
+
+        #region static fields
+
+        static readonly uint TILE_SIZE = FileHandler.GetUintProperty("tile size", FileAccessor.GENERAL);
+        private static Dictionary<ExternalEntity, Texture> s_buildings = new Dictionary<ExternalEntity, Texture>(new externalEntityEqualityComparer());
+        private static Dictionary<Tuple<Block, BuildingStyle>, Texture> s_templates = new Dictionary<Tuple<Block, BuildingStyle>, Texture>(new TupleEqualityComparer());
+        private static Dictionary<BuildingParts, Texture> s_parts = new Dictionary<BuildingParts, Texture>
         {
             {BuildingParts.CENTER, new Texture("images/buildings/0_buildingmiddle.gif")},
             {BuildingParts.CORNER, new Texture("images/buildings/9_corner.gif")},
             {BuildingParts.EDGE, new Texture("images/buildings/9_edge.gif")}
         };
 
+        #endregion
+
+        #region public methods
+
         //checks if the image exists, if not, then if an equivalent image exist, and if not, creates a new image. 
         private static Texture GetBuildingImage(ExternalEntity building)
         {
-            if (buildings.ContainsKey(building)) return buildings[building];
-            var temp = Tuple.Create(new Block((uint)building.Size.X, (uint)building.Size.Y), generateStyle(building.Loyalty));
+            if (s_buildings.ContainsKey(building)) return s_buildings[building];
+            var temp = Tuple.Create(new Block((uint)building.Size.X, (uint)building.Size.Y), GenerateStyle(building.Loyalty));
             Texture image = null;
-            if (templates.ContainsKey(temp))
+            if (s_templates.ContainsKey(temp))
             {
-                image = templates[temp];
+                image = s_templates[temp];
             }
             else
             {
-                image = new Texture(generateBuildingImage(temp));
-                templates.Add(temp, image);
+                image = new Texture(GenerateBuildingImage(temp));
+                s_templates.Add(temp, image);
             }
-            buildings.Add(building,image);
+            s_buildings.Add(building,image);
             return image;
         }
 
+        public static SFML.Graphics.Texture GetBuildingSFMLTexture(ExternalEntity building)
+        {
+            Texture temp = GetBuildingImage(building);
+            return temp;
+        }
+
+        #endregion
+
+        #region private methods
+
         //generate a building image from a block
-        private static Texture generateBuildingImage(Tuple<Block, BuildingStyle> temp)
+        private static Texture GenerateBuildingImage(Tuple<Block, BuildingStyle> temp)
         {
             //TODO - if too heavy for realtime computing, try instead of generating an image, generating a rendertexture.
             uint depth = Convert.ToUInt16(temp.Item1.X);
@@ -105,7 +122,7 @@ namespace Game.Graphic_Manager
             {
                 for (int j = 1; j <= height; j++)
                 {
-                    sprites.Add(getBuildingTile(depth, height, i, j, style));
+                    sprites.Add(GetBuildingTile(depth, height, i, j, style));
                 }
             }
 
@@ -133,8 +150,7 @@ namespace Game.Graphic_Manager
             return new Texture(img.Texture);
         }
 
-
-        private static Sprite getBuildingTile(uint length, uint depth, int x, int y, BuildingStyle style)
+        private static Sprite GetBuildingTile(uint length, uint depth, int x, int y, BuildingStyle style)
         {
             //TODO - account for style
             Sprite img = null;
@@ -158,36 +174,36 @@ namespace Game.Graphic_Manager
             switch (id)
             {
                 case (0):
-                    img = new Sprite(parts[BuildingParts.CENTER]);
+                    img = new Sprite(s_parts[BuildingParts.CENTER]);
                     break;
                 case (1):
-                    img = new Sprite(parts[BuildingParts.EDGE]);
+                    img = new Sprite(s_parts[BuildingParts.EDGE]);
                     img.Rotation = 180f;
                     break;
                 case (9):
-                    img = new Sprite(parts[BuildingParts.EDGE]);
+                    img = new Sprite(s_parts[BuildingParts.EDGE]);
                     break;
                 case (10):
-                    img = new Sprite(parts[BuildingParts.EDGE]);
+                    img = new Sprite(s_parts[BuildingParts.EDGE]);
                     img.Rotation = 270f;;
                     break;
                 case (90):
-                    img = new Sprite(parts[BuildingParts.EDGE]);
+                    img = new Sprite(s_parts[BuildingParts.EDGE]);
                     img.Rotation = 90f;
                     break;
                 case (11):
-                    img = new Sprite(parts[BuildingParts.CORNER]);
+                    img = new Sprite(s_parts[BuildingParts.CORNER]);
                     img.Rotation = 270f;
                     break;
                 case (91):
-                    img = new Sprite(parts[BuildingParts.CORNER]);
+                    img = new Sprite(s_parts[BuildingParts.CORNER]);
                     img.Rotation = 180f;
                     break;
                 case (19):
-                    img = new Sprite(parts[BuildingParts.CORNER]);
+                    img = new Sprite(s_parts[BuildingParts.CORNER]);
                     break;
                 case (99):
-                    img = new Sprite(parts[BuildingParts.CORNER]);
+                    img = new Sprite(s_parts[BuildingParts.CORNER]);
                     img.Rotation = 90f;
                     break;
                 default:
@@ -198,34 +214,35 @@ namespace Game.Graphic_Manager
             return img;
         }
 
-        private static BuildingStyle generateStyle(Logic.Affiliation aff)
+        private static BuildingStyle GenerateStyle(Logic.Affiliation aff)
         {
             //TODO - missing function
             int num = (int)aff;
             return (BuildingStyle)num;
         }
 
-        internal static SFML.Graphics.Texture getBuildingSFMLTexture(ExternalEntity building)
+        #endregion
+
+        #region TupleEqualityComparer
+
+        internal class TupleEqualityComparer : IEqualityComparer<Tuple<Block, BuildingStyle>>
         {
-            Texture temp = GetBuildingImage(building);
-            return temp;
+
+            public bool Equals(Tuple<Block, BuildingStyle> first, Tuple<Block, BuildingStyle> second)
+            {
+                return (first.Item1.EqualSize(second.Item1) && first.Item2 == second.Item2);
+            }
+
+
+            public int GetHashCode(Tuple<Block, BuildingStyle> item)
+            {
+                int hCode = (int)(item.Item1.X * item.Item1.Y * item.Item2.GetHashCode());
+                return hCode.GetHashCode();
+            }
         }
+
+        #endregion
     }
 
-    class tupleEqualityComparer : IEqualityComparer<Tuple<Block, BuildingStyle>>
-    {
-
-        public bool Equals(Tuple<Block, BuildingStyle> first, Tuple<Block, BuildingStyle> second)
-        {
-            return (first.Item1.EqualSize(second.Item1) && first.Item2 == second.Item2);
-        }
-
-
-        public int GetHashCode(Tuple<Block, BuildingStyle> item)
-        {
-            int hCode = (int)(item.Item1.X * item.Item1.Y * item.Item2.GetHashCode());
-            return hCode.GetHashCode();
-        }
-
-    }
+    #endregion
 }

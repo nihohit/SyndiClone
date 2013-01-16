@@ -9,22 +9,11 @@ using System.Text;
  * */
 namespace Game.City_Generator
 {
-
     class BuildingTile:Tile
     {
-
-
         /********************************Constructor***************************************/
-        internal BuildingTile(Building b): base(){
-            _type = ContentType.BUILDING;
-            _building = b;
-        }
-
-
-        /********************************Properties***************************************/
-        internal override Building Building {
-            get { return _building; }
-            set { _building = value; }
-        }
+        public BuildingTile(Building b)
+            : base(ContentType.BUILDING, b)
+        { }
     }
 }

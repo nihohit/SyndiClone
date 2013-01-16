@@ -1,91 +1,103 @@
 ﻿using System.Collections.Generic;
+using System;
 
 namespace Game.Buffers
 {
-    class InputBuffer : Buffers.Buffer
+    /// <summary>
+    /// the buffer for the input from the game screen to the game logic and display manager.
+    /// </summary>
+    public class InputBuffer : Buffer
     {
-        private bool _logicFlag = false;
-        private bool _graphicFlag = false;
-        private bool _soundFlag = false;
-        private List<BufferEvent> _soundEvents = new List<BufferEvent>();
-        private List<BufferEvent> _logicEvents = new List<BufferEvent>();
-        private List<BufferEvent> _graphicEvents = new List<BufferEvent>();
+        #region fields
+        private List<IBufferEvent> m_soundEvents = new List<IBufferEvent>();
+        private List<IBufferEvent> m_logicEvents = new List<IBufferEvent>();
+        private List<IBufferEvent> m_graphicEvents = new List<IBufferEvent>();
+        #endregion
 
-        public bool SoundInput
-        {
-            get { return _soundFlag; }
-            set { _logicFlag = value; }
-        }
+        #region properties
+        public bool SoundInput {get; private set; }
 
-        public bool LogicInput
-        {
-            get { return _logicFlag; }
-            set { _logicFlag = value; }
-        }
+        public bool LogicInput {get; private set; }
 
-        public bool GraphicInput
-        {
-            get { return _graphicFlag; }
-            set { _graphicFlag = value; }
-        }
+        public bool GraphicInput {get; private set; }
+        #endregion
 
-        void setAllFlags()
-        {
-            this.LogicInput = true;
-            this.SoundInput = true;
-            this.GraphicInput = true;
-        }
+        #region public method
 
-        public void enterEvent(BufferEvent input)
+        //TODO - do we bother with different events?
+        public void EnterEvent(IBufferEvent input)
         {
             lock (this)
             {
-                this._graphicEvents.Add(input);
-                this._logicEvents.Add(input);
-                this._soundEvents.Add(input);
-                this.setAllFlags();
+                m_graphicEvents.Add(input);
+                m_logicEvents.Add(input);
+                m_soundEvents.Add(input);
+                SetAllFlags();
                 /*
                 switch (input.type())
                 {
                     case BufferType.PAUSE:
-                        this._graphicEvents.Add(input);
-                        this._logicEvents.Add(input);
-                        this._soundEvents.Add(input);
-                        this.setAllFlags();
+                        graphicEvents.Add(input);
+                        logicEvents.Add(input);
+                        soundEvents.Add(input);
+                        setAllFlags();
                         break;
                     case BufferType.UNPAUSE:
-                        this._graphicEvents.Add(input);
-                        this._logicEvents.Add(input);
-                        this._soundEvents.Add(input);
-                        this.setAllFlags();
+                        graphicEvents.Add(input);
+                        logicEvents.Add(input);
+                        soundEvents.Add(input);
+                        setAllFlags();
                         break;
                     case BufferType.END:
-                        this._graphicEvents.Add(input);
-                        this._logicEvents.Add(input);
-                        this._soundEvents.Add(input);
-                        this.setAllFlags();
+                        graphicEvents.Add(input);
+                        logicEvents.Add(input);
+                        soundEvents.Add(input);
+                        setAllFlags();
                         break;
                 }*/
                 
             }
         }
 
-        public List<BufferEvent> logicEvents()
+        public List<IBufferEvent> GetEvents(InputModuleAccessors accessor)
         {
-            List<BufferEvent> temp = new List<BufferEvent>(this._logicEvents);
-            this._logicEvents.Clear();
-            this.LogicInput = false;
-            return temp;
-            
+            switch (accessor)
+            {
+                case InputModuleAccessors.Graphics:
+                    GraphicInput = false;
+                    return GetEventsFromList(m_graphicEvents);
+
+                case InputModuleAccessors.Logic:
+                    LogicInput = false;
+                    return GetEventsFromList(m_logicEvents);
+
+                case InputModuleAccessors.Sounds:
+                    SoundInput = false;
+                    return GetEventsFromList(m_soundEvents);
+
+                default:
+                    throw new Exception("invalid InputModuleAccessor " + accessor);
+            }
         }
 
+        #endregion
 
-        internal List<BufferEvent> graphicEvents()
+        #region private methods
+
+        private List<IBufferEvent> GetEventsFromList(List<IBufferEvent> eventsList)
         {
-            List<BufferEvent> temp = new List<BufferEvent>(this._graphicEvents);
-            this._graphicEvents.Clear();
-            this.GraphicInput = false;
+            List<IBufferEvent> temp = new List<IBufferEvent>(eventsList);
+            eventsList.Clear();
             return temp;
         }
+
+        private void SetAllFlags()
+        {
+            LogicInput = true;
+            SoundInput = true;
+            GraphicInput = true;
+        }
+
+        #endregion
     }
 }

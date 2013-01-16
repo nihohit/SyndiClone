@@ -97,6 +97,7 @@
     <Compile Include="Logic\Entities\Constructor.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Logic\Entities\ConstructorBuilding.cs" />
     <Compile Include="Logic\Entities\Cop.cs">
       <SubType>Code</SubType>
     </Compile>

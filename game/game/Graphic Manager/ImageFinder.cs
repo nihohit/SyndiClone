@@ -6,34 +6,16 @@ using SFML.Graphics;
 
 namespace Game.Graphic_Manager
 {
-    //this is the general class for finding textures, just in case I'd like to replace the sprite finder
-    //HACK - is this interface even needed? 
-     interface TextureFinder
+    class SpriteFinder
     {
-        Sprite getSprite(ExternalEntity ent);
-        Sprite getShot(ShotType shot);
-        Sprite remove(ExternalEntity ent);
-        Sprite nextSprite(ExternalEntity mover);
-        Sprite getPath(ExternalEntity mover);
-        Animation generateDestoryResults(Area area, entityType entityType);
-        void setPath(ExternalEntity ent, List<Direction> path, SFML.Window.Vector2f position);
-        Sprite removePath(ExternalEntity ent);
-        bool hasPath(ExternalEntity ent);
-        Sprite nextPathStep(ExternalEntity ent);
-    }
+        private enum ImageType {PATH } //this enumerator is used for miscelenae. 
 
+        #region fields
+        private readonly uint m_distanceBetweenPathObjects = FileHandler.GetUintProperty("path sprite distance", FileAccessor.DISPLAY);
+        private readonly Dictionary<ExternalEntity, SpriteLoop> m_spriteLoopFinder = new Dictionary<ExternalEntity, SpriteLoop>();
+        private readonly Dictionary<ExternalEntity, SpriteLoop> m_pathFinder = new Dictionary<ExternalEntity, SpriteLoop>();
 
-    class SpriteFinder : TextureFinder
-    {
-        enum ImageType {PATH } //this enumerator is used for miscelenae. 
-
-        /***************
-         * class fields
-         ***************/
-        private uint distanceBetweenPathObjects = FileHandler.getUintProperty("path sprite distance", FileAccessor.DISPLAY);
-        private Dictionary<ExternalEntity, SpriteLoop> spriteLoopFinder = new Dictionary<ExternalEntity, SpriteLoop>();
-        private Dictionary<ExternalEntity, SpriteLoop> pathFinder = new Dictionary<ExternalEntity, SpriteLoop>();
-        private Dictionary<Logic.Affiliation, Texture> personFinder = new Dictionary<Logic.Affiliation, Texture>
+        private readonly Dictionary<Logic.Affiliation, Texture> m_personFinder = new Dictionary<Logic.Affiliation, Texture>
         {
             {Logic.Affiliation.INDEPENDENT, new Texture("images/Persons/personblue.png")},
             {Logic.Affiliation.CORP1, new Texture("images/Persons/personpurple.png")},
@@ -43,112 +25,112 @@ namespace Game.Graphic_Manager
             {Logic.Affiliation.CIVILIAN, new Texture("images/Persons/personyellow.png")}
         };
 
-        private Dictionary<ShotType, Texture> shots = new Dictionary<ShotType, Texture>
+        private readonly Dictionary<ShotType, Texture> m_shots = new Dictionary<ShotType, Texture>
         {
             { ShotType.PISTOL_BULLET, new Texture("images/shots/bulletshotstraight.png")}
 
         };
 
-        private Dictionary<ImageType, Texture> miscellaneous = new Dictionary<ImageType, Texture>
+        private readonly Dictionary<ImageType, Texture> m_miscellaneous = new Dictionary<ImageType, Texture>
         {
             {ImageType.PATH, new Texture("images/UI/path.png")}
         };
 
-        private List<ExternalEntity> removed = new List<ExternalEntity>();
+        private readonly List<ExternalEntity> m_removed = new List<ExternalEntity>();
 
-        /***************
-         * constructor
-         ***************/
+        #endregion
 
-        internal SpriteFinder()
+        #region constructor
+
+        public SpriteFinder() 
         {
         }
 
-        /************
-         * External functions
-         ***********/
+        #endregion
 
-        Sprite TextureFinder.getShot(ShotType shot)
+        #region public methods
+
+        public Sprite GetShot(ShotType shot)
         {
-            return new Sprite(shots[shot]);
+            return new Sprite(m_shots[shot]);
         }
 
-        Sprite TextureFinder.getSprite(ExternalEntity ent)
+        public Sprite GetSprite(ExternalEntity ent)
         {
-            if (!spriteLoopFinder.ContainsKey(ent))
+            if (!m_spriteLoopFinder.ContainsKey(ent))
             {
-                spriteLoopFinder.Add(ent, this.generateNewSpriteLoop(ent));
+                m_spriteLoopFinder.Add(ent, GenerateNewSpriteLoop(ent));
             }
-            return spriteLoopFinder[ent].nextSprite();
+            return m_spriteLoopFinder[ent].nextSprite();
         }
 
         //this function returns an animation as the result of destroying an entity.
-        Graphic_Manager.Animation TextureFinder.generateDestoryResults(Area area, entityType type)
+        public Graphic_Manager.Animation GenerateDestoryResults(Area area, entityType type)
         {
             //TODO - missing function
             return new Graphic_Manager.Animation(area, type);
         }
 
-        Sprite TextureFinder.remove(ExternalEntity ent)
+        public Sprite Remove(ExternalEntity ent)
         {
-            Sprite temp = this.spriteLoopFinder[ent].CurrentSprite();
-            this.spriteLoopFinder.Remove(ent);
+            Sprite temp = m_spriteLoopFinder[ent].CurrentSprite();
+            m_spriteLoopFinder.Remove(ent);
             return temp;
         }
 
-        Sprite TextureFinder.nextSprite(ExternalEntity mover)
+        public Sprite NextSprite(ExternalEntity mover)
         {
-            return this.spriteLoopFinder[mover].nextSprite();
+            return m_spriteLoopFinder[mover].nextSprite();
         }
 
-        Sprite TextureFinder.removePath(ExternalEntity ent)
+        public Sprite RemovePath(ExternalEntity ent)
         {
-            if (pathFinder.ContainsKey(ent))
+            if (m_pathFinder.ContainsKey(ent))
             {
-                Sprite temp = pathFinder[ent].CurrentSprite();
-                pathFinder.Remove(ent);
+                Sprite temp = m_pathFinder[ent].CurrentSprite();
+                m_pathFinder.Remove(ent);
                 return temp;
             }
             return null;
         }
 
-        void TextureFinder.setPath(ExternalEntity ent, List<Direction> path, SFML.Window.Vector2f position)
+        public void SetPath(ExternalEntity ent, List<Direction> path, SFML.Window.Vector2f position)
         {
-            pathFinder.Add(ent, generateNewComplexPath(path, position));
+            m_pathFinder.Add(ent, GenerateNewComplexPath(path, position));
         }
 
-        Sprite TextureFinder.getPath(ExternalEntity ent)
+        public Sprite GetPath(ExternalEntity ent)
         {
-            return this.pathFinder[ent].CurrentSprite();
-        }
-
-
-        Sprite TextureFinder.nextPathStep(ExternalEntity ent)
-        {
-            return this.pathFinder[ent].nextSprite();
+            return m_pathFinder[ent].CurrentSprite();
         }
 
 
-        bool TextureFinder.hasPath(ExternalEntity ent)
+        public Sprite NextPathStep(ExternalEntity ent)
         {
-            return pathFinder.ContainsKey(ent);
+            return m_pathFinder[ent].nextSprite();
         }
 
-        /***********
-         * internal methods
-         **********/
 
-        private SpriteLoop generateNewSpriteLoop(ExternalEntity ent)
+        public bool HasPath(ExternalEntity ent)
+        {
+            return m_pathFinder.ContainsKey(ent);
+        }
+
+        #endregion
+
+        #region private methods
+
+        private SpriteLoop GenerateNewSpriteLoop(ExternalEntity ent)
         {
             List<Sprite> list = new List<Sprite>();
             switch (ent.Type)
             {
                 case (Game.Logic.entityType.BUILDING):
-                    list.Add(new Sprite(BuildingImageGenerator.getBuildingSFMLTexture(ent)));
+                    list.Add(new Sprite(BuildingImageGenerator.GetBuildingSFMLTexture(ent)));
                     break;
 
                 case (Logic.entityType.PERSON):
-                    list.Add(new Sprite(personFinder[ent.Loyalty]));
+                    list.Add(new Sprite(m_personFinder[ent.Loyalty]));
                     break;
 
                 case (Logic.entityType.VEHICLE):
@@ -159,31 +141,29 @@ namespace Game.Graphic_Manager
             return new SpriteLoop(list);
         }
 
-        /*************
-        * PATHS
-        *************/
+        #region paths
 
         /*This function receives the parameters for a path, generates its bounding box, and then creates a series of RenderTextures sized as the bounding box, and places the 
          * relevant sprites in RenderTextures. 
          * DistanceBetweenPathObjects basically says how many sprites will be in the resulting loop. 
          */
-        private SpriteLoop generateNewComplexPath(List<Direction> path, SFML.Window.Vector2f position)
+        private SpriteLoop GenerateNewComplexPath(List<Direction> path, SFML.Window.Vector2f position)
         {
-            Area area = getPathSize(path);
+            Area area = GetPathSize(path);
             List<Sprite> list = new List<Sprite>();
-            List <Sprite> newSprite = generateNewPathSprite(path, area.Entry);
+            List <Sprite> newSprite = GenerateNewPathSprite(path, area.Entry);
             
             list.Clear();
             Sprite temp;
             int count;
             RenderTexture texture;
             //In each recursion of this loop a new RenderTexture is created and each sprite that is relevant to that texture is embedded in it. 
-            for (uint i = 0; i < distanceBetweenPathObjects; i++)
+            for (uint i = 0; i < m_distanceBetweenPathObjects; i++)
             {
                 texture = new RenderTexture((uint)area.Size.X, (uint)area.Size.Y);
-                for (uint j = 0; j < path.Count / distanceBetweenPathObjects; j++)
+                for (uint j = 0; j < path.Count / m_distanceBetweenPathObjects; j++)
                 {
-                    count = (int)(j * distanceBetweenPathObjects + i);
+                    count = (int)(j * m_distanceBetweenPathObjects + i);
                     if (count < newSprite.Count)
                     {
                         texture.Draw(newSprite[count]);
@@ -200,9 +180,9 @@ namespace Game.Graphic_Manager
         }
 
         //This function computes the size of a path texture, and its beginning point inside the square.
-        private Area getPathSize(List<Direction> path)
+        private Area GetPathSize(List<Direction> path)
         {
-            Texture pathTexture = miscellaneous[ImageType.PATH];
+            Texture pathTexture = m_miscellaneous[ImageType.PATH];
             uint maxSize = Math.Max(pathTexture.Size.X, pathTexture.Size.Y);
             uint halfSize = maxSize / 2;
             uint xSize = maxSize, xPos = halfSize, ySize = maxSize, yPos = halfSize, x = halfSize, y = halfSize;
@@ -249,16 +229,16 @@ namespace Game.Graphic_Manager
         }
 
         //This function returns a new path sprite, rotated to the correct way. 
-        private List<Sprite> generateNewPathSprite(List<Direction> path, Point entry)
+        private List<Sprite> GenerateNewPathSprite(List<Direction> path, Point entry)
         {
             List<Sprite> newList = new List<Sprite>();
             Vector initial = new Vector(entry.X, entry.Y);
             Sprite temp;
-            Texture texture = miscellaneous[ImageType.PATH];
+            Texture texture = m_miscellaneous[ImageType.PATH];
             uint xSize = texture.Size.X / 2, ySize = texture.Size.Y / 2;
             foreach (Direction dir in path)
             {
-                temp = new Sprite(miscellaneous[ImageType.PATH]);
+                temp = new Sprite(m_miscellaneous[ImageType.PATH]);
                 temp.Origin = new SFML.Window.Vector2f(xSize, ySize);
                 switch (dir)
                 {
@@ -286,13 +266,16 @@ namespace Game.Graphic_Manager
                         temp.Rotation = 225F;
                         break;
                 }
-                initial = initial.addVector(Vector.directionToVector(dir));
-                temp.Position = initial.toVector2f();
+                initial = initial.AddVector(Vector.DirectionToVector(dir));
+                temp.Position = initial.ToVector2f();
                 newList.Add(temp);
             }
 
             return newList;
         }
+
+        #endregion
+        #endregion
 
     }
 
@@ -301,13 +284,12 @@ namespace Game.Graphic_Manager
 
         public bool Equals(ExternalEntity first, ExternalEntity second)
         {
-            return (first.Ent.Equals(second.Ent));
+            return (first.InternalEntity.Equals(second.InternalEntity));
         }
-
 
         public int GetHashCode(ExternalEntity item)
         {
-            int hCode = item.Ent.GetHashCode();
+            int hCode = item.InternalEntity.GetHashCode();
             return hCode.GetHashCode();
         }
         

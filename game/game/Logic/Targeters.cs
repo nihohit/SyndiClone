@@ -6,10 +6,9 @@ namespace Game.Logic
     /*
      * This class is in charge of choosing targets to a given shooter out of the list of enemies in range of him. 
      */
-    internal static class Targeters
+    public static class Targeters
     {
-
-        public static Entity threatTargeterHigh(List<Entity> entities, Affiliation loyalty)
+        public static Entity ThreatTargeterHigh(List<Entity> entities, Affiliation loyalty)
         {
             Entity target = null;
             int seenThreat = 0;
@@ -24,7 +23,7 @@ namespace Game.Logic
             return target;
         }
 
-        public static Entity speedTargeterHigh(List<Entity> entities, Affiliation loyalty)
+        public static Entity SpeedTargeterHigh(List<Entity> entities, Affiliation loyalty)
         {
             Entity target = null;
             int speed = 0;
@@ -40,7 +39,7 @@ namespace Game.Logic
             return target;
         }
 
-        public static Entity healthTargeterHigh(List<Entity> entities, Affiliation loyalty)
+        public static Entity HealthTargeterHigh(List<Entity> entities, Affiliation loyalty)
         {
             Entity target = null;
             int health = 0;
@@ -56,7 +55,7 @@ namespace Game.Logic
             return target;
         }
 
-        public static Entity threatTargeterLow(List<Entity> entities, Affiliation loyalty)
+        public static Entity ThreatTargeterLow(List<Entity> entities, Affiliation loyalty)
         {
             Entity target = null;
             int seenThreat = 10000;
@@ -73,7 +72,7 @@ namespace Game.Logic
             return target;
         }
 
-        public static Entity speedTargeterLow(List<Entity> entities, Affiliation loyalty)
+        public static Entity SpeedTargeterLow(List<Entity> entities, Affiliation loyalty)
         {
             Entity target = null;
             int speed = 10000;
@@ -89,7 +88,7 @@ namespace Game.Logic
             return target;
         }
 
-        public static Entity healthTargeterLow(List<Entity> entities, Affiliation loyalty)
+        public static Entity HealthTargeterLow(List<Entity> entities, Affiliation loyalty)
         {
             Entity target = null;
             int health = 10000;
@@ -105,7 +104,7 @@ namespace Game.Logic
             return target;
         }
 
-        internal static Entity simpleTestTargeter(List<Entity> list, Affiliation affiliation)
+        public static Entity SimpleTestTargeter(List<Entity> list, Affiliation affiliation)
         {
             Entity target = null;
             int seenThreat = 10000;
