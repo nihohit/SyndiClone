@@ -46,7 +46,7 @@ namespace Game.Logic.Entities
        #region constructors
 
        public Cop(PoliceStation station) :
-           base(copReact, Affiliation.INDEPENDENT, new List<Direction>(), station.ExitPoint().VectorToDirection())
+           base(copReact, Affiliation.INDEPENDENT, new List<Direction>(), station.Exit.VectorToDirection())
        {
            m_station = station;
            m_timeBeforeShot = 0;
@@ -56,7 +56,7 @@ namespace Game.Logic.Entities
        }
 
        public Cop(PoliceStation station, List<Direction> path) :
-           base(copReact, Affiliation.INDEPENDENT, new List<Direction>(path), station.ExitPoint().VectorToDirection())
+           base(copReact, Affiliation.INDEPENDENT, new List<Direction>(path), station.Exit.VectorToDirection())
        {
            m_station = station;
            m_timeBeforeShot = 0;

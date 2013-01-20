@@ -51,6 +51,11 @@ namespace Game.Graphic_Manager
             m_crosshair.Origin = new Vector2f(m_crosshair.Texture.Size.X / 2, m_crosshair.Texture.Size.Y / 2);
             m_UIview = new View(new Vector2f(background.Size.X/2, background.Size.Y/2), new Vector2f(background.Size.X, background.Size.Y));
             DisplayWatch.Start();
+            /*TODO - remove
+#if DEBUG
+            Logic.Pathfinding.AdvancedVisibleAStar.Setup(buffer);
+#endif
+             */
         }
 
         #endregion

@@ -143,13 +143,13 @@
     <Compile Include="Logic\LogicInfo.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Logic\Pathfinding\MyAStar.cs">
+    <Compile Include="Logic\Pathfinding\AStar.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Logic\Pathfinding\MyTwoTieredAstar.cs">
+    <Compile Include="Logic\Pathfinding\AdvancedAstar.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Logic\Pathfinding\MyVisibleAStar.cs">
+    <Compile Include="Logic\Pathfinding\VisibleAStar.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Logic\Pathfinding\PathfindingInfo.cs">

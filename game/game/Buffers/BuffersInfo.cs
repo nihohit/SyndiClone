@@ -14,7 +14,7 @@ namespace Game.Buffers
     /// This enumerator represents the different buffer types we use. 
     /// TODO - different buffers will use different events - might be useful to seperate to different enumerators.
     /// </summary>
-    public enum BufferType { MOVE, SHOT, DESTROY, CREATE, PAUSE, SELECT, DESELECT, UNPAUSE, ENDGAME, MOUSEMOVE, SETPATH, UNIT_SELECT }
+    public enum BufferType { MOVE, SHOT, DESTROY, CREATE, PAUSE, SELECT, DESELECT, UNPAUSE, ENDGAME, MOUSEMOVE, SETPATH, UNIT_SELECT, DISPLAY_IMAGE }
 
     #endregion
 
@@ -270,6 +270,25 @@ namespace Game.Buffers
         public BufferType type()
         {
             return BufferType.CREATE;
+        }
+    }
+
+    #endregion
+
+    #region DisplayImageBufferEvent
+
+    public class DisplayImageBufferEvent : IBufferEvent
+    {
+        public DisplayImageBufferEvent(SFML.Graphics.Sprite sprite)
+        {
+            Sprite = sprite;
+        }
+
+        public SFML.Graphics.Sprite Sprite { get; private set; }
+
+        public BufferType type()
+        {
+            return BufferType.DISPLAY_IMAGE;
         }
     }
 

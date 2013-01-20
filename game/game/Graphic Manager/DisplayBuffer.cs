@@ -209,6 +209,13 @@ namespace Game.Buffers
                         }
                         m_finder.SetPath(((SetPathActionBufferEvent)action).Entity, ((SetPathActionBufferEvent)action).Path, ((SetPathActionBufferEvent)action).Position);
                         break;
+
+                    case BufferType.DISPLAY_IMAGE:
+                        m_displaySprites.Add(((DisplayImageBufferEvent)action).Sprite);
+                        break;
+
+                    default:
+                        throw new System.ArgumentException("the action is not relevant to the display buffer");
                 }
             }
             m_actions.Clear();

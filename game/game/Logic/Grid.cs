@@ -2,6 +2,8 @@
 using Game.Logic.Entities;
 using Game;
 using System;
+using System.Threading.Tasks;
+using System.Linq;
 
 namespace Game.Logic
 {
@@ -34,7 +36,8 @@ namespace Game.Logic
         private readonly Entity[,] m_gameGrid;
         private readonly TerrainGrid m_pathFindingGrid;
         private Entity m_selected;
-        private Pathfinding.pathfindFunction m_pathfindingFunction = Pathfinding.AdvancedAstar.findPath;
+        private Pathfinding.AdvancedAStar m_pathfinder;
+        private readonly Dictionary<ConstructorBuilding, Task<List<Direction>>> m_constructorsToPaths = new Dictionary<ConstructorBuilding, Task<List<Direction>>>();
         //TODO - add corporations
         static Random s_random = new Random();
 
@@ -46,6 +49,7 @@ namespace Game.Logic
         {
             m_gameGrid = new Entity[x, y];
             m_pathFindingGrid = new TerrainGrid(x,y);
+            
         }
 
         //this function is called after all the buildings have been added to the grid.
@@ -58,6 +62,7 @@ namespace Game.Logic
                     if (m_gameGrid[i, j] == null) m_pathFindingGrid.Grid[i, j] = TerrainType.ROAD;
                     else m_pathFindingGrid.Grid[i, j] = TerrainType.BUILDING;
                 }
+                m_pathfinder = new Pathfinding.AdvancedAStar(m_pathFindingGrid);
             }
         }
 
@@ -90,6 +95,13 @@ namespace Game.Logic
             m_visibleEntities.Clear();
             m_actionsDone.Clear();
             m_destroyedEntities.Clear();
+            foreach (var constructor in m_constructorsToPaths.Keys.ToList())
+            {
+                if (m_constructorsToPaths[constructor].Status == TaskStatus.RanToCompletion)
+                {
+                    SetPathInConstructor(constructor);
+                }
+            }
         }
 
         public List<ExternalEntity> GetAllExternalEntities()
@@ -195,7 +207,11 @@ namespace Game.Logic
 
         public void ResolveConstruction(IConstructor constructor, MovingEntity entity)
         {
-            AddEntity(entity, findConstructionSpot(constructor, entity));
+            if (constructor is ConstructorBuilding)
+            {
+                FinishResolveNewPath((ConstructorBuilding)constructor);
+            }
+            AddEntity(entity, FindConstructionSpot(constructor, entity));
             //TODO - add the transition of the entity from the center of the building to outside. currently just pops out. 
         }
 
@@ -287,16 +303,9 @@ namespace Game.Logic
         /*
          * This function will be used for player units, taht need complex routes.
          */
-        private List<Direction> GetComplexPath(Point entry, Point target, Vector size, MovementType movement, Direction direction)
+        private Task<List<Direction>> GetComplexPath(Point entry, Point target, Vector size, MovementType movement, Direction direction)
         {
-            List<Direction> ans = new List<Direction>();
-
-            ans = m_pathfindingFunction(entry, target, size, m_pathFindingGrid, movement, Pathfinding.Heuristics.DiagonalTo(target), direction);
-            if (!(ans.Count == entry.GetDiffVector(target).Length()))
-            {
-                //TODO - probably continue from there.
-            }
-            return ans;
+            return m_pathfinder.FindPathAsync(entry, target, direction, new Pathfinding.AStarConfiguration(size, movement, Pathfinding.Heuristics.DiagonalTo(target), true, true));
         }
 
         /*
@@ -634,12 +643,12 @@ namespace Game.Logic
 
         #region construction logic
 
-        private Area findConstructionSpot(IConstructor constructor, Entity ent)
+        private Area FindConstructionSpot(IConstructor constructor, Entity ent)
         {
-            return new Area(getExitPoint((Building)constructor), ent.Size);
+            return new Area(GetExitPoint((Building)constructor), ent.Size);
         }
 
-        private Point getExitPoint(Building constructor)
+        private Point GetExitPoint(Building constructor)
         {
             return new Point(ConvertToCentralPoint(constructor), constructor.Exit);
         }
@@ -647,19 +656,19 @@ namespace Game.Logic
         public void SelectUnit(Point point)
         {
             Entity temp = GetEntityInPoint(point);
-            if ((m_selected == null) && (temp != null) && (temp.Loyalty == Affiliation.INDEPENDENT)) //TODO - loyalty should be player issuing the order
+            if ((m_selected == null) && (temp != null) && (temp.Loyalty == Affiliation.INDEPENDENT) && (temp is ConstructorBuilding)) //TODO - loyalty should be player issuing the order
             {
                 m_selected = temp;
                 m_actionsDone.Add(new Buffers.UnitSelectBufferEvent(m_entities[m_selected], 
                     new Vector(ConvertToCentralPoint(temp).X,ConvertToCentralPoint(temp).Y)));
+                FinishResolveNewPath((ConstructorBuilding)temp);
                 return;
             }
             if (m_selected != null)
             {
-                if ((temp != null) && (temp.Type == entityType.BUILDING)) point = getExitPoint((Building)temp); 
+                if ((temp != null) && (temp.Type == entityType.BUILDING)) point = GetExitPoint((Building)temp); 
                 PoliceStation pol = ((PoliceStation)m_selected);
-                pol.Path = GetComplexPath(getExitPoint(pol), point, new Vector(1,1), MovementType.GROUND, pol.ExitPoint().VectorToDirection());
-                m_actionsDone.Add(new Buffers.SetPathActionBufferEvent(m_entities[pol],((PoliceStation)m_selected).Path, findConstructionSpot(pol, pol.GetConstruct()).Entry.ToVector2f()));
+                m_constructorsToPaths.Add(pol,GetComplexPath(GetExitPoint(pol), point, new Vector(1,1), MovementType.GROUND, pol.Exit.VectorToDirection()));
                 DeselectUnit();
             }
         }
@@ -709,6 +718,24 @@ namespace Game.Logic
                     ent.Exit = options[s_random.Next(0, options.Count)];
                 else throw new Exception("can't find exit point");
             }
+        }
+
+        private void FinishResolveNewPath(ConstructorBuilding build)
+        {
+            if (m_constructorsToPaths.ContainsKey(build))
+            {
+                var task = m_constructorsToPaths[build];
+                task.Wait();
+                SetPathInConstructor(build);
+            }
+        }
+
+        private void SetPathInConstructor(ConstructorBuilding constructor)
+        {
+            var task = m_constructorsToPaths[constructor];
+            m_constructorsToPaths.Remove(constructor);
+            constructor.Path = task.Result;
+            m_actionsDone.Add(new Buffers.SetPathActionBufferEvent(m_entities[constructor], constructor.Path, FindConstructionSpot(constructor, constructor.GetConstruct()).Entry.ToVector2f()));
         }
 
         #endregion

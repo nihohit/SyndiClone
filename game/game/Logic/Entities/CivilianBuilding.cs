@@ -9,6 +9,7 @@ namespace Game.Logic.Entities
         public CivilianBuilding(Game.Vector realSize, int sizeModifier, Vector exit)
             : base(sizeModifier, Entity.ReactionPlaceHolder, realSize, Affiliation.CIVILIAN)
         {
+
             base.Exit = exit;
             reactionFunction react = delegate(List<Entity> ent)
             {
@@ -31,7 +32,7 @@ namespace Game.Logic.Entities
             return new ConstructReaction(temp);
         }
 
-        public MovingEntity GetConstruct()
+        public override MovingEntity GetConstruct()
         {
             return ((ConstructReaction)Reaction).Focus;
         }
@@ -39,11 +40,6 @@ namespace Game.Logic.Entities
         public override bool ReadyToConstruct()
         {
             return base.ReadyToConstruct();
-        }
-
-        public Vector ExitPoint()
-        {
-            return base.Exit;
         }
 
         public override string ToString()

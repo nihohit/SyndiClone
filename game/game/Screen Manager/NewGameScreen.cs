@@ -66,9 +66,9 @@
 
             s_civAmount = new Gwen.Control.NumericUpDown(s_canvas);
             s_civAmount.SetBounds((int)s_window.Size.X / 2 + 120, (int)s_window.Size.Y / 2 - 60, 100, 30);
-            s_civAmount.Value = 600;
-            s_civAmount.Max = 1000;
-            s_civAmount.Min = 400;
+            s_civAmount.Value = 300;
+            s_civAmount.Max = 600;
+            s_civAmount.Min = 200;
 
             s_yValue = new Gwen.Control.NumericUpDown(s_canvas);
             s_yValue.SetBounds((int)s_window.Size.X / 2 - 120, (int)s_window.Size.Y / 2 - 60, 100, 30);

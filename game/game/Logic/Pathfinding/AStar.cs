@@ -2,73 +2,63 @@
 using System.Collections.Generic;
 
 namespace Game.Logic.Pathfinding
-
 {
-    static class Astar
+    #region AStar
+
+    public class AStar
     {
-        //TODO - support using the same board several times.
+        //TODO - create updates that will save updating the whole board
 
-        static private readonly Dictionary<Point, AstarNode> points = new Dictionary<Point, AstarNode>();
-        static private readonly PriorityQueueB<AstarNode> openSet = new PriorityQueueB<AstarNode>();
-        //static private readonly HashSet<AstarNode> closedSet = new HashSet<AstarNode>();
-        static private Logic.TerrainGrid gridHolder;
-        static private Logic.MovementType traversalMethod;
-        static private Heuristic heuristic;
-        static private Vector size;
-        static private System.Diagnostics.Stopwatch timer = new System.Diagnostics.Stopwatch();
-        static private bool directionCritical = true;
-        static private bool diagonalMovement = true;
-        static int amountOfNodesChecked;
+        private Logic.TerrainGrid m_gridHolder;
 
-        static public List<Direction> findPath(Point entry, Point goal, Vector _size, Logic.TerrainGrid _grid, Logic.MovementType _traversalMethod, Heuristic _heuristic, Direction dir)
+        #region constructor
+
+        public AStar(TerrainGrid gridHolder)
         {
-            timer.Start();
-            amountOfNodesChecked = 0;
-            //entry = new Point(entry, Vector.directionToVector(dir).multiply(_size));
-            size = _size;
-            heuristic = _heuristic;
-            gridHolder = _grid;
-            traversalMethod = _traversalMethod;
-            points.Add(entry, new AstarNode(entry, heuristic(entry), dir));
-            openSet.Push(points[entry]);
+            m_gridHolder = gridHolder;
+        }
 
-            while (openSet.Count > 0)
+        #endregion
+
+        #region public methods
+
+        public virtual List<Direction> FindPath(Point entry, Point goal, Direction originalDirection, AStarConfiguration configuration)
+        {
+            AStarInternalState internalState = GenerateInternalState(entry, originalDirection, configuration);
+
+            while (internalState.OpenSet.Count > 0)
             {
-                AstarNode current = openSet.Pop();
-                if (current.Point == goal) return reconstructPath(current);
+                AstarNode current = internalState.OpenSet.Pop();
+                if (current.Point == goal) return ReconstructPath(current, internalState);
                 current.Open = false;
-                checkAllNeighbours(current);
+                CheckAllNeighbours(current, internalState);
             }
 
             throw new Exception("open set empty, route impossible");
         }
 
-        static public AstarNode findPathNoReconstruction(Point entry, Point goal, Vector _size, Logic.TerrainGrid _grid, Logic.MovementType _traversalMethod, Heuristic _heuristic, Direction dir)
+        public virtual AstarNode FindPathNoReconstruction(Point entry, Point goal, Direction originalDirection, AStarConfiguration configuration)
         {
-            timer.Start();
-            amountOfNodesChecked = 0;
-            //entry = new Point(entry, Vector.directionToVector(dir).multiply(_size));
-            size = _size;
-            heuristic = _heuristic;
-            gridHolder = _grid;
-            traversalMethod = _traversalMethod;
-            points.Add(entry, new AstarNode(entry, heuristic(entry), dir));
-            openSet.Push(points[entry]);
+            var internalState = GenerateInternalState(entry, originalDirection, configuration);
 
-            while (openSet.Count > 0)
+            while (internalState.OpenSet.Count > 0)
             {
-                AstarNode current = openSet.Pop();
+                AstarNode current = internalState.OpenSet.Pop();
                 if (current.Point == goal) return current;
                 current.Open = false;
-                checkAllNeighbours(current);
+                CheckAllNeighbours(current, internalState);
             }
 
             throw new Exception("open set empty, route impossible");
         }
+
+        #endregion
+
+        #region private methods
 
         //this function checks over all the relevant neighbours of a point.
         /*
-        private static void checkAllNeighboursReduced(AstarNode current)
+        private void checkAllNeighboursReduced(AstarNode current)
         {
             int x = current.Point.X, y = current.Point.Y;
             bool down = (current.Point.Y < gridHolder.Grid.GetLength(1) - 1);
@@ -150,71 +140,80 @@ namespace Game.Logic.Pathfinding
                     break;
             }
         }*/
-        
-        private static void checkAllNeighbours(AstarNode current)
-        {
 
+        private AStarInternalState GenerateInternalState(Point entry, Direction originalDirection, AStarConfiguration configuration)
+        {
+            var internalState = new AStarInternalState(configuration);
+
+            internalState.Points.Add(entry, new AstarNode(entry, configuration.Heuristic(entry), originalDirection));
+            internalState.OpenSet.Push(internalState.Points[entry]);
+
+            return internalState;
+        }
+        
+        private void CheckAllNeighbours(AstarNode current, AStarInternalState state)
+        {
             int x = current.Point.X, y;
-            bool down = (current.Point.Y < gridHolder.Grid.GetLength(1) - 1);
+            bool down = (current.Point.Y < m_gridHolder.Grid.GetLength(1) - 1);
             bool up = (current.Point.Y > 0);
             bool left = (current.Point.X > 0);
-            bool right = (current.Point.X < gridHolder.Grid.GetLength(0) - 1);
+            bool right = (current.Point.X < m_gridHolder.Grid.GetLength(0) - 1);
             if (up)
             {
                 y = y = current.Point.Y - 1;
-                checkPoint(new Point(x, y), current);
-                if (diagonalMovement)
+                CheckPoint(new Point(x, y), current, state);
+                if (state.Configuration.DiagonalMovement)
                 {
-                    if (left) checkPoint(new Point(x - 1, y), current);
-                    if (right) checkPoint(new Point(x + 1, y), current);
+                    if (left) CheckPoint(new Point(x - 1, y), current, state);
+                    if (right) CheckPoint(new Point(x + 1, y), current, state);
                 }
             }
 
             if (down)
             {
                 y = y = current.Point.Y + 1;
-                checkPoint(new Point(x, y), current);
-                if (diagonalMovement)
+                CheckPoint(new Point(x, y), current, state);
+                if (state.Configuration.DiagonalMovement)
                 {
-                    if (left) checkPoint(new Point(x - 1, y), current);
-                    if (right) checkPoint(new Point(x + 1, y), current);
+                    if (left) CheckPoint(new Point(x - 1, y), current, state);
+                    if (right) CheckPoint(new Point(x + 1, y), current, state);
                 }
             }
             y= current.Point.Y;
-            if(left) checkPoint(new Point(x -1 , y), current);
-            if (right) checkPoint(new Point(x + 1, y), current);
+            if (left) CheckPoint(new Point(x - 1, y), current, state);
+            if (right) CheckPoint(new Point(x + 1, y), current, state);
         }
 
-        private static void checkPoint(Point temp, AstarNode current)
+        private void CheckPoint(Point temp, AstarNode current, AStarInternalState state)
         {
-            //TODO - handle changing size with changing direction
-            amountOfNodesChecked++;
+            //TODO - handle changing size with changing direction for things which aren't squares
+            state.AmountOfNodesChecked++;
             int g = 0, tempG = 0;
             
             AstarNode newNode = null;
-            double costToMove = current.GValue + moveCostDirection(current.Direction, current.Point, temp);
-            if (points.ContainsKey(temp))
+            double costToMove = current.GValue + MoveCostDirection(current.Direction, current.Point, temp, state);
+            if (state.Points.ContainsKey(temp))
             {
-                newNode = points[temp];
+                newNode = state.Points[temp];
                 if (!newNode.Open) return;
                 if (costToMove < newNode.GValue) 
                 {
                     newNode.Parent = current;
                     newNode.GValue = costToMove;
                     //TODO - find a more elegant way to do 
-                    openSet.RemoveLocation(newNode);
-                    openSet.Push(newNode);
+                    state.OpenSet.RemoveLocation(newNode);
+                    state.OpenSet.Push(newNode);
                 }
             }
             else
             {
-                newNode = new AstarNode(temp, costToMove, g, heuristic(temp), current);
-                points.Add(temp, newNode);
-                Area area = new Area(temp, size);
+                newNode = new AstarNode(temp, costToMove, g, state.Configuration.Heuristic(temp), current);
+                state.Points.Add(temp, newNode);
+                Area area = new Area(temp, state.Configuration.Size);
                 g = 0;
                 foreach (Point point in area.GetPointArea())
                 {
-                    tempG = costOfMovement(point);
+                    tempG = CostOfMovement(point, state);
                     if (tempG == -1)
                     {
                         newNode.Open = false;
@@ -222,19 +221,19 @@ namespace Game.Logic.Pathfinding
                     }
                     g += tempG;
                 }
-                openSet.Push(newNode);
+                state.OpenSet.Push(newNode);
             }
         }
 
-        private static double moveCostDirection(Direction direction, Point point, Point temp)
+        private double MoveCostDirection(Direction direction, Point point, Point temp, AStarInternalState state)
         {
             Direction newDir = Vector.VectorToDirection(point, temp);
-            double check = directionalMovementCost(newDir);
-            if (directionCritical) check += switchDirectionCost(direction, newDir);
+            double check = DirectionalMovementCost(newDir);
+            if (state.Configuration.DirectionChangeMatters) check += SwitchDirectionCost(direction, newDir);
             return check;
         }
 
-        private static double switchDirectionCost(Direction origianlDirection, Direction newDir)
+        private double SwitchDirectionCost(Direction origianlDirection, Direction newDir)
         {
             if (origianlDirection == newDir) return 0;
             if ((origianlDirection == Direction.UP && (newDir == Direction.UPLEFT || newDir == Direction.UPRIGHT))
@@ -258,7 +257,7 @@ namespace Game.Logic.Pathfinding
             return 0.4;
         }
 
-        private static double directionalMovementCost(Direction newDir)
+        private double DirectionalMovementCost(Direction newDir)
         {
             if (newDir == Direction.DOWNLEFT || newDir == Direction.DOWNRIGHT
                 || newDir == Direction.UPLEFT || newDir == Direction.UPRIGHT)
@@ -266,32 +265,26 @@ namespace Game.Logic.Pathfinding
             return 1;
         }
 
-        private static int costOfMovement(Point temp)
+        private int CostOfMovement(Point temp, AStarInternalState state)
         {
-            if (traversalMethod == MovementType.FLYER) return 1;
-            switch (gridHolder.Grid[temp.X, temp.Y])
+            if (state.Configuration.TraversalMethod == MovementType.FLYER) return 1;
+            switch (m_gridHolder.Grid[temp.X, temp.Y])
             {
                 case TerrainType.ROAD:
                     return 1;
                 case TerrainType.BUILDING:
-                    if (traversalMethod == MovementType.CRUSHER) return 1;
+                    if (state.Configuration.TraversalMethod == MovementType.CRUSHER) return 1;
                     return -1;
                 case TerrainType.WATER:
-                    if (traversalMethod == MovementType.HOVER) return 1;
+                    if (state.Configuration.TraversalMethod == MovementType.HOVER) return 1;
                     return -1;
                 default:
                     return -1;
             }
         }
 
-        private static List<Direction> reconstructPath(AstarNode current)
+        private List<Direction> ReconstructPath(AstarNode current, AStarInternalState state)
         {
-            points.Clear();
-            openSet.Clear();
-            //closedSet.Clear();
-            timer.Stop();
-            //Console.Out.WriteLine("amount of nodes checked " + amountOfNodesChecked + " amount of time elapsed " + timer.ElapsedTicks);
-            timer.Reset();
             List<Direction> ans = new List<Direction>();
 
             while(current!= null)
@@ -303,17 +296,50 @@ namespace Game.Logic.Pathfinding
             return ans;
         }
 
-        public static bool DirectionChangeMatters
-        {
-            get { return Astar.directionCritical; }
-            set { Astar.directionCritical = value; }
-        }
-
-        public static bool DiagonalMovement
-        {
-            get { return Astar.diagonalMovement; }
-            set { Astar.diagonalMovement = value; }
-        }
-
+        #endregion
     }
+
+    #endregion
+
+    #region AStarConfiguration
+
+    public class AStarConfiguration
+    {
+        public AStarConfiguration(Vector size, Logic.MovementType traversalMethod, Heuristic heuristic,bool directionChangeMatters, bool diagonalMovement)
+        {
+            Size = size;
+            TraversalMethod = traversalMethod;
+            Heuristic = heuristic;
+            DirectionChangeMatters = directionChangeMatters;
+            DiagonalMovement = diagonalMovement;
+        }
+
+        public Vector Size { get; private set; }
+        public Logic.MovementType TraversalMethod { get; private set; }
+        public Heuristic Heuristic { get; private set; }
+        public bool DirectionChangeMatters { get; private set; }
+        public bool DiagonalMovement { get; private set; }
+    }
+
+    #endregion
+
+    #region AStarInternalState
+
+    public class AStarInternalState
+    {
+        public AStarInternalState(AStarConfiguration configuration)
+        {
+            Configuration = configuration;
+            AmountOfNodesChecked = 0;
+            Points = new Dictionary<Point, AstarNode>();
+            OpenSet = new PriorityQueueB<AstarNode>();
+        }
+
+        public AStarConfiguration Configuration { get; private set; }
+        public Dictionary<Point, AstarNode> Points { get; private set; }
+        public PriorityQueueB<AstarNode> OpenSet { get; private set; }
+        public int AmountOfNodesChecked { get; set; }
+    }
+
+    #endregion
 }

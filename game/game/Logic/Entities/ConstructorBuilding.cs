@@ -5,7 +5,9 @@ using System.Text;
 
 namespace Game.Logic.Entities
 {
-    public abstract class ConstructorBuilding : Building
+    #region ConstructorBuilding
+
+    public abstract class ConstructorBuilding : Building, IConstructor
     {
         protected const int AMOUNT_OF_STEPS_BEFORE_BUILDING = 2000;
 
@@ -15,6 +17,7 @@ namespace Game.Logic.Entities
         public ConstructorBuilding (int sizeModifier, reactionFunction reaction, Vector size, Affiliation loyalty) 
         : base (sizeModifier, reaction, size, loyalty)
         {
+            Path = Path = new List<Direction>();
             m_timeToConstruct = 0;
             m_readyToBuild = true;
         }
@@ -33,5 +36,11 @@ namespace Game.Logic.Entities
             }
             return ready;
         }
+
+        public abstract MovingEntity GetConstruct();
+
+        public List<Direction> Path { get; set; }
     }
+
+    #endregion
 }

@@ -319,7 +319,7 @@ namespace Game.Screen_Manager
             m_xMove = 0;
             m_yMove = 0;
 
-            Console.Out.WriteLine(" mouse location: {0} , {1} , max: {2} , {3}, min: {4} , {5}", m_mouseX, m_mouseY, maxX, maxY, minX, minY);
+            //Console.Out.WriteLine(" mouse location: {0} , {1} , max: {2} , {3}, min: {4} , {5}", m_mouseX, m_mouseY, maxX, maxY, minX, minY);
             if (m_mouseX - minX < scrollZoneSize.X)
             {
                 m_xMove = -(scrollZoneSize.X - m_mouseX) / scrollZoneSize.X;

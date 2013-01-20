@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Game.Logic.Entities 
 {
-    class PoliceStation : ConstructorBuilding, IConstructor
+    class PoliceStation : ConstructorBuilding //TODO - should be ConstructorBuilding
     {
         #region consts
 
@@ -21,7 +21,6 @@ namespace Game.Logic.Entities
 
         #region properties
 
-        public List<Direction> Path { get; set; } //TODO - delete after I won't need to control the plice
         public bool Alert { get; set; }
 
         #endregion
@@ -51,15 +50,15 @@ namespace Game.Logic.Entities
 
         #region public methods
 
-        public MovingEntity GetConstruct()
+        public override MovingEntity GetConstruct()
         {
             Cop temp = m_toConstruct;
             m_toConstruct = new Cop(this, Path);
             m_amountOfPolicemen++;
             return temp;
         }
-        
-        bool IConstructor.ReadyToConstruct()
+
+        public override bool ReadyToConstruct()
         {
             if (Path.Count > 0)
             {
@@ -81,11 +80,6 @@ namespace Game.Logic.Entities
                 }
             }
             return false;
-        }
-
-        public Vector ExitPoint()
-        {
-            return base.Exit;
         }
 
         public void PolicemanDestroyed()
