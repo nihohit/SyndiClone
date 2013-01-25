@@ -2,6 +2,7 @@
 using Game.Buffers;
 using System.Collections.Generic;
 using System;
+using System.Linq;
 
 namespace Game.Logic
 {
@@ -19,7 +20,8 @@ namespace Game.Logic
         private readonly UniqueList<Entity> m_playerUnits = new UniqueList<Entity>();
         private readonly UniqueList<IShooter> m_shootingEntities = new UniqueList<IShooter>();
         private readonly UniqueList<IConstructor> m_constructingEntities = new UniqueList<IConstructor>();
-        private readonly UniqueList<Entity> m_alwaysActiveEntities;
+        private readonly UniqueList<Entity> m_alwaysActiveEntities; //TODO - we can skip this, if we decide that civilians work even when not in view. all depends on calculations' weight
+        private readonly Dictionary<int, Affiliation> m_playerIdToAffiliation = new Dictionary<int, Affiliation>();
 
         private readonly int m_maximumAmountOfCivilians;
         private int m_currentCivilianAmount;
@@ -59,6 +61,7 @@ namespace Game.Logic
             m_gameRunning = true;
             totalWatch.Start();
             m_frameTimer.Start();
+            m_playerIdToAffiliation.Add(1, Affiliation.CORP1);
         }
 
         #endregion
@@ -97,32 +100,32 @@ namespace Game.Logic
             {
                 other.Start();
 
-                    PopulateActionLists();
-                    ResolveOrders();
+                PopulateActionLists();
+                ResolveOrders();
 
                 other.Stop();
 
                 move.Start();
 
-                    HandleMovement();
+                HandleMovement();
 
                 move.Stop();
 
                 shoot.Start();
 
-                    HandleShooting();
+                HandleShooting();
 
                 shoot.Stop();
 
                 construct.Start();
 
-                    HandleUnitCreation();
+                HandleUnitCreation();
 
                 construct.Stop();
 
                 synch.Start();
 
-                    UpdateOutput();
+                UpdateOutput();
 
                 synch.Stop();
 
@@ -179,21 +182,27 @@ namespace Game.Logic
         private void UpdateOutput()
         {
             List<IBufferEvent> actions = m_grid.ReturnCommitedActions();
-            foreach (IBufferEvent action in actions)
+            foreach (IBufferEvent action in actions.ToList())
             {
-                switch(action.type())
+                switch(action.Type())
                 {
-                    case(BufferType.DESTROY):
-                        m_alwaysActiveEntities.Remove(((DestroyBufferEvent)action).Ent.InternalEntity);
-                        m_playerUnits.Remove(((DestroyBufferEvent)action).Ent.InternalEntity);
-                        if ((((DestroyBufferEvent)action).Ent.Type == entityType.PERSON) && ((DestroyBufferEvent)action).Ent.Loyalty == Affiliation.CIVILIAN)
+                    case (BufferType.LOGIC_INTERNAL_DESTROY):
+                        InternalDestroyBufferEvent temp = (InternalDestroyBufferEvent)action;
+                        m_alwaysActiveEntities.Remove(temp.DestroyedEntity);
+                        m_playerUnits.Remove(temp.DestroyedEntity);
+                        if ((temp.DestroyedEntity.Type == EntityType.PERSON) && temp.DestroyedEntity.Loyalty == Affiliation.CIVILIAN)
                         {
                             m_currentCivilianAmount--;
                         }
+                        actions.Remove(action);
+                        actions.Add(new ExternalDestroyBufferEvent(temp));
                         break;
-                    case(BufferType.CREATE):
-                        //TODO - recreate
-                        m_alwaysActiveEntities.Add(((CreateUnitBufferEvent)action).Mover.InternalEntity);
+
+                    case (BufferType.LOGIC_INTERNAL_CREATE):
+                        //TODO - change this function
+                        m_alwaysActiveEntities.Add(((InternalCreateUnitBufferEvent)action).CreatedEntity);
+                        actions.Remove(action);
+                        actions.Add(new ExternalCreateUnitBufferEvent((InternalCreateUnitBufferEvent)action));
                         break;
                     //TODO - missing cases?
                 }
@@ -203,7 +212,7 @@ namespace Game.Logic
             lock (m_displayBuffer)
             {
                 //List<ExternalEntity> newPath = grid.getVisibleEntities();
-                List<ExternalEntity> newList = new List<ExternalEntity>(m_grid.GetAllExternalEntities());
+                List<VisualEntityInformation> newList = new List<VisualEntityInformation>(m_grid.GetAllVisualEntitiesInformation());
                 m_displayBuffer.ReceiveVisibleEntities(newList);
                 if (actions.Count > 0)
                 {
@@ -212,7 +221,6 @@ namespace Game.Logic
                 }
                 m_displayBuffer.Updated = true;
             }
-            
         }
 
         private void HandleInput()
@@ -224,7 +232,7 @@ namespace Game.Logic
                     List<IBufferEvent> events = m_inputBuffer.GetEvents(InputModuleAccessors.Logic);
                     foreach (IBufferEvent action in events)
                     {
-                        switch (action.type())
+                        switch (action.Type())
                         {
                             case BufferType.PAUSE:
                                 m_unpaused = false;
@@ -237,7 +245,7 @@ namespace Game.Logic
                                 m_gameRunning = false;
                                 break;
                             case BufferType.SELECT:
-                                m_grid.SelectUnit(((MouseSelectBufferEvent)action).Coords.ToPoint());
+                                m_grid.SelectUnit(((MouseSelectBufferEvent)action).Coords.ToPoint(), m_playerIdToAffiliation[((MouseSelectBufferEvent)action).PlayerId]);
                                 break;
                             case BufferType.DESELECT:
                                 m_grid.DeselectUnit();
@@ -246,7 +254,6 @@ namespace Game.Logic
                     }
                 }
             }
-            
         }
 
         /*
@@ -271,9 +278,9 @@ namespace Game.Logic
                     ent.WhatSees.Clear();
                 }
                 Reaction react = ent.Reaction;
-                Action action = react.Action();
+                ActionType action = react.Action();
 
-                if (action == Action.FIRE_AT || action == Action.MOVE_WHILE_SHOOT)
+                if (action == ActionType.FIRE_AT || action == ActionType.MOVE_WHILE_SHOOT)
                 {
                     IShooter temp = (IShooter)ent;
                     if (temp.ReadyToShoot())
@@ -282,8 +289,8 @@ namespace Game.Logic
                     } 
                 }
 
-                if (action == Action.MOVE_TOWARDS || action == Action.MOVE_WHILE_SHOOT || action == Action.RUN_AWAY_FROM || 
-                    (action == Action.IGNORE && ent.Type != entityType.BUILDING))
+                if (action == ActionType.MOVE_TOWARDS || action == ActionType.MOVE_WHILE_SHOOT || action == ActionType.RUN_AWAY_FROM || 
+                    (action == ActionType.IGNORE && ent.Type != EntityType.BUILDING))
                 {
                     MovingEntity temp = (MovingEntity)ent;
                     if (temp.ReadyToMove(temp.Speed))
@@ -292,7 +299,7 @@ namespace Game.Logic
                     }
                 }
 
-                if (action == Action.CONSTRUCT_ENTITY)
+                if (action == ActionType.CONSTRUCT_ENTITY)
                 {
                     IConstructor temp = (IConstructor)ent;
                     bool check = temp.ReadyToConstruct();
@@ -339,7 +346,6 @@ namespace Game.Logic
             }
              */
             m_activeEntities = m_grid.GetAllEntities();
-            
         }
 
         //TODO - add blocks, add the whole player logic, add research

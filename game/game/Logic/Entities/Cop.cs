@@ -8,22 +8,20 @@ namespace Game.Logic.Entities
 
        #region static members
 
-       //TODO - change back to threatTargeterHigh
        static private Reaction copReact(List<Entity> list)
        {
-           Entity temp = Targeters.SimpleTestTargeter(list, Affiliation.INDEPENDENT);
+           Entity temp = Targeters.ThreatTargeterHigh(list, Affiliation.INDEPENDENT);
            if (temp == null)
            {
                return new IgnoreReaction();
                
            }
-           return new ShootReaction(temp);
-
+           return new PursueReaction(temp);
        }
-       //TODO - change back to threatTargeterHigh
+
        static Entity copTargeter(List<Entity> list)
        {
-           return Targeters.ThreatTargeterLow(list, Affiliation.INDEPENDENT);
+           return Targeters.ThreatTargeterHigh(list, Affiliation.INDEPENDENT);
        }
 
        private static Weapons copWeapon = Weapons.Instance(WeaponType.PISTOL);

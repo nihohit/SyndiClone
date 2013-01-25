@@ -137,7 +137,7 @@ namespace Game.Graphic_Manager
                     List<IBufferEvent> list = m_input.GetEvents(InputModuleAccessors.Graphics);
                     foreach (IBufferEvent action in list)
                     {
-                        if (action.type() == BufferType.ENDGAME)
+                        if (action.Type() == BufferType.ENDGAME)
                             DisplayStats();
                     }
                 }

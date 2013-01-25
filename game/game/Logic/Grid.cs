@@ -4,6 +4,7 @@ using Game;
 using System;
 using System.Threading.Tasks;
 using System.Linq;
+using System.Diagnostics;
 
 namespace Game.Logic
 {
@@ -28,10 +29,10 @@ namespace Game.Logic
 
         #region fields
 
-        private readonly Dictionary<Entity, ExternalEntity> m_entities = new Dictionary<Entity, ExternalEntity>();
+        private readonly UniqueList<Entity> m_entities = new UniqueList<Entity>();
         private readonly Dictionary<Entity, Area> m_entitiesToLocations = new Dictionary<Entity, Area>();
         private readonly List<Buffers.IBufferEvent> m_actionsDone = new List<Buffers.IBufferEvent>();
-        private readonly UniqueList<ExternalEntity> m_visibleEntities = new UniqueList<ExternalEntity>();
+        private readonly UniqueList<VisualEntityInformation> m_visibleEntities = new UniqueList<VisualEntityInformation>();
         private readonly UniqueList<Entity> m_destroyedEntities = new UniqueList<Entity>();
         private readonly Entity[,] m_gameGrid;
         private readonly TerrainGrid m_pathFindingGrid;
@@ -69,7 +70,7 @@ namespace Game.Logic
         //this function is called after all the buildings have been inserted into the grid. 
         public void InitialiseExitPoints()
         {
-            foreach (Entity ent in m_entities.Keys)
+            foreach (Entity ent in m_entities)
             {
                 SetExitPoint((Building)ent);
             }
@@ -80,14 +81,14 @@ namespace Game.Logic
         #region public methods
 
         /// TODO - make this player specific.
-        public List<ExternalEntity> GetVisibleEntities()
+        public List<VisualEntityInformation> GetVisibleEntities()
         {
             return m_visibleEntities;
         }
 
         public List<Entity> GetAllEntities()
         {
-            return new List<Entity>(m_entities.Keys);
+            return new List<Entity>(m_entities);
         }
 
         public void ClearLists()
@@ -104,9 +105,9 @@ namespace Game.Logic
             }
         }
 
-        public List<ExternalEntity> GetAllExternalEntities()
+        public List<VisualEntityInformation> GetAllVisualEntitiesInformation()
         {
-            return new List<ExternalEntity>(m_entities.Values);
+            return new List<VisualEntityInformation>(m_entities.Select(ent => ent.VisualInfo));
         }
 
         /*
@@ -126,7 +127,7 @@ namespace Game.Logic
             //TODO - look into Sight simply having a list and the given blast, instead of creating a new list & blast for every iteration
             //Get all the relevant variables
             Point location = ConvertToCentralPoint(ent);
-            Sight sight = ent.Sight;
+            Sight sight = ent.SightSystem;
             int radius = sight.Range;
             WasBlocked blocked = sight.Blocked;
             //curries the list of entities to an effect
@@ -147,7 +148,7 @@ namespace Game.Logic
             foreach (Entity temp in ent.WhatSees)
             {
                 //TODO - this is wrong. it should only return what the player units see. 
-                m_visibleEntities.Add(m_entities[temp]);
+                m_visibleEntities.Add(temp.VisualInfo);
             }
         }
 
@@ -156,24 +157,27 @@ namespace Game.Logic
          */
         public void ResolveMove(MovingEntity ent)
         {
-
-            Action action = ent.Reaction.Action();
+            ActionType action = ent.Reaction.Action();
+            Point currentLocation = ConvertToCentralPoint(ent);
             switch (action)
             {
-                case Action.IGNORE:
-                    Move(ent);
+                case ActionType.IGNORE:
                     break;
 
-                case Action.RUN_AWAY_FROM:
+                case ActionType.RUN_AWAY_FROM:
                     Point from = ConvertToCentralPoint(((RunAwayReaction)ent.Reaction).Focus);
-                    Point currentLocation = ConvertToCentralPoint(ent);
                     Point runTo = GetOppositePoint(from, currentLocation, CIV_FLEE_RANGE);
                     ent.Path = GetSimplePath(currentLocation, runTo, ent);
                     ((Civilian)ent).RunningAway();
-                    Move(ent);
+                    break;
+
+                case ActionType.PURSUE:
+                    Point targetLocation = ConvertToCentralPoint(((PursueReaction)ent.Reaction).Focus);
+                    ent.Path = GetSimplePath(currentLocation, targetLocation, ent);
                     break;
                 //TODO - missing cases
             }
+            Move(ent);
         }
 
         private Entity GetEntityInPoint(Point point)
@@ -200,9 +204,9 @@ namespace Game.Logic
                 //if (gameGrid[point.X, point.Y] != null) throw new Exception();
                 m_gameGrid[point.X, point.Y] = ent;
             }
-            ExternalEntity temp = new ExternalEntity(ent, new Vector(area.Entry.X, area.Entry.Y).ToVector2f());
-            m_entities.Add(ent, temp);
-            AddEvent(new Buffers.CreateUnitBufferEvent(temp, area));
+            m_entities.Add(ent);
+            ent.VisualInfo.Position = new Vector(area.Entry.X, area.Entry.Y).ToVector2f();
+            AddEvent(new Buffers.InternalCreateUnitBufferEvent(ent, area));
         }
 
         public void ResolveConstruction(IConstructor constructor, MovingEntity entity)
@@ -327,7 +331,7 @@ namespace Game.Logic
             while (!(x0 == x1 & y0 == y1))
             {
                 Entity ent = m_gameGrid[x0, y0];
-                if (ent != null && ent.Type == entityType.BUILDING) break;
+                if (ent != null && ent.Type == EntityType.BUILDING) break;
                 e2 = 2 * err;
                 if (e2 > -dy)
                 {
@@ -466,15 +470,8 @@ namespace Game.Logic
             };
 
             IterateOverArea(toSwitch, putEntityInArea(ent));
-            if (m_entities.ContainsKey(ent))
-            {
-                ExternalEntity newEnt = m_entities[ent];
-                newEnt.Position = new SFML.Window.Vector2f(Convert.ToSingle(location.Entry.X), Convert.ToSingle(location.Entry.Y));
-            }
-            else
-            {
-                throw new Exception("entity isn't in entities dictionary");
-            }
+            Debug.Assert(m_entities.Contains(ent), String.Format("entity {0} isn't in entities list", ent.ToString()));
+            ent.VisualInfo.Position = new SFML.Window.Vector2f(Convert.ToSingle(location.Entry.X), Convert.ToSingle(location.Entry.Y));
             m_entitiesToLocations[ent] = toSwitch;
         }
 
@@ -623,7 +620,7 @@ namespace Game.Logic
 
         private void Destroy(Entity ent)
         {
-            if (ent.Type == entityType.BUILDING)
+            if (ent.Type == EntityType.BUILDING)
             {
                 Area area = m_entitiesToLocations[ent];
                 foreach (Point point in area.GetPointArea())
@@ -632,7 +629,7 @@ namespace Game.Logic
                 }
             }
 
-            AddEvent(new Buffers.DestroyBufferEvent(m_entitiesToLocations[ent], m_entities[ent]));
+            AddEvent(new Buffers.InternalDestroyBufferEvent(m_entitiesToLocations[ent], ent));
             RemoveFromLocation(ent);
             m_entitiesToLocations.Remove(ent);
             m_entities.Remove(ent);
@@ -653,23 +650,35 @@ namespace Game.Logic
             return new Point(ConvertToCentralPoint(constructor), constructor.Exit);
         }
 
-        public void SelectUnit(Point point)
+        public void SelectUnit(Point point, Affiliation player)
         {
             Entity temp = GetEntityInPoint(point);
-            if ((m_selected == null) && (temp != null) && (temp.Loyalty == Affiliation.INDEPENDENT) && (temp is ConstructorBuilding)) //TODO - loyalty should be player issuing the order
+            if (m_selected == null)
             {
-                m_selected = temp;
-                m_actionsDone.Add(new Buffers.UnitSelectBufferEvent(m_entities[m_selected], 
-                    new Vector(ConvertToCentralPoint(temp).X,ConvertToCentralPoint(temp).Y)));
-                FinishResolveNewPath((ConstructorBuilding)temp);
-                return;
+                if ((temp != null) && (temp is ISelectable)) //TODO - loyalty should be player issuing the order
+                {
+                    m_selected = temp;
+                    m_actionsDone.Add(new Buffers.UnitSelectBufferEvent(m_selected.VisualInfo, 
+                        ((ISelectable)temp).Select(player),
+                        new Vector(ConvertToCentralPoint(temp).X, ConvertToCentralPoint(temp).Y)));
+                    FinishResolveNewPath((ConstructorBuilding)temp);
+                    return;
+                }
+                //TODO - else?
             }
-            if (m_selected != null)
+            else
             {
-                if ((temp != null) && (temp.Type == entityType.BUILDING)) point = GetExitPoint((Building)temp); 
-                PoliceStation pol = ((PoliceStation)m_selected);
-                m_constructorsToPaths.Add(pol,GetComplexPath(GetExitPoint(pol), point, new Vector(1,1), MovementType.GROUND, pol.Exit.VectorToDirection()));
-                DeselectUnit();
+                if ((temp != null) && (temp is ISelectable))
+                {
+                    var selction = ((ISelectable)temp).Select(player);
+                    if (selction.Controlled)
+                    {
+                        point = GetExitPoint((Building)temp);
+                        PoliceStation pol = ((PoliceStation)m_selected);
+                        m_constructorsToPaths.Add(pol, GetComplexPath(GetExitPoint(pol), point, new Vector(1, 1), MovementType.GROUND, pol.Exit.VectorToDirection()));
+                    }
+                    DeselectUnit();
+                }  
             }
         }
 
@@ -735,7 +744,7 @@ namespace Game.Logic
             var task = m_constructorsToPaths[constructor];
             m_constructorsToPaths.Remove(constructor);
             constructor.Path = task.Result;
-            m_actionsDone.Add(new Buffers.SetPathActionBufferEvent(m_entities[constructor], constructor.Path, FindConstructionSpot(constructor, constructor.GetConstruct()).Entry.ToVector2f()));
+            m_actionsDone.Add(new Buffers.SetPathActionBufferEvent(constructor.VisualInfo, constructor.Path, FindConstructionSpot(constructor, constructor.GetConstruct()).Entry.ToVector2f()));
         }
 
         #endregion

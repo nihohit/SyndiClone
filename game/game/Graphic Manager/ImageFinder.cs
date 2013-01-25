@@ -12,8 +12,8 @@ namespace Game.Graphic_Manager
 
         #region fields
         private readonly uint m_distanceBetweenPathObjects = FileHandler.GetUintProperty("path sprite distance", FileAccessor.DISPLAY);
-        private readonly Dictionary<ExternalEntity, SpriteLoop> m_spriteLoopFinder = new Dictionary<ExternalEntity, SpriteLoop>();
-        private readonly Dictionary<ExternalEntity, SpriteLoop> m_pathFinder = new Dictionary<ExternalEntity, SpriteLoop>();
+        private readonly Dictionary<VisualEntityInformation, SpriteLoop> m_spriteLoopFinder = new Dictionary<VisualEntityInformation, SpriteLoop>();
+        private readonly Dictionary<VisualEntityInformation, SpriteLoop> m_pathFinder = new Dictionary<VisualEntityInformation, SpriteLoop>();
 
         private readonly Dictionary<Logic.Affiliation, Texture> m_personFinder = new Dictionary<Logic.Affiliation, Texture>
         {
@@ -36,7 +36,7 @@ namespace Game.Graphic_Manager
             {ImageType.PATH, new Texture("images/UI/path.png")}
         };
 
-        private readonly List<ExternalEntity> m_removed = new List<ExternalEntity>();
+        private readonly List<VisualEntityInformation> m_removed = new List<VisualEntityInformation>();
 
         #endregion
 
@@ -55,7 +55,7 @@ namespace Game.Graphic_Manager
             return new Sprite(m_shots[shot]);
         }
 
-        public Sprite GetSprite(ExternalEntity ent)
+        public Sprite GetSprite(VisualEntityInformation ent)
         {
             if (!m_spriteLoopFinder.ContainsKey(ent))
             {
@@ -65,25 +65,25 @@ namespace Game.Graphic_Manager
         }
 
         //this function returns an animation as the result of destroying an entity.
-        public Graphic_Manager.Animation GenerateDestoryResults(Area area, entityType type)
+        public Graphic_Manager.Animation GenerateDestoryResults(Area area, EntityType type)
         {
             //TODO - missing function
             return new Graphic_Manager.Animation(area, type);
         }
 
-        public Sprite Remove(ExternalEntity ent)
+        public Sprite Remove(VisualEntityInformation ent)
         {
             Sprite temp = m_spriteLoopFinder[ent].CurrentSprite();
             m_spriteLoopFinder.Remove(ent);
             return temp;
         }
 
-        public Sprite NextSprite(ExternalEntity mover)
+        public Sprite NextSprite(VisualEntityInformation mover)
         {
             return m_spriteLoopFinder[mover].nextSprite();
         }
 
-        public Sprite RemovePath(ExternalEntity ent)
+        public Sprite RemovePath(VisualEntityInformation ent)
         {
             if (m_pathFinder.ContainsKey(ent))
             {
@@ -94,24 +94,24 @@ namespace Game.Graphic_Manager
             return null;
         }
 
-        public void SetPath(ExternalEntity ent, List<Direction> path, SFML.Window.Vector2f position)
+        public void SetPath(VisualEntityInformation ent, List<Direction> path, SFML.Window.Vector2f position)
         {
             m_pathFinder.Add(ent, GenerateNewComplexPath(path, position));
         }
 
-        public Sprite GetPath(ExternalEntity ent)
+        public Sprite GetPath(VisualEntityInformation ent)
         {
             return m_pathFinder[ent].CurrentSprite();
         }
 
 
-        public Sprite NextPathStep(ExternalEntity ent)
+        public Sprite NextPathStep(VisualEntityInformation ent)
         {
             return m_pathFinder[ent].nextSprite();
         }
 
 
-        public bool HasPath(ExternalEntity ent)
+        public bool HasPath(VisualEntityInformation ent)
         {
             return m_pathFinder.ContainsKey(ent);
         }
@@ -120,20 +120,20 @@ namespace Game.Graphic_Manager
 
         #region private methods
 
-        private SpriteLoop GenerateNewSpriteLoop(ExternalEntity ent)
+        private SpriteLoop GenerateNewSpriteLoop(VisualEntityInformation ent)
         {
             List<Sprite> list = new List<Sprite>();
             switch (ent.Type)
             {
-                case (Game.Logic.entityType.BUILDING):
+                case (Game.Logic.EntityType.BUILDING):
                     list.Add(new Sprite(BuildingImageGenerator.GetBuildingSFMLTexture(ent)));
                     break;
 
-                case (Logic.entityType.PERSON):
-                    list.Add(new Sprite(m_personFinder[ent.Loyalty]));
+                case (Logic.EntityType.PERSON):
+                    list.Add(new Sprite(m_personFinder[ent.VisibleLoyalty]));
                     break;
 
-                case (Logic.entityType.VEHICLE):
+                case (Logic.EntityType.VEHICLE):
                     //TODO - missing function
                     break;
 
@@ -279,17 +279,17 @@ namespace Game.Graphic_Manager
 
     }
 
-    class externalEntityEqualityComparer : IEqualityComparer<ExternalEntity>
+    class VisualInformationEqualityComparer : IEqualityComparer<VisualEntityInformation>
     {
 
-        public bool Equals(ExternalEntity first, ExternalEntity second)
+        public bool Equals(VisualEntityInformation first, VisualEntityInformation second)
         {
-            return (first.InternalEntity.Equals(second.InternalEntity));
+            return (first.EntityId.Equals(second.EntityId));
         }
 
-        public int GetHashCode(ExternalEntity item)
+        public int GetHashCode(VisualEntityInformation item)
         {
-            int hCode = item.InternalEntity.GetHashCode();
+            int hCode = item.EntityId.GetHashCode();
             return hCode.GetHashCode();
         }
         

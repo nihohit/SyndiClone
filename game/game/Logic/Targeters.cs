@@ -29,7 +29,7 @@ namespace Game.Logic
             int speed = 0;
             foreach (Entity ent in entities)
             {
-                if ((ent is MovingEntity && ((MovingEntity)ent).Speed > speed) || (ent.Type == entityType.BUILDING && target == null) && (ent.Loyalty != loyalty))
+                if ((ent is MovingEntity && ((MovingEntity)ent).Speed > speed) || (ent.Type == EntityType.BUILDING && target == null) && (ent.Loyalty != loyalty))
                 {
                     speed = ((MovingEntity)ent).Speed;
                     target = ent;
@@ -78,7 +78,7 @@ namespace Game.Logic
             int speed = 10000;
             foreach (Entity ent in entities)
             {
-                if ((ent is MovingEntity && ((MovingEntity)ent).Speed < speed) || (ent.Type == entityType.BUILDING && target == null) && (ent.Loyalty != loyalty))
+                if ((ent is MovingEntity && ((MovingEntity)ent).Speed < speed) || (ent.Type == EntityType.BUILDING && target == null) && (ent.Loyalty != loyalty))
                 {
                     speed = ((MovingEntity)ent).Speed;
                     target = ent;
@@ -110,8 +110,7 @@ namespace Game.Logic
             int seenThreat = 10000;
             foreach (Entity ent in list)
             {
-
-                if ((ent.Threat < seenThreat) && (ent.Loyalty != affiliation) && (ent.Type != entityType.BUILDING))
+                if ((ent.Threat < seenThreat) && (ent.Loyalty != affiliation) && (ent.Type != EntityType.BUILDING))
                 {
                     seenThreat = ent.Threat;
                     target = ent;

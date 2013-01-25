@@ -239,7 +239,7 @@ namespace Game.Screen_Manager
                 Vector2f temp = m_mainWindow.ConvertCoords(new Vector2i(e.X, e.Y));
                 Vector result = new Vector(Convert.ToInt16(temp.X), Convert.ToInt16(temp.Y));
                 //Console.Out.WriteLine("clicked on " + result.X + " , " + result.Y);
-                m_input.EnterEvent(new MouseSelectBufferEvent(result));
+                m_input.EnterEvent(new MouseSelectBufferEvent(result, 1)); //TODO - proper playerId
                 return;
             }
             if (e.Button == Mouse.Button.Right) { m_input.EnterEvent(new CancelActionBufferEvent()); }

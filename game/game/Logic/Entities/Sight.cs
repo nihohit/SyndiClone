@@ -65,7 +65,7 @@ namespace Game.Logic.Entities
         static public bool DefaultBlockedSight(Entity ent)
         {
             if (ent == null) return false;
-            switch (ent.Visible)
+            switch (ent.VisibleStatus)
             {
                 case Visibility.SOLID:
                     return true;

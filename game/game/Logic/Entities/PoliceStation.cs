@@ -60,26 +60,22 @@ namespace Game.Logic.Entities
 
         public override bool ReadyToConstruct()
         {
-            if (Path.Count > 0)
+            if (Alert)
             {
-                if (Alert)
+                if (m_amountOfPolicemen < m_policemenCap * 3)
                 {
-                    if (m_amountOfPolicemen < m_policemenCap * 3)
-                    {
-                        return base.ReadyToConstruct();
-                    }
-                    else //TODO - this is the only place where we remove the policestation's alert. should this be so?
-                    {
-                        Alert = false;
-                        return false;
-                    }
+                    return base.ReadyToConstruct();
                 }
-                else
+                else //TODO - this is the only place where we remove the policestation's alert. should this be so?
                 {
-                    return (base.ReadyToConstruct() && (m_amountOfPolicemen <= m_policemenCap));
+                    Alert = false;
+                    return false;
                 }
             }
-            return false;
+            else
+            {
+                return (base.ReadyToConstruct() && (m_amountOfPolicemen <= m_policemenCap));
+            }
         }
 
         public void PolicemanDestroyed()

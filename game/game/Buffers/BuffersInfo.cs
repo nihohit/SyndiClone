@@ -14,7 +14,7 @@ namespace Game.Buffers
     /// This enumerator represents the different buffer types we use. 
     /// TODO - different buffers will use different events - might be useful to seperate to different enumerators.
     /// </summary>
-    public enum BufferType { MOVE, SHOT, DESTROY, CREATE, PAUSE, SELECT, DESELECT, UNPAUSE, ENDGAME, MOUSEMOVE, SETPATH, UNIT_SELECT, DISPLAY_IMAGE }
+    public enum BufferType { MOVE, SHOT, EXTERNAL_DESTROY, EXTERNAL_CREATE, PAUSE, SELECT, DESELECT, UNPAUSE, ENDGAME, MOUSEMOVE, SETPATH, UNIT_SELECT, DISPLAY_IMAGE, LOGIC_INTERNAL_CREATE, LOGIC_INTERNAL_DESTROY }
 
     #endregion
 
@@ -23,7 +23,7 @@ namespace Game.Buffers
     //this interface represents the basic buffer event - it just identifies itself, the rest is in the specific events.
     public interface IBufferEvent
     {
-        BufferType type();
+        BufferType Type();
     }
 
     #endregion
@@ -35,7 +35,7 @@ namespace Game.Buffers
     //this event pauses the game.
     public struct PauseBufferEvent : IBufferEvent
     {
-        BufferType IBufferEvent.type()
+        BufferType IBufferEvent.Type()
         {
             return BufferType.PAUSE;
         }
@@ -55,18 +55,18 @@ namespace Game.Buffers
 
         public System.Collections.Generic.List<Logic.Direction> Path { get; private set; }
         public SFML.Window.Vector2f Position { get; private set; }
-        public ExternalEntity Entity { get; private set; }
+        public VisualEntityInformation Entity { get; private set; }
 
         #endregion
 
-        public SetPathActionBufferEvent(ExternalEntity ent, System.Collections.Generic.List<Logic.Direction> path, SFML.Window.Vector2f pos)
+        public SetPathActionBufferEvent(VisualEntityInformation ent, System.Collections.Generic.List<Logic.Direction> path, SFML.Window.Vector2f pos)
         {
             Path = path;
             Position = pos;
             Entity = ent;
         }
 
-        BufferType IBufferEvent.type()
+        BufferType IBufferEvent.Type()
         {
             return BufferType.SETPATH;
         }
@@ -79,7 +79,7 @@ namespace Game.Buffers
     //this event represents a cancel action - deselection of units, etc. basically right click.
     public struct CancelActionBufferEvent : IBufferEvent
     {
-        BufferType IBufferEvent.type()
+        BufferType IBufferEvent.Type()
         {
             return BufferType.DESELECT;
         }
@@ -92,18 +92,25 @@ namespace Game.Buffers
     public struct MouseSelectBufferEvent : IBufferEvent
     {
         private readonly Vector m_coords;
+        private readonly int m_playerId;
 
         public Vector Coords
         {
             get { return m_coords; }
+        }
+
+        public int PlayerId
+        {
+            get { return m_playerId; }
         } 
 
-        public MouseSelectBufferEvent(Vector coords)
+        public MouseSelectBufferEvent(Vector coords, int playerId)
         {
             m_coords = coords;
+            m_playerId = playerId;
         }
         
-        BufferType IBufferEvent.type()
+        BufferType IBufferEvent.Type()
         {
             return BufferType.SELECT;
         }
@@ -116,18 +123,21 @@ namespace Game.Buffers
     public struct UnitSelectBufferEvent : IBufferEvent
     {
         private readonly Vector m_coords;
-        private readonly ExternalEntity m_ent;
+        private readonly VisualEntityInformation m_entInfo;
+        private readonly SelectedEntityInformation m_selectedInfo;
 
         public Vector Coords { get { return m_coords; } }
-        public ExternalEntity Ent { get { return m_ent; } }
+        public VisualEntityInformation VisibleInfo { get { return m_entInfo; } }
+        public SelectedEntityInformation SelectedInfo { get { return m_selectedInfo; } }
 
-        public UnitSelectBufferEvent(ExternalEntity ent, Vector coords)
+        public UnitSelectBufferEvent(VisualEntityInformation ent, SelectedEntityInformation selectedInfo, Vector coords)
         {
             m_coords = coords;
-            m_ent = ent;
+            m_entInfo = ent;
+            m_selectedInfo = selectedInfo;
         }
 
-        BufferType IBufferEvent.type()
+        BufferType IBufferEvent.Type()
         {
             return BufferType.UNIT_SELECT;
         }
@@ -142,7 +152,7 @@ namespace Game.Buffers
     {
         private readonly SFML.Window.Vector2f m_coords;
         
-        BufferType IBufferEvent.type()
+        BufferType IBufferEvent.Type()
         {
             return BufferType.MOUSEMOVE;
         }
@@ -167,7 +177,7 @@ namespace Game.Buffers
     //this event ends a game. 
     public struct EndGameBufferEvent : IBufferEvent
     {
-        BufferType IBufferEvent.type()
+        BufferType IBufferEvent.Type()
         {
             return BufferType.ENDGAME;
         }
@@ -179,7 +189,7 @@ namespace Game.Buffers
 
     public struct UnPauseBufferEvent : IBufferEvent
     {
-        BufferType IBufferEvent.type()
+        BufferType IBufferEvent.Type()
         {
             return BufferType.UNPAUSE;
         }
@@ -203,7 +213,7 @@ namespace Game.Buffers
             Shot = shot;
         }
 
-        public BufferType type()
+        public BufferType Type()
         {
             return BufferType.SHOT;
         }
@@ -211,21 +221,21 @@ namespace Game.Buffers
 
     #endregion
 
-    #region DestroyBufferEvent
+    #region InternalDestroyBufferEvent
 
     //this event will be sent by the logic to the output buffers when an entity is destroyed.
-    public struct DestroyBufferEvent : IBufferEvent
+    public struct InternalDestroyBufferEvent : IBufferEvent
     {
         private readonly Area m_area;
-        private readonly ExternalEntity m_ent;
+        private readonly Entity m_ent;
 
-        public DestroyBufferEvent(Area area, ExternalEntity ent)
+        public InternalDestroyBufferEvent(Area area, Entity ent)
         {
             m_area = area;
             m_ent = ent;
         }
 
-        public ExternalEntity Ent
+        public Entity DestroyedEntity
         {
             get { return m_ent; }
         }
@@ -235,41 +245,87 @@ namespace Game.Buffers
             get { return m_area; }
         }
 
-        BufferType IBufferEvent.type()
+        BufferType IBufferEvent.Type()
         {
-            return BufferType.DESTROY;
+            return BufferType.LOGIC_INTERNAL_DESTROY;
         }
     }
 
     #endregion
 
-    #region CreateUnitBufferEvent
+    #region ExternalDestroyBufferEvent
+
+    //this event will be sent by the logic to the output buffers when an entity is destroyed.
+    public struct ExternalDestroyBufferEvent : IBufferEvent
+    {
+        private readonly Area m_area;
+        private readonly VisualEntityInformation m_visualInfo;
+
+        public ExternalDestroyBufferEvent(InternalDestroyBufferEvent internalDestroyed)
+        {
+            m_area = internalDestroyed.Area;
+            m_visualInfo = internalDestroyed.DestroyedEntity.VisualInfo;
+        }
+
+        public VisualEntityInformation VisualInfo
+        {
+            get { return m_visualInfo; }
+        }
+
+        public Area Area
+        {
+            get { return m_area; }
+        }
+
+        BufferType IBufferEvent.Type()
+        {
+            return BufferType.EXTERNAL_DESTROY;
+        }
+    }
+
+    #endregion
+
+    #region ExternalCreateUnitBufferEvent
 
     //this event signifies the creation of a new entity.
-    public struct CreateUnitBufferEvent : IBufferEvent
+    public class ExternalCreateUnitBufferEvent : IBufferEvent
     {
-        private readonly ExternalEntity m_mover;
-        private readonly Area m_location;
-
-        public CreateUnitBufferEvent(ExternalEntity mover, Area location)
+        public ExternalCreateUnitBufferEvent(InternalCreateUnitBufferEvent internalCreationEvent)
         {
-            m_mover = mover;
-            m_location = location;
+            VisibleInfo = internalCreationEvent.CreatedEntity.VisualInfo;
+            Location = internalCreationEvent.Location;
         }
 
-        public Area Location
+        public Area Location { get; private set; }
+
+        public VisualEntityInformation VisibleInfo { get; private set; }
+
+        public BufferType Type()
         {
-            get { return m_location; }
+            return BufferType.EXTERNAL_CREATE;
+        }
+    }
+
+    #endregion
+
+    #region InternalCreateUnitBufferEvent
+
+    //this event signifies the creation of a new entity.
+    public class InternalCreateUnitBufferEvent : IBufferEvent
+    {
+        public InternalCreateUnitBufferEvent(Entity ent, Area location)
+        {
+            CreatedEntity = ent;
+            Location = location;
         }
 
-        public ExternalEntity Mover
-        {
-            get { return m_mover; }
-        }
+        public Area Location { get; private set; }
 
-        public BufferType type()
+        public Entity CreatedEntity { get; private set; }
+
+        public BufferType Type()
         {
-            return BufferType.CREATE;
+            return BufferType.LOGIC_INTERNAL_CREATE;
         }
     }
 
@@ -286,7 +342,7 @@ namespace Game.Buffers
 
         public SFML.Graphics.Sprite Sprite { get; private set; }
 
-        public BufferType type()
+        public BufferType Type()
         {
             return BufferType.DISPLAY_IMAGE;
         }

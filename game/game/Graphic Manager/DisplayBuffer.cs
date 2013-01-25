@@ -27,11 +27,11 @@ namespace Game.Buffers
         private readonly HashSet<Game.Graphic_Manager.Animation> m_newAnimations = new HashSet<Game.Graphic_Manager.Animation>();
         private readonly SpriteFinder m_finder = new SpriteFinder();
         private readonly HashSet<IBufferEvent> m_actions = new HashSet<IBufferEvent>();
-        private List<ExternalEntity> m_visibleEntities = new List<ExternalEntity>();
+        private List<VisualEntityInformation> m_visibleEntities = new List<VisualEntityInformation>();
         private bool m_updated = false;
         private bool m_selected = false;
         private bool m_deselected = false;
-        private ExternalEntity m_selectedEntity; //For UI purposes
+        private VisualEntityInformation m_selectedEntity; //For UI purposes
 
         #endregion
 
@@ -89,7 +89,7 @@ namespace Game.Buffers
 
         #region input methods
 
-        public void ReceiveVisibleEntities(List<ExternalEntity> visibleExternalEntityList)
+        public void ReceiveVisibleEntities(List<VisualEntityInformation> visibleExternalEntityList)
         {
             m_visibleEntities = visibleExternalEntityList;
         }
@@ -156,33 +156,33 @@ namespace Game.Buffers
         {
             foreach (IBufferEvent action in m_actions)
             {
-                switch (action.type())
+                switch (action.Type())
                 {
-                    case BufferType.DESTROY:
-                        ExternalEntity ent = ((DestroyBufferEvent)action).Ent;
-                        Sprite temp = m_finder.Remove(ent);
+                    case BufferType.EXTERNAL_DESTROY:
+                        VisualEntityInformation visualInfo = ((ExternalDestroyBufferEvent)action).VisualInfo;
+                        Sprite temp = m_finder.Remove(visualInfo);
                         m_removedSprites.Add(temp);
-                        if (ent.Type != entityType.PERSON)
-                            m_newAnimations.Add(m_finder.GenerateDestoryResults(((DestroyBufferEvent)action).Area, ent.Type));
+                        if (visualInfo.Type != EntityType.PERSON)
+                            m_newAnimations.Add(m_finder.GenerateDestoryResults(((ExternalDestroyBufferEvent)action).Area, visualInfo.Type));
                         Decal decal = null;
-                        switch (ent.Type)
+                        switch (visualInfo.Type)
                         {
-                            case (entityType.BUILDING):
+                            case (EntityType.BUILDING):
                                 decal = new Decal(DecalType.RUBBLE);
                                 break;
-                            case (entityType.VEHICLE):
+                            case (EntityType.VEHICLE):
                                 decal = new Decal(DecalType.WRECKAGE);
                                 break;
-                            case (entityType.PERSON):
+                            case (EntityType.PERSON):
                                 decal = new Decal(DecalType.BLOOD);
                                 break;
                         }
 
-                        decal.SetLocation(ent.Position);
+                        decal.SetLocation(visualInfo.Position);
                         AddDecal(decal);
                         break;
 
-                    case BufferType.CREATE:
+                    case BufferType.EXTERNAL_CREATE:
                         //TODO
                         break;
 
@@ -192,7 +192,7 @@ namespace Game.Buffers
 
                     case BufferType.UNIT_SELECT:
                         m_selection.Position = ((UnitSelectBufferEvent)action).Coords.ToVector2f();
-                        m_selectedEntity = ((UnitSelectBufferEvent)action).Ent;
+                        m_selectedEntity = ((UnitSelectBufferEvent)action).VisibleInfo;
                         m_selected = true;
                         break;
 
@@ -257,7 +257,7 @@ namespace Game.Buffers
                 DisplayAdditionalInfo(m_selectedEntity);
                 return;
             }
-            if (m_deselected)
+            if (m_deselected && m_selectedEntity != null)
             {
                 m_removedSprites.Add(m_selection);
                 RemoveAdditionalInfo(m_selectedEntity);
@@ -265,7 +265,7 @@ namespace Game.Buffers
             }
         }
 
-        private void RemoveAdditionalInfo(ExternalEntity selectedEntity)
+        private void RemoveAdditionalInfo(VisualEntityInformation selectedEntity)
         {
             if (m_finder.HasPath(selectedEntity))
             {
@@ -273,7 +273,7 @@ namespace Game.Buffers
             }
         }
 
-        private void DisplayAdditionalInfo(ExternalEntity selectedEntity)
+        private void DisplayAdditionalInfo(VisualEntityInformation selectedEntity)
         {
             if (m_finder.HasPath(selectedEntity))
             {
@@ -285,7 +285,7 @@ namespace Game.Buffers
 
         private void AnalyzeEntities()
         {
-            foreach (ExternalEntity ent in m_visibleEntities)
+            foreach (VisualEntityInformation ent in m_visibleEntities)
             {
                 Sprite temp = m_finder.GetSprite(ent);
                 temp.Position = new Vector2f(ent.Position.X, ent.Position.Y);

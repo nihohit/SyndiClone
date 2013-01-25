@@ -19,7 +19,7 @@ namespace Game.Logic.Entities
         public Vector Exit { get; set; }
 
         public Building(int sizeModifier, reactionFunction reaction, Vector size, Affiliation loyalty)
-            : base(BASE_BUILD_REACTION_TIME*sizeModifier, reaction, BASE_BUILD_HEALTH*sizeModifier, entityType.BUILDING, size, loyalty)
+            : base(BASE_BUILD_REACTION_TIME*sizeModifier, reaction, BASE_BUILD_HEALTH*sizeModifier, EntityType.BUILDING, size, loyalty)
         {
             m_sizeModifier = sizeModifier;
             List<Upgrades> list = new List<Upgrades>();

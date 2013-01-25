@@ -28,7 +28,7 @@ namespace Game.Logic.Entities
 
         #region constructor
 
-        protected MovingEntity(int reactionTime, reactionFunction reaction, int health, entityType type, Vector size, Affiliation loyalty, Visibility visibility, Sight sight, int speed, List<Direction> path, Direction headed)
+        protected MovingEntity(int reactionTime, reactionFunction reaction, int health, EntityType type, Vector size, Affiliation loyalty, Visibility visibility, Sight sight, int speed, List<Direction> path, Direction headed)
             : base(reactionTime, reaction, health, type, size, loyalty)
         {
             Speed = speed;

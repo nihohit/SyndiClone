@@ -17,8 +17,8 @@ namespace Game.Logic
 
     #region enumerators
 
-    public enum Action { FIRE_AT, IGNORE, RUN_AWAY_FROM, MOVE_TOWARDS, MOVE_WHILE_SHOOT, CONSTRUCT_ENTITY } //This enum checks the possible actions entities can take
-    public enum entityType { PERSON, VEHICLE, BUILDING} //the different types of entities
+    public enum ActionType { FIRE_AT, IGNORE, RUN_AWAY_FROM, MOVE_TOWARDS, MOVE_WHILE_SHOOT, CONSTRUCT_ENTITY, PURSUE } //This enum checks the possible actions entities can take
+    public enum EntityType { PERSON, VEHICLE, BUILDING} //the different types of entities
     public enum Visibility { CLOAKED, MASKED, REVEALED, SOLID } //the visibility of an entity
     public enum Affiliation { INDEPENDENT, CORP1, CORP2, CORP3, CORP4, CIVILIAN } //to which player each entity belongs
     public enum SightType { DEFAULT_SIGHT, BLIND } //different sights
@@ -55,11 +55,17 @@ namespace Game.Logic
 
     #region reactions
 
+    #region Reaction
+
     //This interface describes the reaction of an entity to the enemies it sees. 
     public interface Reaction
     {
-        Action Action();
+        ActionType Action();
     }
+
+    #endregion
+
+    #region ShootReaction
 
     public struct ShootReaction : Reaction
     {
@@ -70,17 +76,44 @@ namespace Game.Logic
             get { return m_focus; }
         } 
 
-        Action Reaction.Action()
+        ActionType Reaction.Action()
         {
-            return Action.FIRE_AT;
+            return ActionType.FIRE_AT;
         }
 
         public ShootReaction(Entity focus)
         {
             m_focus = focus;
         }
-
     }
+
+    #endregion
+
+    #region PursueReaction
+
+    public struct PursueReaction : Reaction
+    {
+        private readonly Entity m_focus;
+
+        public Entity Focus
+        {
+            get { return m_focus; }
+        }
+
+        public ActionType Action()
+        {
+            return ActionType.PURSUE;
+        }
+
+        public PursueReaction(Entity focus)
+        {
+            m_focus = focus;
+        }
+    }
+
+    #endregion
+
+    #region ShootAndMoveReaction
 
     public struct ShootAndMoveReaction : Reaction
     {
@@ -91,9 +124,9 @@ namespace Game.Logic
             get { return m_focus; }
         } 
 
-        Action Reaction.Action()
+        ActionType Reaction.Action()
         {
-            return Action.MOVE_WHILE_SHOOT;
+            return ActionType.MOVE_WHILE_SHOOT;
         }
 
         ShootAndMoveReaction(Entity focus)
@@ -101,6 +134,10 @@ namespace Game.Logic
             m_focus = focus;
         }
     }
+
+    #endregion
+
+    #region ConstructReaction
 
     public struct ConstructReaction : Reaction
     {
@@ -111,17 +148,20 @@ namespace Game.Logic
             get { return m_focus; }
         } 
 
-        Action Reaction.Action()
+        ActionType Reaction.Action()
         {
-            return Action.CONSTRUCT_ENTITY;
+            return ActionType.CONSTRUCT_ENTITY;
         }
 
         public ConstructReaction(MovingEntity focus)
         {
             m_focus = focus;
         }
-
     }
+
+    #endregion
+
+    #region RunAwayReaction
 
     public struct RunAwayReaction : Reaction
     {
@@ -132,25 +172,30 @@ namespace Game.Logic
             get { return m_focus; }
         } 
 
-        Action Reaction.Action()
+        ActionType Reaction.Action()
         {
-            return Action.RUN_AWAY_FROM;
+            return ActionType.RUN_AWAY_FROM;
         }
 
         public RunAwayReaction(Entity focus)
         {
             m_focus = focus;
         }
-
     }
+
+    #endregion
+
+    #region IgnoreReaction
 
     public struct IgnoreReaction : Reaction
     {
-        Action Reaction.Action()
+        ActionType Reaction.Action()
         {
-            return Action.IGNORE;
+            return ActionType.IGNORE;
         }
     }
+
+    #endregion
 
     #endregion
 
@@ -196,6 +241,17 @@ namespace Game.Logic
         // when exception propagates from a remoting server to the client.
         protected LocationFullException(System.Runtime.Serialization.SerializationInfo info,
             System.Runtime.Serialization.StreamingContext context) { }
+    }
+
+    #endregion
+
+    #region EntityInformation
+
+    public class SelectedEntityInformation
+    {
+        public bool Controlled { get; private set; }
+
+        //TODO - determine what needs to be here.
     }
 
     #endregion

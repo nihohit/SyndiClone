@@ -49,7 +49,7 @@ namespace Game.Graphic_Manager
         #region static fields
 
         static readonly uint TILE_SIZE = FileHandler.GetUintProperty("tile size", FileAccessor.GENERAL);
-        private static Dictionary<ExternalEntity, Texture> s_buildings = new Dictionary<ExternalEntity, Texture>(new externalEntityEqualityComparer());
+        private static Dictionary<VisualEntityInformation, Texture> s_buildings = new Dictionary<VisualEntityInformation, Texture>(new VisualInformationEqualityComparer());
         private static Dictionary<Tuple<Block, BuildingStyle>, Texture> s_templates = new Dictionary<Tuple<Block, BuildingStyle>, Texture>(new TupleEqualityComparer());
         private static Dictionary<BuildingParts, Texture> s_parts = new Dictionary<BuildingParts, Texture>
         {
@@ -62,11 +62,20 @@ namespace Game.Graphic_Manager
 
         #region public methods
 
+        public static SFML.Graphics.Texture GetBuildingSFMLTexture(VisualEntityInformation building)
+        {
+            return GetBuildingImage(building);
+        }
+
+        #endregion
+
+        #region private methods
+
         //checks if the image exists, if not, then if an equivalent image exist, and if not, creates a new image. 
-        private static Texture GetBuildingImage(ExternalEntity building)
+        private static Texture GetBuildingImage(VisualEntityInformation building)
         {
             if (s_buildings.ContainsKey(building)) return s_buildings[building];
-            var temp = Tuple.Create(new Block((uint)building.Size.X, (uint)building.Size.Y), GenerateStyle(building.Loyalty));
+            var temp = Tuple.Create(new Block((uint)building.Size.X, (uint)building.Size.Y), GenerateStyle(building.VisibleLoyalty));
             Texture image = null;
             if (s_templates.ContainsKey(temp))
             {
@@ -77,19 +86,9 @@ namespace Game.Graphic_Manager
                 image = new Texture(GenerateBuildingImage(temp));
                 s_templates.Add(temp, image);
             }
-            s_buildings.Add(building,image);
+            s_buildings.Add(building, image);
             return image;
         }
-
-        public static SFML.Graphics.Texture GetBuildingSFMLTexture(ExternalEntity building)
-        {
-            Texture temp = GetBuildingImage(building);
-            return temp;
-        }
-
-        #endregion
-
-        #region private methods
 
         //generate a building image from a block
         private static Texture GenerateBuildingImage(Tuple<Block, BuildingStyle> temp)

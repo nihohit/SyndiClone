@@ -82,6 +82,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Logic\Entities\Agent.cs" />
+    <Compile Include="Logic\Entities\BasicFactory.cs" />
     <Compile Include="Logic\Entities\BlastEffect.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -94,7 +95,7 @@
     <Compile Include="Logic\Entities\CivilianBuilding.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Logic\Entities\Constructor.cs">
+    <Compile Include="Logic\Entities\EntitiesInterfaces.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Logic\Entities\ConstructorBuilding.cs" />
@@ -104,7 +105,7 @@
     <Compile Include="Logic\Entities\Entity.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Logic\Entities\ExternalEntity.cs">
+    <Compile Include="Logic\Entities\VisibleEntityInformation.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Logic\Entities\MovingEntity.cs">

@@ -1,8 +1,15 @@
-﻿
+﻿using System;
+
 namespace Game.Logic.Entities
 {
     public abstract class Entity
     {
+        #region static members
+
+        private static int s_Id = 0;
+
+        #endregion
+
         #region consts
 
         const int TIME_TO_REACT = 1000;
@@ -31,30 +38,37 @@ namespace Game.Logic.Entities
 
         public Affiliation Loyalty { get; set; }
 
-        public Visibility Visible { get; set; }
+        public Visibility VisibleStatus { get; set; }
 
-        public Sight Sight { get; private set; }
+        public Sight SightSystem { get; private set; }
 
-        public entityType Type { get; private set; }
+        public EntityType Type { get; private set; }
 
         public Vector Size { get; set; }
+
+        public int Id { get; private set;  }
+
+        public VisualEntityInformation VisualInfo { get; protected set; }
 
         #endregion
 
         #region constructor
 
-        protected Entity(int reactionTime, reactionFunction reaction, int health,entityType type, Vector size, Affiliation loyalty)
+        protected Entity(int reactionTime, reactionFunction reaction, int health, EntityType type, Vector size, Affiliation loyalty)
         {
             Health = health;
             Size = size;
             Type = type;
             Loyalty = loyalty;
-            Sight = Sight.instance(SightType.DEFAULT_SIGHT);
+            SightSystem = Sight.instance(SightType.DEFAULT_SIGHT);
             Reaction = new IgnoreReaction();
-            Visible = Visibility.REVEALED;
+            VisibleStatus = Visibility.REVEALED;
             ReactionFunction = reaction;
             ReactionTime = reactionTime;
             WhatSees = new UniqueList<Entity>();
+            s_Id++;
+            Id = s_Id;
+            VisualInfo = new VisualEntityInformation(Type, Loyalty, size, Id);
         }
 
         #endregion
@@ -73,7 +87,7 @@ namespace Game.Logic.Entities
 
         public override string ToString()
         {
-            return "Health: " + Health + " size: " + Size.ToString();
+            return String.Format("Id: {0}, Health: {1}, Size: {2}", Id, Health, Size.ToString());
         }
 
         #region virtual methods
@@ -116,10 +130,10 @@ namespace Game.Logic.Entities
                         Health += 7;
                         break;
                     case(Upgrades.VISIBILITY_SOLID):
-                        Visible = Visibility.SOLID;
+                        VisibleStatus = Visibility.SOLID;
                         break;
                     case(Upgrades.BUILDING_BLIND):
-                        Sight = Sight.instance(SightType.BLIND);
+                        SightSystem = Sight.instance(SightType.BLIND);
                         break;
                 }
             }

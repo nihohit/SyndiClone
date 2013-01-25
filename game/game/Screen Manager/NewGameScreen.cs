@@ -62,19 +62,19 @@
             s_xValue.SetBounds((int)s_window.Size.X / 2 , (int)s_window.Size.Y / 2 - 60, 100, 30);
             s_xValue.Value = 40;
             s_xValue.Max = 60;
-            s_xValue.Min = 20;
+            s_xValue.Min = 40;
 
             s_civAmount = new Gwen.Control.NumericUpDown(s_canvas);
             s_civAmount.SetBounds((int)s_window.Size.X / 2 + 120, (int)s_window.Size.Y / 2 - 60, 100, 30);
-            s_civAmount.Value = 300;
+            s_civAmount.Value = 100;
             s_civAmount.Max = 600;
-            s_civAmount.Min = 200;
+            s_civAmount.Min = 100;
 
             s_yValue = new Gwen.Control.NumericUpDown(s_canvas);
             s_yValue.SetBounds((int)s_window.Size.X / 2 - 120, (int)s_window.Size.Y / 2 - 60, 100, 30);
             s_yValue.Value = 30;
             s_yValue.Max = 45;
-            s_yValue.Min = 15;
+            s_yValue.Min = 30;
 
             var quitGameButton = new Gwen.Control.Button(s_canvas);
             quitGameButton.Text = "back";

@@ -10,7 +10,7 @@ namespace Game.Logic.Entities
         const int PERSON_SPEED = 10;
 
         protected Person(reactionFunction react, Affiliation loyalty, List<Direction> path, Direction headed) :
-            base(PERSON_REACTION_TIME, react, PERSON_HEALTH, entityType.PERSON, new Vector(1, 1), loyalty, Visibility.REVEALED, Sight.instance(SightType.DEFAULT_SIGHT), PERSON_SPEED, path, headed)
+            base(PERSON_REACTION_TIME, react, PERSON_HEALTH, EntityType.PERSON, new Vector(1, 1), loyalty, Visibility.REVEALED, Sight.instance(SightType.DEFAULT_SIGHT), PERSON_SPEED, path, headed)
         {
         }
 

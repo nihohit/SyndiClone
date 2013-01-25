@@ -72,7 +72,7 @@ namespace Game.Graphic_Manager
             m_order = new List<Sprite>(list);
         }
 
-        public Animation(Area area, Logic.entityType type)
+        public Animation(Area area, Logic.EntityType type)
         {
             // TODO - missing function. The basic idea is to generate an explosion sprite based on size, and whether it's a person, building or vehicle
             m_order = null;
