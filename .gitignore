@@ -21,6 +21,8 @@ Thumbs.db
 *.log
 *.lib
 *.sbr
+*.suo
+*.sln
 obj/
 [Rr]elease*/
 _ReSharper*/
