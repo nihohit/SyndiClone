@@ -433,7 +433,7 @@ namespace Gwen.Renderer
             Debug.Assert(m_CacheSize % 4 == 0);
             if (m_CacheSize > 0)
             {
-                m_Target.Draw(m_VertexCache, 0, m_CacheSize, PrimitiveType.Quads, m_RenderState);
+                m_Target.Draw(m_VertexCache, PrimitiveType.Quads, m_RenderState);
                 m_CacheSize = 0;
             }
         }

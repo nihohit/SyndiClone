@@ -31,3 +31,6 @@ Tao*/
 
 #ignore the city files
 *.mf
+/GwenCS/Gwen.Renderer.SFML/bin/
+/game/game/bin/
+/GwenCS/Gwen/bin/
