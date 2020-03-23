@@ -1,17 +1,15 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
-namespace Game.Logic.Entities
-{
-    public interface IShooter
-    {
+namespace Game.Logic.Entities {
+  public interface IShooter {
 
-        Weapons Weapon();
+    Weapons Weapon();
 
-        bool ReadyToShoot();
+    bool ReadyToShoot();
 
-        Entity Target();
+    Entity Target();
 
-        targetChooser Targeter();
+    targetChooser Targeter();
 
-    }
+  }
 }

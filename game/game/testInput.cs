@@ -1,22 +1,15 @@
-﻿using System.Threading;
 using System;
-using SFML.Window;
-using SFML.Graphics;
 using System.Collections.Generic;
+using System.Threading;
+using SFML.Graphics;
+using SFML.Window;
 
-namespace Game
-{
-
-    class main
-    {
-
-        static int Main(string[] args)
-        {
-            FileHandler.Init();
-            Screen_Manager.ScreenManager.Run();
-            return 1;
-        }
+namespace Game {
+  internal class main {
+    static int Main(string[] args) {
+      FileHandler.Init();
+      Screen_Manager.ScreenManager.Run();
+      return 1;
     }
-
-
+  }
 }

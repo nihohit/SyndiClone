@@ -1,258 +1,218 @@
-﻿using System.Collections.Generic;
-using Game.Logic.Entities;
 using System;
+using System.Collections.Generic;
+using Game.Logic.Entities;
 
+namespace Game.Logic {
+  #region delegates
 
-namespace Game.Logic
-{
-    #region delegates
+  public delegate bool EntityChecker(Entity ent); //These functions check basic questions about entities and return a bool
+  public delegate void ShotEffect(Entity ent); //These functions simulate effects on entities. mostly will be damage
+  public delegate bool WasBlocked(Entity ent); //These functions check whether an entitiy blocks a certain effect
+  public delegate Entity targetChooser(List<Entity> targets); //These functions choose which entity, out of the list of possible entities, to target
+  public delegate Reaction reactionFunction(List<Entity> ent); //These functions set the reaction of entities
 
-    public delegate bool EntityChecker(Entity ent); //These functions check basic questions about entities and return a bool
-    public delegate void ShotEffect(Entity ent); //These functions simulate effects on entities. mostly will be damage
-    public delegate bool WasBlocked(Entity ent); //These functions check whether an entitiy blocks a certain effect
-    public delegate Entity targetChooser(List<Entity> targets); //These functions choose which entity, out of the list of possible entities, to target
-    public delegate Reaction reactionFunction(List<Entity> ent); //These functions set the reaction of entities
+  #endregion
 
-    #endregion
+  #region enumerators
 
-    #region enumerators
+  public enum ActionType { FIRE_AT, IGNORE, RUN_AWAY_FROM, MOVE_TOWARDS, MOVE_WHILE_SHOOT, CONSTRUCT_ENTITY, PURSUE } //This enum checks the possible actions entities can take
+ public enum EntityType { PERSON, VEHICLE, BUILDING } //the different types of entities
+ public enum Visibility { CLOAKED, MASKED, REVEALED, SOLID } //the visibility of an entity
+ public enum Affiliation { INDEPENDENT, CORP1, CORP2, CORP3, CORP4, CIVILIAN } //to which player each entity belongs
+ public enum SightType { DEFAULT_SIGHT, BLIND } //different sights
+ public enum WeaponType { PISTOL, ASSAULT, BAZOOKA, SNIPER, RAILGUN } //different weapons
+  public enum MovementType { GROUND, HOVER, FLYER, CRUSHER }
+  public enum TerrainType { ROAD, WATER, BUILDING }
+  public enum BlastType { } //different blast effect
+  public enum ShotType { SIGHT, PISTOL_BULLET }
+  public enum Direction { LEFT, RIGHT, UP, DOWN, UPLEFT, UPRIGHT, DOWNLEFT, DOWNRIGHT }
+  public enum Corporations { BIOTECH, STEALTH, ARMS, VEHICLES, VISION }
+  public enum Upgrades { BULLETPROOF_VEST, VISIBILITY_SOLID, BUILDING_BLIND, FLYER, HOVER, CRUSHER }
 
-    public enum ActionType { FIRE_AT, IGNORE, RUN_AWAY_FROM, MOVE_TOWARDS, MOVE_WHILE_SHOOT, CONSTRUCT_ENTITY, PURSUE } //This enum checks the possible actions entities can take
-    public enum EntityType { PERSON, VEHICLE, BUILDING} //the different types of entities
-    public enum Visibility { CLOAKED, MASKED, REVEALED, SOLID } //the visibility of an entity
-    public enum Affiliation { INDEPENDENT, CORP1, CORP2, CORP3, CORP4, CIVILIAN } //to which player each entity belongs
-    public enum SightType { DEFAULT_SIGHT, BLIND } //different sights
-    public enum WeaponType { PISTOL, ASSAULT, BAZOOKA, SNIPER, RAILGUN } //different weapons
-    public enum MovementType { GROUND, HOVER, FLYER, CRUSHER }
-    public enum TerrainType { ROAD, WATER, BUILDING } 
-    public enum BlastType { } //different blast effect
-    public enum ShotType { SIGHT, PISTOL_BULLET }
-    public enum Direction { LEFT, RIGHT, UP, DOWN, UPLEFT, UPRIGHT, DOWNLEFT, DOWNRIGHT }
-    public enum Corporations { BIOTECH, STEALTH, ARMS, VEHICLES, VISION }
-    public enum Upgrades { BULLETPROOF_VEST, VISIBILITY_SOLID, BUILDING_BLIND, FLYER, HOVER, CRUSHER }
+  #endregion
 
-    #endregion
+  #region TerrainGrid
 
-    #region TerrainGrid
+  //This class is a holder for an array - used so the array won't be transferred by value over functions. 
+  public class TerrainGrid {
+    private readonly TerrainType[, ] grid;
 
-    //This class is a holder for an array - used so the array won't be transferred by value over functions. 
-    public class TerrainGrid
-    {
-        private readonly TerrainType[,] grid;
-
-        public TerrainGrid(int x, int y)
-        {
-            grid = new TerrainType[x, y];
-        }
-
-        public Logic.TerrainType[,] Grid
-        {
-            get { return grid; }
-        } 
+    public TerrainGrid(int x, int y) {
+      grid = new TerrainType[x, y];
     }
 
-    #endregion
+    public Logic.TerrainType[, ] Grid {
+      get { return grid; }
+    }
+  }
 
-    #region reactions
+  #endregion
 
-    #region Reaction
+  #region reactions
 
-    //This interface describes the reaction of an entity to the enemies it sees. 
-    public interface Reaction
-    {
-        ActionType Action();
+  #region Reaction
+
+  //This interface describes the reaction of an entity to the enemies it sees. 
+  public interface Reaction {
+    ActionType Action();
+  }
+
+  #endregion
+
+  #region ShootReaction
+
+  public struct ShootReaction : Reaction {
+    private readonly Entity m_focus;
+
+    public Entity Focus {
+      get { return m_focus; }
     }
 
-    #endregion
-
-    #region ShootReaction
-
-    public struct ShootReaction : Reaction
-    {
-        private readonly Entity m_focus;
-
-        public Entity Focus
-        {
-            get { return m_focus; }
-        } 
-
-        ActionType Reaction.Action()
-        {
-            return ActionType.FIRE_AT;
-        }
-
-        public ShootReaction(Entity focus)
-        {
-            m_focus = focus;
-        }
+    ActionType Reaction.Action() {
+      return ActionType.FIRE_AT;
     }
 
-    #endregion
+    public ShootReaction(Entity focus) {
+      m_focus = focus;
+    }
+  }
 
-    #region PursueReaction
+  #endregion
 
-    public struct PursueReaction : Reaction
-    {
-        private readonly Entity m_focus;
+  #region PursueReaction
 
-        public Entity Focus
-        {
-            get { return m_focus; }
-        }
+  public struct PursueReaction : Reaction {
+    private readonly Entity m_focus;
 
-        public ActionType Action()
-        {
-            return ActionType.PURSUE;
-        }
-
-        public PursueReaction(Entity focus)
-        {
-            m_focus = focus;
-        }
+    public Entity Focus {
+      get { return m_focus; }
     }
 
-    #endregion
-
-    #region ShootAndMoveReaction
-
-    public struct ShootAndMoveReaction : Reaction
-    {
-        private readonly Entity m_focus;
-
-        public Entity Focus
-        {
-            get { return m_focus; }
-        } 
-
-        ActionType Reaction.Action()
-        {
-            return ActionType.MOVE_WHILE_SHOOT;
-        }
-
-        ShootAndMoveReaction(Entity focus)
-        {
-            m_focus = focus;
-        }
+    public ActionType Action() {
+      return ActionType.PURSUE;
     }
 
-    #endregion
+    public PursueReaction(Entity focus) {
+      m_focus = focus;
+    }
+  }
 
-    #region ConstructReaction
+  #endregion
 
-    public struct ConstructReaction : Reaction
-    {
-        private readonly MovingEntity m_focus;
+  #region ShootAndMoveReaction
 
-        public MovingEntity Focus
-        {
-            get { return m_focus; }
-        } 
+  public struct ShootAndMoveReaction : Reaction {
+    private readonly Entity m_focus;
 
-        ActionType Reaction.Action()
-        {
-            return ActionType.CONSTRUCT_ENTITY;
-        }
-
-        public ConstructReaction(MovingEntity focus)
-        {
-            m_focus = focus;
-        }
+    public Entity Focus {
+      get { return m_focus; }
     }
 
-    #endregion
-
-    #region RunAwayReaction
-
-    public struct RunAwayReaction : Reaction
-    {
-        private readonly Entity m_focus;
-
-        public Entity Focus
-        {
-            get { return m_focus; }
-        } 
-
-        ActionType Reaction.Action()
-        {
-            return ActionType.RUN_AWAY_FROM;
-        }
-
-        public RunAwayReaction(Entity focus)
-        {
-            m_focus = focus;
-        }
+    ActionType Reaction.Action() {
+      return ActionType.MOVE_WHILE_SHOOT;
     }
 
-    #endregion
+    ShootAndMoveReaction(Entity focus) {
+      m_focus = focus;
+    }
+  }
 
-    #region IgnoreReaction
+  #endregion
 
-    public struct IgnoreReaction : Reaction
-    {
-        ActionType Reaction.Action()
-        {
-            return ActionType.IGNORE;
-        }
+  #region ConstructReaction
+
+  public struct ConstructReaction : Reaction {
+    private readonly MovingEntity m_focus;
+
+    public MovingEntity Focus {
+      get { return m_focus; }
     }
 
-    #endregion
-
-    #endregion
-
-    #region UniqueList
-
-    //This class represents a list that verifies that entities entered into it only once. 
-    public class UniqueList<T> : List<T>
-    {
-        public UniqueList()
-            : base()
-        {
-        }
-
-        public UniqueList(List<T> old)
-            : base(old)
-        {
-        }
-
-        public void uniqueAdd(T obj)
-        {
-            if (!base.Contains(obj)) base.Add(obj);
-        }
-
-        public void listAdd(UniqueList<T> list)
-        {
-            foreach (T t in list)
-            {
-                uniqueAdd(t);
-            }
-        }
+    ActionType Reaction.Action() {
+      return ActionType.CONSTRUCT_ENTITY;
     }
 
-    #endregion
+    public ConstructReaction(MovingEntity focus) {
+      m_focus = focus;
+    }
+  }
 
-    #region LocationFullException
+  #endregion
 
-    public class LocationFullException : System.ApplicationException
-    {
-        public LocationFullException() { }
-        public LocationFullException(string message) { }
+  #region RunAwayReaction
 
-        // Constructor needed for serialization 
-        // when exception propagates from a remoting server to the client.
-        protected LocationFullException(System.Runtime.Serialization.SerializationInfo info,
-            System.Runtime.Serialization.StreamingContext context) { }
+  public struct RunAwayReaction : Reaction {
+    private readonly Entity m_focus;
+
+    public Entity Focus {
+      get { return m_focus; }
     }
 
-    #endregion
-
-    #region EntityInformation
-
-    public class SelectedEntityInformation
-    {
-        public bool Controlled { get; private set; }
-
-        //TODO - determine what needs to be here.
+    ActionType Reaction.Action() {
+      return ActionType.RUN_AWAY_FROM;
     }
 
-    #endregion
+    public RunAwayReaction(Entity focus) {
+      m_focus = focus;
+    }
+  }
+
+  #endregion
+
+  #region IgnoreReaction
+
+  public struct IgnoreReaction : Reaction {
+    ActionType Reaction.Action() {
+      return ActionType.IGNORE;
+    }
+  }
+
+  #endregion
+
+  #endregion
+
+  #region UniqueList
+
+  //This class represents a list that verifies that entities entered into it only once. 
+  public class UniqueList<T> : List<T> {
+    public UniqueList() : base() { }
+
+    public UniqueList(List<T> old) : base(old) { }
+
+    public void uniqueAdd(T obj) {
+      if (!base.Contains(obj)) base.Add(obj);
+    }
+
+    public void listAdd(UniqueList<T> list) {
+      foreach (T t in list) {
+        uniqueAdd(t);
+      }
+    }
+  }
+
+  #endregion
+
+  #region LocationFullException
+
+  public class LocationFullException : System.ApplicationException {
+    public LocationFullException() { }
+    public LocationFullException(string message) { }
+
+    // Constructor needed for serialization 
+    // when exception propagates from a remoting server to the client.
+    protected LocationFullException(System.Runtime.Serialization.SerializationInfo info,
+      System.Runtime.Serialization.StreamingContext context) { }
+  }
+
+  #endregion
+
+  #region EntityInformation
+
+  public class SelectedEntityInformation {
+    public bool Controlled { get; private set; }
+
+    //TODO - determine what needs to be here.
+  }
+
+  #endregion
 }
