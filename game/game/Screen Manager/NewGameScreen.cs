@@ -1,3 +1,5 @@
+using System;
+
 namespace Game.Screen_Manager {
   /// <summary>
   /// In this screen, you define the parameters for a new game and call its creation.
@@ -46,45 +48,52 @@ namespace Game.Screen_Manager {
     #region private methods
 
     private void InitialiseUI() {
-      var newGameButton = new Gwen.Control.Button(s_canvas);
-      newGameButton.Text = "New Game";
-      newGameButton.SetBounds((int) s_window.Size.X / 2, (int) s_window.Size.Y / 2 - 100, 200, 200);
-      newGameButton.AutoSizeToContents = true;
+      var halfX = (int)s_window.Size.X / 2;
+      var halfY = (int)s_window.Size.Y / 2;
+      var newGameButton = new Gwen.Control.Button(s_canvas) {
+        Text = "New Game",
+        AutoSizeToContents = true
+      };
       newGameButton.Pressed += GenerateNewGame;
+      newGameButton.SetBounds(halfX, halfY - 100, 200, 200);
 
-      s_xValue = new Gwen.Control.NumericUpDown(s_canvas);
-      s_xValue.SetBounds((int) s_window.Size.X / 2, (int) s_window.Size.Y / 2 - 60, 100, 30);
-      s_xValue.Value = 40;
-      s_xValue.Max = 60;
-      s_xValue.Min = 40;
+      s_xValue = new Gwen.Control.NumericUpDown(s_canvas) {
+        Value = 40,
+        Max = 60,
+        Min = 40
+      };
+      s_xValue.SetBounds(halfX, halfY - 60, 100, 30);
 
-      s_civAmount = new Gwen.Control.NumericUpDown(s_canvas);
-      s_civAmount.SetBounds((int) s_window.Size.X / 2 + 120, (int) s_window.Size.Y / 2 - 60, 100, 30);
-      s_civAmount.Value = 100;
-      s_civAmount.Max = 600;
-      s_civAmount.Min = 100;
+      s_civAmount = new Gwen.Control.NumericUpDown(s_canvas) {
+        Value = 100,
+        Max = 600,
+        Min = 100
+      };
+      s_civAmount.SetBounds(halfX + 120, halfY - 60, 100, 30);
 
-      s_yValue = new Gwen.Control.NumericUpDown(s_canvas);
-      s_yValue.SetBounds((int) s_window.Size.X / 2 - 120, (int) s_window.Size.Y / 2 - 60, 100, 30);
-      s_yValue.Value = 30;
-      s_yValue.Max = 45;
-      s_yValue.Min = 30;
+      s_yValue = new Gwen.Control.NumericUpDown(s_canvas) {
+        Value = 30,
+        Max = 45,
+        Min = 30
+      };
+      s_yValue.SetBounds(halfX - 120, halfY - 60, 100, 30);
 
-      var quitGameButton = new Gwen.Control.Button(s_canvas);
-      quitGameButton.Text = "back";
-      quitGameButton.SetBounds((int) s_window.Size.X / 2, (int) s_window.Size.Y / 2 + 100, 400, 200);
-      quitGameButton.AutoSizeToContents = true;
+      var quitGameButton = new Gwen.Control.Button(s_canvas) {
+        Text = "back",
+        AutoSizeToContents = true
+      };
       quitGameButton.Pressed += GoBackToMainScreen;
+      quitGameButton.SetBounds(halfX, halfY + 100, 400, 200);
     }
 
-    static private void GenerateNewGame(Gwen.Control.Base control) {
+    static private void GenerateNewGame(Gwen.Control.Base control, EventArgs args) {
       System.Console.Out.WriteLine("new game started");
-      IScreen newGame = new GameScreen((int) s_xValue.Value, (int) s_yValue.Value, (int) s_civAmount.Value); //HACK
+      IScreen newGame = new GameScreen((int)s_xValue.Value, (int)s_yValue.Value, (int)s_civAmount.Value); //HACK
       EraseScreen();
       newGame.GainControl(s_window, s_canvas);
     }
 
-    static private void GoBackToMainScreen(Gwen.Control.Base control) {
+    static private void GoBackToMainScreen(Gwen.Control.Base control, EventArgs args) {
       System.Console.Out.WriteLine("back to main screen");
       EraseScreen();
       IScreen mainScreen = MainScreen.Instance;

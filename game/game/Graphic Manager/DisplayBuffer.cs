@@ -4,6 +4,7 @@ using Game.Logic;
 using Game.Logic.Entities;
 using SFML.Graphics;
 using SFML.Window;
+using Vector2f = SFML.System.Vector2f;
 
 namespace Game.Buffers {
   public class DisplayBuffer : Game.Buffers.Buffer {

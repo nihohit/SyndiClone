@@ -2,7 +2,7 @@ using SFML.Graphics;
 using SFML.Window;
 
 namespace Game {
-  class main {
+  static class main {
     private static Gwen.Input.SFML m_Input;
     private static RenderWindow mainWindow;
 
@@ -28,7 +28,7 @@ namespace Game {
       newGameButton.AutoSizeToContents = true;
       newGameButton.Pressed += newGameScreen;
 
-      while (mainWindow.IsOpen()) // quit if main window is closed
+      while (mainWindow.IsOpen) // quit if main window is closed
       {
         mainWindow.SetActive();
         mainWindow.DispatchEvents();
@@ -56,7 +56,7 @@ namespace Game {
       m_Input.ProcessMessage(new Gwen.Input.SFMLMouseButtonEventArgs(e, false));
     }
 
-    static private void newGameScreen(Gwen.Control.Base control) {
+    static private void newGameScreen(Gwen.Control.Base control, System.EventArgs arguments) {
       mainWindow.Close(); // modified to do something other to write to console
     }
   }

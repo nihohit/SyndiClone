@@ -1,4 +1,5 @@
 using System;
+using Vector2f = SFML.System.Vector2f;
 
 namespace Game {
   public struct Point {
@@ -45,8 +46,8 @@ namespace Game {
       return ((obj is Point) && ((Point) obj == this));
     }
 
-    public SFML.Window.Vector2f ToVector2f() {
-      return new SFML.Window.Vector2f(Convert.ToSingle(m_xLoc), Convert.ToSingle(m_yLoc));
+    public Vector2f ToVector2f() {
+      return new Vector2f(Convert.ToSingle(m_xLoc), Convert.ToSingle(m_yLoc));
     }
 
     public override int GetHashCode() {

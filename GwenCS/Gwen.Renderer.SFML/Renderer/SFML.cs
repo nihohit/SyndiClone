@@ -4,11 +4,12 @@ using System.Diagnostics;
 using System.Drawing;
 using SFML;
 using SFML.Graphics;
-using SFML.Window;
 using Tao.OpenGl;
 using Color = SFML.Graphics.Color;
 using Image = SFML.Graphics.Image;
 using SFMLTexture = SFML.Graphics.Texture;
+using Vector2f = SFML.System.Vector2f;
+using Vector2i = SFML.System.Vector2i;
 
 namespace Gwen.Renderer
 {
@@ -43,7 +44,7 @@ namespace Gwen.Renderer
         {
             base.Begin();
             var port = m_Target.GetViewport(m_Target.GetView());
-            var scaled = m_Target.ConvertCoords(new Vector2i(port.Width, port.Height));
+            var scaled = m_Target.MapPixelToCoords(new Vector2i(port.Width, port.Height));
             m_ViewScale.X = (port.Width/scaled.X)*Scale;
             m_ViewScale.Y = (port.Height/scaled.Y)*Scale;
         }
@@ -195,7 +196,7 @@ namespace Gwen.Renderer
                     text += '\0';
             }
 
-            Point extents = new Point(0, sfFont.GetLineSpacing((uint)font.RealSize));
+            Point extents = new Point(0, Convert.ToInt32(sfFont.GetLineSpacing(Convert.ToUInt32(font.RealSize))));
             char prev = '\0';
 
             for (int i = 0; i < text.Length; i++)
@@ -205,14 +206,15 @@ namespace Gwen.Renderer
                 prev = cur;
                 if (cur == '\n' || cur == '\v')
                     continue;
-                extents.X += sfFont.GetGlyph(cur, (uint) font.RealSize, false).Advance;
+                extents.X += Convert.ToInt32(sfFont.GetGlyph(cur, Convert.ToUInt32(font.RealSize), false, 0).Advance);
             }
 
             return extents;
         }
 
-        public override void RenderText(Font font, Point pos, string text)
+        public override void RenderText(Font font, Point pos, TextContainer textContainer)
         {
+            var text = textContainer.Text;
             //m_Target.SaveGLStates();
             pos = Translate(pos);
             global::SFML.Graphics.Font sfFont = font.RendererData as global::SFML.Graphics.Font;
@@ -238,7 +240,8 @@ namespace Gwen.Renderer
             sfText.Font = sfFont;
             sfText.Position = new Vector2f(pos.X, pos.Y);
             sfText.CharacterSize = (uint)font.RealSize; // [omeg] round?
-            sfText.Color = m_Color;
+            sfText.FillColor = m_Color;
+            sfText.OutlineColor = m_Color;
             m_Target.Draw(sfText);
             sfText.Dispose();
             //m_Target.RestoreGLStates();

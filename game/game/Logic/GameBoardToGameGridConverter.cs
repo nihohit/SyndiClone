@@ -4,8 +4,8 @@ using Game.City_Generator;
 using Game.Logic.Entities;
 
 namespace Game.Logic {
-  static class GameBoardToGameGridConverter {
-    static readonly int TILE_SIZE_CONVERSION = FileHandler.GetIntProperty("tile size", FileAccessor.GENERAL);
+  internal static class GameBoardToGameGridConverter {
+    private static readonly int TILE_SIZE_CONVERSION = FileHandler.GetIntProperty("tile size", FileAccessor.GENERAL);
 
     #region public methods
 
@@ -60,24 +60,24 @@ namespace Game.Logic {
     private static Vector GetExitVector(City_Generator.Building build) {
       int x = 0, y = 0;
       switch (build.ExitDirection) {
-      case (0):
-        y = -1;
-        break;
-      case (1):
-        y = 1;
-        break;
-      case (2):
-        x = -1;
-        break;
-      case (3):
-        x = 1;
-        break;
+        case (0):
+          y = -1;
+          break;
+        case (1):
+          y = 1;
+          break;
+        case (2):
+          x = -1;
+          break;
+        case (3):
+          x = 1;
+          break;
       }
 
       //TODO - something here is wrong, and the default exit locations seem rather random.
       return new Vector(
-        (short) (x * build.Dimensions.Length * TILE_SIZE_CONVERSION / 2),
-        (short) (y * build.Dimensions.Depth * TILE_SIZE_CONVERSION / 2));
+        (short)(x * build.Dimensions.Length * TILE_SIZE_CONVERSION / 2),
+        (short)(y * build.Dimensions.Depth * TILE_SIZE_CONVERSION / 2));
     }
 
     #endregion
@@ -89,8 +89,8 @@ namespace Game.Logic {
      */
     private static Area ConvertToArea(Game.City_Generator.Building build) {
       return new Area(
-        new Point((short) (build.Dimensions.StartY * TILE_SIZE_CONVERSION), (short) (build.Dimensions.StartX * TILE_SIZE_CONVERSION)),
-        new Vector((short) (build.Dimensions.Length * TILE_SIZE_CONVERSION), (short) (build.Dimensions.Depth * TILE_SIZE_CONVERSION)));
+        new Point((short)(build.Dimensions.StartY * TILE_SIZE_CONVERSION), (short)(build.Dimensions.StartX * TILE_SIZE_CONVERSION)),
+        new Vector((short)(build.Dimensions.Length * TILE_SIZE_CONVERSION), (short)(build.Dimensions.Depth * TILE_SIZE_CONVERSION)));
     }
 
     #endregion

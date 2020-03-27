@@ -2,6 +2,7 @@ using Gwen;
 using Gwen.Control;
 using Gwen.ControlInternal;
 using Gwen.Input;
+using System;
 
 namespace Game.Screen_Manager {
   /// <summary>
@@ -63,14 +64,14 @@ namespace Game.Screen_Manager {
       quitGameButton.Pressed += QuitGame;
     }
 
-    static private void GenerateNewGameScreen(Gwen.Control.Base control) {
+    static private void GenerateNewGameScreen(Gwen.Control.Base control, EventArgs args) {
       System.Console.Out.WriteLine("button clicked");
       IScreen newGame = NewGameScreen.Instance;
       EraseScreen();
       newGame.GainControl(s_window, s_canvas);
     }
 
-    static private void QuitGame(Gwen.Control.Base control) {
+    static private void QuitGame(Gwen.Control.Base control, EventArgs args) {
       System.Console.Out.WriteLine("game ended");
       EraseScreen();
       s_canvas.Dispose();

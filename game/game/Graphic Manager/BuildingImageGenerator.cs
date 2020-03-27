@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Game.Logic;
 using Game.Logic.Entities;
 using SFML.Graphics;
+using Vector2f = SFML.System.Vector2f;
 
 namespace Game.Graphic_Manager {
   #region Block
@@ -114,7 +115,7 @@ namespace Game.Graphic_Manager {
       //this copies all the smaller images into the larger one.
       foreach (Sprite sprite in sprites) {
         if (sprite != null) {
-          sprite.Position = new SFML.Window.Vector2f(depthOffset, heightOffset);
+          sprite.Position = new Vector2f(depthOffset, heightOffset);
           img.Draw(sprite);
         }
 
@@ -190,7 +191,7 @@ namespace Game.Graphic_Manager {
         default:
           break;
       }
-      if (img != null) img.Origin = new SFML.Window.Vector2f(img.Texture.Size.X / 2, img.Texture.Size.Y / 2);
+      if (img != null) img.Origin = new Vector2f(img.Texture.Size.X / 2, img.Texture.Size.Y / 2);
       else throw new NullReferenceException();
       return img;
     }

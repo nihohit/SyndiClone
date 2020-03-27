@@ -43,7 +43,7 @@ namespace Game.Screen_Manager {
       CurrentScreen = MainScreen.Instance;
       CurrentScreen.GainControl(s_window, canvas);
 
-      while (s_window.IsOpen()) // quit if main window is closed
+      while (s_window.IsOpen) // quit if main window is closed
       {
         CurrentScreen.Loop();
       }

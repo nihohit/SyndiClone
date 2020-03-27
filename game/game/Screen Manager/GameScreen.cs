@@ -4,6 +4,7 @@ using Game.Buffers;
 using Gwen.Renderer;
 using SFML.Graphics;
 using SFML.Window;
+using Vector2f = SFML.System.Vector2f;
 
 namespace Game.Screen_Manager {
   /// <summary>
@@ -30,14 +31,11 @@ namespace Game.Screen_Manager {
     #region file read values
     //currently, at least.
 
-    float AMOUNT_OF_PIXEL_ALLOWED_OFFSCREEN = FileHandler.GetFloatProperty("pixels allowed off background", FileAccessor.SCREEN);
-    uint SCREEN_EDGE_PERCENT_FOR_MOUSE_SCROLLING = FileHandler.GetUintProperty("mouse scroll range", FileAccessor.SCREEN);
-    uint SCREEN_EDGE_MOUSE_SCROLL_RELATION = FileHandler.GetUintProperty("mouse scroll relation", FileAccessor.SCREEN);
-    uint SPEED_OF_MOUSE_SCROLL = FileHandler.GetUintProperty("mouse scroll speed", FileAccessor.SCREEN);
-    uint SCREEN_WIDTH = FileHandler.GetUintProperty("screen width", FileAccessor.SCREEN);
-    uint SCREEN_HEIGHT = FileHandler.GetUintProperty("screen height", FileAccessor.SCREEN);
-    uint FRAME_RATES = FileHandler.GetUintProperty("frame rates", FileAccessor.SCREEN);
-    float MIN_X = FileHandler.GetFloatProperty("minimal view size", FileAccessor.SCREEN); //these represent the bounds on the size of the view
+    private readonly float AMOUNT_OF_PIXEL_ALLOWED_OFFSCREEN = FileHandler.GetFloatProperty("pixels allowed off background", FileAccessor.SCREEN);
+    private readonly uint SCREEN_EDGE_PERCENT_FOR_MOUSE_SCROLLING = FileHandler.GetUintProperty("mouse scroll range", FileAccessor.SCREEN);
+    private readonly uint SPEED_OF_MOUSE_SCROLL = FileHandler.GetUintProperty("mouse scroll speed", FileAccessor.SCREEN);
+    private readonly uint FRAME_RATES = FileHandler.GetUintProperty("frame rates", FileAccessor.SCREEN);
+    private readonly float MIN_X = FileHandler.GetFloatProperty("minimal view size", FileAccessor.SCREEN); //these represent the bounds on the size of the view
 
     #endregion
 
@@ -71,15 +69,15 @@ namespace Game.Screen_Manager {
     private void IntialiseWindow() {
       m_mainWindow.SetFramerateLimit(FRAME_RATES);
       m_mainWindow.SetActive(false);
-      m_mainWindow.Closed += new EventHandler(OnClosed);
-      m_mainWindow.KeyPressed += new EventHandler<KeyEventArgs>(OnKeyPressed);
-      m_mainWindow.GainedFocus += new EventHandler(OnGainingFocus);
-      m_mainWindow.LostFocus += new EventHandler(OnLosingFocus);
-      m_mainWindow.MouseWheelMoved += new EventHandler<MouseWheelEventArgs>(Zooming);
-      m_mainWindow.MouseButtonPressed += new EventHandler<MouseButtonEventArgs>(MouseClick);
-      m_mainWindow.MouseMoved += new EventHandler<MouseMoveEventArgs>(MouseMoved);
+      m_mainWindow.Closed += OnClosed;
+      m_mainWindow.KeyPressed += OnKeyPressed;
+      m_mainWindow.GainedFocus += OnGainingFocus;
+      m_mainWindow.LostFocus += OnLosingFocus;
+      m_mainWindow.MouseWheelScrolled += Zooming;
+      m_mainWindow.MouseButtonPressed += MouseClick;
+      m_mainWindow.MouseMoved += MouseMoved;
       m_mainWindow.SetMouseCursorVisible(false);
-      m_mainWindow.Resized += new EventHandler<SizeEventArgs>(Resizing);
+      m_mainWindow.Resized += Resizing;
     }
 
     private void InitialiseUI() {
@@ -161,7 +159,7 @@ namespace Game.Screen_Manager {
         return;
       }
       if (e.Code == Keyboard.Key.Space && m_inGame) {
-        lock(m_input) {
+        lock (m_input) {
           if (m_activeGame)
             m_input.EnterEvent(new PauseBufferEvent());
           else
@@ -186,7 +184,7 @@ namespace Game.Screen_Manager {
     /// Function called when the window is closed
     /// </summary>
     void OnClosed(object sender, EventArgs e) {
-      Window window = (Window) sender;
+      Window window = (Window)sender;
       window.Close();
       m_input.EnterEvent(new EndGameBufferEvent());
       m_logicThread.Join();
@@ -210,9 +208,9 @@ namespace Game.Screen_Manager {
 
     void MouseClick(object sender, MouseButtonEventArgs e) {
       if (e.Button == Mouse.Button.Left) {
-        Vector2f temp = m_mainWindow.ConvertCoords(new Vector2i(e.X, e.Y));
+        Vector2f temp = m_mainWindow.MapPixelToCoords(new SFML.System.Vector2i(e.X, e.Y));
         Vector result = new Vector(Convert.ToInt16(temp.X), Convert.ToInt16(temp.Y));
-        //Console.Out.WriteLine("clicked on " + result.X + " , " + result.Y);
+        Console.Out.WriteLine("clicked on " + result.X + " , " + result.Y);
         m_input.EnterEvent(new MouseSelectBufferEvent(result, 1)); //TODO - proper playerId
         return;
       }
@@ -241,10 +239,10 @@ namespace Game.Screen_Manager {
       }
     }
 
-    void Zooming(object sender, MouseWheelEventArgs e) {
+    void Zooming(object sender, MouseWheelScrollEventArgs e) {
       float scale = 1 - (e.Delta / 10F);
       if (scale != 1) {
-        View currentView = ((RenderWindow) sender).GetView();
+        View currentView = ((RenderWindow)sender).GetView();
         float newX = currentView.Size.X * scale, newY = currentView.Size.Y * scale;
         if (((scale > 1) && (newX < m_topX && newY < m_topY)) ||
           ((scale < 1) && (newX > MIN_X || newY > m_minY)))

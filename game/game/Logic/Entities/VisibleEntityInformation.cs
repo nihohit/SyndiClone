@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Vector2f = SFML.System.Vector2f;
 
 namespace Game.Logic.Entities {
   public class VisualEntityInformation {
@@ -9,7 +10,7 @@ namespace Game.Logic.Entities {
 
     public EntityType Type { get; private set; }
 
-    public SFML.Window.Vector2f Position { get; set; }
+    public Vector2f Position { get; set; }
 
     public Affiliation VisibleLoyalty { get; set; }
 
@@ -21,7 +22,7 @@ namespace Game.Logic.Entities {
 
     #region constructors
 
-    public VisualEntityInformation(EntityType type, Affiliation visibleLoyalty, Vector size, int entityId, SFML.Window.Vector2f position) {
+    public VisualEntityInformation(EntityType type, Affiliation visibleLoyalty, Vector size, int entityId, Vector2f position) {
       Position = position;
       VisibleLoyalty = visibleLoyalty;
       Size = size;
@@ -29,7 +30,7 @@ namespace Game.Logic.Entities {
       EntityId = entityId;
     }
 
-    public VisualEntityInformation(EntityType type, Affiliation visibleLoyalty, Vector size, int entityId) : this(type, visibleLoyalty, size, entityId, new SFML.Window.Vector2f(-1, -1)) { }
+    public VisualEntityInformation(EntityType type, Affiliation visibleLoyalty, Vector size, int entityId) : this(type, visibleLoyalty, size, entityId, new Vector2f(-1, -1)) { }
 
     #endregion
 

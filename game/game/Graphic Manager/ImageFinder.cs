@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Game.Logic;
 using Game.Logic.Entities;
 using SFML.Graphics;
+using Vector2f = SFML.System.Vector2f;
 
 namespace Game.Graphic_Manager {
   class SpriteFinder {
@@ -76,7 +77,7 @@ namespace Game.Graphic_Manager {
       return null;
     }
 
-    public void SetPath(VisualEntityInformation ent, List<Direction> path, SFML.Window.Vector2f position) {
+    public void SetPath(VisualEntityInformation ent, List<Direction> path, Vector2f position) {
       m_pathFinder.Add(ent, GenerateNewComplexPath(path, position));
     }
 
@@ -121,7 +122,7 @@ namespace Game.Graphic_Manager {
      * relevant sprites in RenderTextures. 
      * DistanceBetweenPathObjects basically says how many sprites will be in the resulting loop. 
      */
-    private SpriteLoop GenerateNewComplexPath(List<Direction> path, SFML.Window.Vector2f position) {
+    private SpriteLoop GenerateNewComplexPath(List<Direction> path, Vector2f position) {
       Area area = GetPathSize(path);
       List<Sprite> list = new List<Sprite>();
       List<Sprite> newSprite = GenerateNewPathSprite(path, area.Entry);
@@ -141,7 +142,7 @@ namespace Game.Graphic_Manager {
         }
         texture.Display();
         temp = new Sprite(new Texture(texture.Texture));
-        temp.Origin = new SFML.Window.Vector2f(area.Entry.X, area.Entry.Y);
+        temp.Origin = new Vector2f(area.Entry.X, area.Entry.Y);
         temp.Position = position;
         list.Add(temp);
       }
@@ -204,7 +205,7 @@ namespace Game.Graphic_Manager {
       uint xSize = texture.Size.X / 2, ySize = texture.Size.Y / 2;
       foreach (Direction dir in path) {
         temp = new Sprite(m_miscellaneous[ImageType.PATH]);
-        temp.Origin = new SFML.Window.Vector2f(xSize, ySize);
+        temp.Origin = new Vector2f(xSize, ySize);
         switch (dir) {
         case (Direction.UP):
           break;

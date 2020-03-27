@@ -1,4 +1,5 @@
 using System;
+using Vector2f = SFML.System.Vector2f;
 
 namespace Game {
   #region Vector
@@ -40,8 +41,8 @@ namespace Game {
       return new Point(m_x, m_y);
     }
 
-    public SFML.Window.Vector2f ToVector2f() {
-      return new SFML.Window.Vector2f(Convert.ToSingle(m_x), Convert.ToSingle(m_y));
+    public Vector2f ToVector2f() {
+      return new Vector2f(Convert.ToSingle(m_x), Convert.ToSingle(m_y));
     }
 
     //Always presume that the vector is new point - old point;

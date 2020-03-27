@@ -43,7 +43,7 @@ namespace Game.Graphic_Manager {
       return m_sprite;
     }
 
-    public void SetLocation(SFML.Window.Vector2f vector) {
+    public void SetLocation(SFML.System.Vector2f vector) {
       m_sprite.Position = vector;
     }
 

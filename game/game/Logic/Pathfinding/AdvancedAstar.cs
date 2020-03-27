@@ -10,12 +10,12 @@ namespace Game.Logic.Pathfinding {
   public class AdvancedAStar {
     #region fields
 
-    const int MIN_DISTANCE = 5;
+    private const int MIN_DISTANCE = 5;
 
-    static int TILE_SIZE = (int) FileHandler.GetUintProperty("tile size", FileAccessor.GENERAL);
-    private Logic.TerrainGrid m_gridHolder;
-    private AStar m_internalAStar;
-    private AStar m_internalMinimisedAStar;
+    private static readonly int TILE_SIZE = (int)FileHandler.GetUintProperty("tile size", FileAccessor.GENERAL);
+    private readonly Logic.TerrainGrid m_gridHolder;
+    private readonly AStar m_internalAStar;
+    private readonly AStar m_internalMinimisedAStar;
 
     #endregion
 

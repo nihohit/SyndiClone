@@ -2,6 +2,8 @@
 using Gwen.Control;
 using SFML.Graphics;
 using SFML.Window;
+using Vector2f = SFML.System.Vector2f;
+using Vector2i = SFML.System.Vector2i;
 
 namespace Gwen.Input
 {
@@ -85,8 +87,8 @@ namespace Gwen.Input
         {
             switch (sfKey)
             {
-                case Keyboard.Key.Back:			return Key.Backspace;
-                case Keyboard.Key.Return:		return Key.Return;
+                case Keyboard.Key.Backspace:			return Key.Backspace;
+                case Keyboard.Key.Enter:		return Key.Return;
                 case Keyboard.Key.Escape:		return Key.Escape;
                 case Keyboard.Key.Tab:			return Key.Tab;
                 case Keyboard.Key.Space:		return Key.Space;
@@ -134,7 +136,7 @@ namespace Gwen.Input
 
                 if (m_Target != null)
                 {
-                    Vector2f coord = m_Target.ConvertCoords(new Vector2i(ev.X, ev.Y));
+                    Vector2f coord = m_Target.MapPixelToCoords(new Vector2i(ev.X, ev.Y));
                     ev.X = (int)Math.Floor(coord.X);
                     ev.Y = (int)Math.Floor(coord.Y);
                 }
@@ -154,10 +156,10 @@ namespace Gwen.Input
                 return m_Canvas.Input_MouseButton((int) ev.Args.Button, ev.Down);
             }
 
-            if (args is MouseWheelEventArgs)
+            if (args is MouseWheelScrollEventArgs)
             {
-                MouseWheelEventArgs ev = args as MouseWheelEventArgs;
-                return m_Canvas.Input_MouseWheel(ev.Delta*60);
+                var ev = args as MouseWheelScrollEventArgs;
+                return m_Canvas.Input_MouseWheel(Convert.ToInt32(ev.Delta*60));
             }
 
             if (args is TextEventArgs)
@@ -187,7 +189,6 @@ namespace Gwen.Input
             }
 
             throw new ArgumentException("Invalid event args", "args");
-            return false;
         }
     }
 }

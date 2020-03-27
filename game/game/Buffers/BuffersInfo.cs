@@ -1,5 +1,6 @@
 using Game.Logic;
 using Game.Logic.Entities;
+using Vector2f = SFML.System.Vector2f;
 
 namespace Game.Buffers {
   #region enumerators 
@@ -42,19 +43,19 @@ namespace Game.Buffers {
   #region SetPathActionBufferEvent
 
   /// <summary>
-  /// this event holds a point and a path from that point. 
+  /// this event holds a point and a path from that point.
   /// is used from logic to display buffer, to display the different paths. 
   /// </summary>
   public class SetPathActionBufferEvent : IBufferEvent {
     #region properties
 
     public System.Collections.Generic.List<Logic.Direction> Path { get; private set; }
-    public SFML.Window.Vector2f Position { get; private set; }
+    public Vector2f Position { get; private set; }
     public VisualEntityInformation Entity { get; private set; }
 
     #endregion
 
-    public SetPathActionBufferEvent(VisualEntityInformation ent, System.Collections.Generic.List<Logic.Direction> path, SFML.Window.Vector2f pos) {
+    public SetPathActionBufferEvent(VisualEntityInformation ent, System.Collections.Generic.List<Logic.Direction> path, Vector2f pos) {
       Path = path;
       Position = pos;
       Entity = ent;
@@ -124,21 +125,21 @@ namespace Game.Buffers {
 
   //this event represents mouse moving. used to display the cursor by the display manager.
   public struct MouseMoveBufferEvent : IBufferEvent {
-    private readonly SFML.Window.Vector2f m_coords;
+    private readonly Vector2f m_coords;
 
     BufferType IBufferEvent.Type() {
       return BufferType.MOUSEMOVE;
     }
 
     public MouseMoveBufferEvent(float x, float y) {
-      m_coords = new SFML.Window.Vector2f(x, y);
+      m_coords = new Vector2f(x, y);
     }
 
-    public MouseMoveBufferEvent(SFML.Window.Vector2f vec) {
+    public MouseMoveBufferEvent(Vector2f vec) {
       m_coords = vec;
     }
 
-    public SFML.Window.Vector2f Coords { get { return m_coords; } }
+    public Vector2f Coords { get { return m_coords; } }
   }
 
   #endregion

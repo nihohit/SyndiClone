@@ -399,7 +399,7 @@ namespace Game.Logic {
 
       IterateOverArea(toSwitch, putEntityInArea(ent));
       Debug.Assert(m_entities.Contains(ent), String.Format("entity {0} isn't in entities list", ent.ToString()));
-      ent.VisualInfo.Position = new SFML.Window.Vector2f(Convert.ToSingle(location.Entry.X), Convert.ToSingle(location.Entry.Y));
+      ent.VisualInfo.Position = new SFML.System.Vector2f(Convert.ToSingle(location.Entry.X), Convert.ToSingle(location.Entry.Y));
       m_entitiesToLocations[ent] = toSwitch;
     }
 

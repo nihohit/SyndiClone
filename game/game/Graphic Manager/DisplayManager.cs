@@ -5,6 +5,7 @@ using Game.Buffers;
 using SFML.Graphics;
 using SFML.Window;
 using System.Diagnostics;
+using Vector2f = SFML.System.Vector2f;
 
 namespace Game.Graphic_Manager {
   //This class is in charge of displaying an actual game instance. 
@@ -132,7 +133,7 @@ namespace Game.Graphic_Manager {
     }
 
     private void DrawUI() {
-      m_crosshair.Position = m_mainWindow.ConvertCoords(Mouse.GetPosition(m_mainWindow));
+      m_crosshair.Position = m_mainWindow.MapPixelToCoords(Mouse.GetPosition(m_mainWindow));
       m_mainWindow.Draw(m_crosshair);
     }
 
