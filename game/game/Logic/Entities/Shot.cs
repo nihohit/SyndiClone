@@ -1,24 +1,24 @@
 using System.Collections.Generic;
-using Game.Logic;
 
 namespace Game.Logic.Entities {
-  public class Shot {
-    static Dictionary<ShotType, Shot> s_shots = new Dictionary<ShotType, Shot>();
 
-    const int PISTOL_BULLET_DAMAGE = 3;
+  public class Shot {
+    private static Dictionary<ShotType, Shot> s_shots = new Dictionary<ShotType, Shot>();
+
+    private const int PISTOL_BULLET_DAMAGE = 3;
 
     #region constructors
 
     public static Shot instance(ShotType type) {
       if (!s_shots.ContainsKey(type)) {
         switch (type) {
-        case (ShotType.SIGHT):
-          break;
-        case (ShotType.PISTOL_BULLET):
-          s_shots.Add(type, new Shot(null, PistolBulletEffect, BulletBlocked, type));
-          break;
-          //TODO - missing types
+          case (ShotType.SIGHT):
+            break;
 
+          case (ShotType.PISTOL_BULLET):
+            s_shots.Add(type, new Shot(null, PistolBulletEffect, BulletBlocked, type));
+            break;
+            //TODO - missing types
         }
       }
 
@@ -32,7 +32,7 @@ namespace Game.Logic.Entities {
       Type = type;
     }
 
-    #endregion
+    #endregion constructors
 
     #region properties
 
@@ -44,23 +44,23 @@ namespace Game.Logic.Entities {
 
     public WasBlocked Blocked { get; set; }
 
-    #endregion
+    #endregion properties
 
     #region shots effects
 
-    static void PistolBulletEffect(Entity ent) {
+    private static void PistolBulletEffect(Entity ent) {
       ent.Hit(PISTOL_BULLET_DAMAGE);
     }
 
-    #endregion
+    #endregion shots effects
 
     #region blocked methods
 
-    static bool BulletBlocked(Entity ent) {
+    private static bool BulletBlocked(Entity ent) {
       if (ent == null) return false;
       return true;
     }
 
-    #endregion
+    #endregion blocked methods
   }
 }

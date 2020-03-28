@@ -1,29 +1,32 @@
+using Game.Logic.Entities;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using Game;
-using Game.Logic.Entities;
 
 namespace Game.Logic {
-  class Grid {
+
+  internal class Grid {
 
     #region file read values
 
     private readonly UInt16 randomPathLength = FileHandler.GetUintProperty("random path length", FileAccessor.LOGIC);
     private readonly UInt16 CIV_FLEE_RANGE = FileHandler.GetUintProperty("civilian flee range", FileAccessor.LOGIC);
 
-    #endregion
+    #endregion file read values
 
     #region delegates
 
-    delegate ShotEffect CurriedEntityListAdd(UniqueList<Entity> list); //These functions curry a list to an effect which will enter entities into the list
-    delegate ShotEffect CurriedDirectionListAdd(List<Direction> list); //These functions curry directions to an effect which will put them in lists
-    delegate bool boolPointOperator(Point point); //These functions as a binary question on a Point
-    delegate boolPointOperator CurriedPointOperator(Entity entity); //These are the curried version, which curry and entity for the question
+    private delegate ShotEffect CurriedEntityListAdd(UniqueList<Entity> list); //These functions curry a list to an effect which will enter entities into the list
 
-    #endregion
+    private delegate ShotEffect CurriedDirectionListAdd(List<Direction> list); //These functions curry directions to an effect which will put them in lists
+
+    private delegate bool boolPointOperator(Point point); //These functions as a binary question on a Point
+
+    private delegate boolPointOperator CurriedPointOperator(Entity entity); //These are the curried version, which curry and entity for the question
+
+    #endregion delegates
 
     #region fields
 
@@ -32,22 +35,21 @@ namespace Game.Logic {
     private readonly List<Buffers.IBufferEvent> m_actionsDone = new List<Buffers.IBufferEvent>();
     private readonly UniqueList<VisualEntityInformation> m_visibleEntities = new UniqueList<VisualEntityInformation>();
     private readonly UniqueList<Entity> m_destroyedEntities = new UniqueList<Entity>();
-    private readonly Entity[, ] m_gameGrid;
+    private readonly Entity[,] m_gameGrid;
     private readonly TerrainGrid m_pathFindingGrid;
     private Entity m_selected;
     private Pathfinding.AdvancedAStar m_pathfinder;
     private readonly Dictionary<ConstructorBuilding, Task<List<Direction>>> m_constructorsToPaths = new Dictionary<ConstructorBuilding, Task<List<Direction>>>();
     //TODO - add corporations
-    static Random s_random = new Random();
+    private static Random s_random = new Random();
 
-    #endregion
+    #endregion fields
 
     #region constructor and initialisation
 
     public Grid(int x, int y) {
       m_gameGrid = new Entity[x, y];
       m_pathFindingGrid = new TerrainGrid(x, y);
-
     }
 
     //this function is called after all the buildings have been added to the grid.
@@ -61,14 +63,14 @@ namespace Game.Logic {
       }
     }
 
-    //this function is called after all the buildings have been inserted into the grid. 
+    //this function is called after all the buildings have been inserted into the grid.
     public void InitialiseExitPoints() {
       foreach (Entity ent in m_entities) {
-        SetExitPoint((Building) ent);
+        SetExitPoint((Building)ent);
       }
     }
 
-    #endregion
+    #endregion constructor and initialisation
 
     #region public methods
 
@@ -99,13 +101,14 @@ namespace Game.Logic {
     /*
      * This function returns the list of actions performed in the current round.
      */
+
     public List<Buffers.IBufferEvent> ReturnCommitedActions() {
       foreach (Entity ent in m_destroyedEntities)
         Destroy(ent);
       return m_actionsDone;
     }
 
-    //TODO - change sight logic, so that all entities of a single player add their sights instead of going over the same area again and again. 
+    //TODO - change sight logic, so that all entities of a single player add their sights instead of going over the same area again and again.
     //This function checks if any entity in the radius around the point answers the conditions in checker
     public void WhatSees(Entity ent) {
       //TODO - look into Sight simply having a list and the given blast, instead of creating a new list & blast for every iteration
@@ -115,8 +118,8 @@ namespace Game.Logic {
       int radius = sight.Range;
       WasBlocked blocked = sight.Blocked;
       //curries the list of entities to an effect
-      CurriedEntityListAdd listAdd = delegate(UniqueList<Entity> list) {
-        return delegate(Entity entity) {
+      CurriedEntityListAdd listAdd = delegate (UniqueList<Entity> list) {
+        return delegate (Entity entity) {
           if (entity != null) { list.uniqueAdd(entity); }
         };
       };
@@ -128,7 +131,7 @@ namespace Game.Logic {
       AreaEffect(ent, blast);
 
       foreach (Entity temp in ent.WhatSees) {
-        //TODO - this is wrong. it should only return what the player units see. 
+        //TODO - this is wrong. it should only return what the player units see.
         m_visibleEntities.Add(temp.VisualInfo);
       }
     }
@@ -136,25 +139,26 @@ namespace Game.Logic {
     /*
      * this function resolves a move command from the game logic, based on the reaction set by the entity
      */
+
     public void ResolveMove(MovingEntity ent) {
       ActionType action = ent.Reaction.Action();
       Point currentLocation = ConvertToCentralPoint(ent);
       switch (action) {
-      case ActionType.IGNORE:
-        break;
+        case ActionType.IGNORE:
+          break;
 
-      case ActionType.RUN_AWAY_FROM:
-        Point from = ConvertToCentralPoint(((RunAwayReaction) ent.Reaction).Focus);
-        Point runTo = GetOppositePoint(from, currentLocation, CIV_FLEE_RANGE);
-        ent.Path = GetSimplePath(currentLocation, runTo, ent);
-        ((Civilian) ent).RunningAway();
-        break;
+        case ActionType.RUN_AWAY_FROM:
+          Point from = ConvertToCentralPoint(((RunAwayReaction)ent.Reaction).Focus);
+          Point runTo = GetOppositePoint(from, currentLocation, CIV_FLEE_RANGE);
+          ent.Path = GetSimplePath(currentLocation, runTo, ent);
+          ((Civilian)ent).RunningAway();
+          break;
 
-      case ActionType.PURSUE:
-        Point targetLocation = ConvertToCentralPoint(((PursueReaction) ent.Reaction).Focus);
-        ent.Path = GetSimplePath(currentLocation, targetLocation, ent);
-        break;
-        //TODO - missing cases
+        case ActionType.PURSUE:
+          Point targetLocation = ConvertToCentralPoint(((PursueReaction)ent.Reaction).Focus);
+          ent.Path = GetSimplePath(currentLocation, targetLocation, ent);
+          break;
+          //TODO - missing cases
       }
       Move(ent);
     }
@@ -171,6 +175,7 @@ namespace Game.Logic {
      * This function adds an entity to a certain area
      * TODO - can this become private?
      */
+
     public void AddEntity(Entity ent, Area area) {
       //TODO - if (gameGrid[loc.getX, loc.Y] != null) throw new LocationFullException(loc.ToString() + " " + gameGrid[loc.getX, loc.getY].ToString());
       //else
@@ -186,13 +191,13 @@ namespace Game.Logic {
 
     public void ResolveConstruction(IConstructor constructor, MovingEntity entity) {
       if (constructor is ConstructorBuilding) {
-        FinishResolveNewPath((ConstructorBuilding) constructor);
+        FinishResolveNewPath((ConstructorBuilding)constructor);
       }
       AddEntity(entity, FindConstructionSpot(constructor, entity));
-      //TODO - add the transition of the entity from the center of the building to outside. currently just pops out. 
+      //TODO - add the transition of the entity from the center of the building to outside. currently just pops out.
     }
 
-    #endregion
+    #endregion public methods
 
     #region private methods
 
@@ -202,6 +207,7 @@ namespace Game.Logic {
      * This function finds the central point of an entity - and entity is a grid, and the central point is that which the
      * shots/sights are coming from, and where other units will aim at.
      */
+
     private Point ConvertToCentralPoint(Entity ent) {
       Area area = m_entitiesToLocations[ent];
       int x = area.Entry.X + area.Size.X / 2, y = area.Entry.Y + area.Size.Y / 2;
@@ -211,17 +217,19 @@ namespace Game.Logic {
     /*
      * This function adds events to be reported to future buffers
      */
+
     private void AddEvent(Buffers.IBufferEvent action) {
       m_actionsDone.Add(action);
     }
 
-    #endregion
+    #endregion communication logic
 
     #region movement logic
 
     /*
      * This is the basic moving function
      */
+
     private void Move(MovingEntity ent) {
       int tries = 0;
       while (ent.Path.Count == 0) {
@@ -255,9 +263,10 @@ namespace Game.Logic {
     }
 
     /*
-     * This function is used mainly to generate the simple walking path for civilians. 
+     * This function is used mainly to generate the simple walking path for civilians.
      * Will probably need to make it better in future, it'll probably serve other functions.
      */
+
     private List<Direction> GetSimplePath(Point entry, Point target, MovingEntity ent) {
       List<Direction> ans = ProcessWalkingPath(entry, target);
       if (ans.Count != entry.GetDiffVector(target).Length()) {
@@ -269,6 +278,7 @@ namespace Game.Logic {
     /*
      * This function will be used for player units, taht need complex routes.
      */
+
     private Task<List<Direction>> GetComplexPath(Point entry, Point target, Vector size, MovementType movement, Direction direction) {
       return m_pathfinder.FindPathAsync(entry, target, direction, new Pathfinding.AStarConfiguration(size, movement, Pathfinding.Heuristics.DiagonalTo(target), true, true));
     }
@@ -276,6 +286,7 @@ namespace Game.Logic {
     /*
      * a case of Bresenham's line algorithm that returns a list of directions to go in.
      */
+
     private List<Direction> ProcessWalkingPath(Point exit, Point target) {
       List<Direction> ans = new List<Direction>();
       int x0 = exit.X;
@@ -340,6 +351,7 @@ namespace Game.Logic {
     /*
      * Checks if a ceratin entity can mone, and whether it needs to flip its axis in order to move in the given direction
      */
+
     private bool CanMove(MovingEntity ent, Direction direction) {
       Area location = m_entitiesToLocations[ent];
       if (ent.NeedFlip()) {
@@ -354,6 +366,7 @@ namespace Game.Logic {
     /*
      * Checks if an entity can enter a given area - whether each point is free
      */
+
     private bool CanMove(Entity ent, Area area) {
       //This delegate is a function that checks if the entity in the point is either null (point empty) or the same entity
       CurriedPointOperator checkEntityInArea = (Entity entity) => {
@@ -369,6 +382,7 @@ namespace Game.Logic {
     /**
      * This function serves for running away from a certain point - it finds where does the civilian run to.
      */
+
     private Point GetOppositePoint(Point from, Point center, int distance) {
       Vector dist = center.GetDiffVector(from);
       dist.CompleteToDistance(distance);
@@ -382,8 +396,9 @@ namespace Game.Logic {
     }
 
     /*
-     * 
+     *
      */
+
     private void MoveToNewLocation(MovingEntity ent, Direction dir) {
       Area location = m_entitiesToLocations[ent];
       if (ent.NeedFlip()) {
@@ -414,8 +429,9 @@ namespace Game.Logic {
     }
 
     /*
-     * This function iterates an operator on every point in an area. 
+     * This function iterates an operator on every point in an area.
      */
+
     private bool IterateOverArea(Area area, boolPointOperator op) {
       bool ans = true;
       Point entry = area.Entry;
@@ -427,7 +443,7 @@ namespace Game.Logic {
       return ans;
     }
 
-    #endregion
+    #endregion movement logic
 
     #region shooting logic
 
@@ -438,6 +454,7 @@ namespace Game.Logic {
     /*
      * this function sends a shot effect in every direction - lines to every point in the radius circumference
      */
+
     private void AreaEffect(Point location, BlastEffect blast) {
       int radius = blast.Radius;
       int x = location.X;
@@ -467,7 +484,7 @@ namespace Game.Logic {
       //get all relevant variables
       Weapons weapon = shooter.Weapon();
       Shot shot = weapon.Shot;
-      Point exit = ConvertToCentralPoint((Entity) shooter);
+      Point exit = ConvertToCentralPoint((Entity)shooter);
       Point currentTargetLocation = ConvertToCentralPoint(target);
       Vector direction = new Vector(currentTargetLocation, exit);
       direction = direction.normalProbability(direction.Length() / weapon.Accuracy);
@@ -485,6 +502,7 @@ namespace Game.Logic {
     /*
      * A simple version of Berensham's line algorithm, that calculates the way of a bullet, and affects every entity in the way
      */
+
     private Point ProcessPath(Point exit, Point target, Shot shot) {
       ShotEffect effect = shot.Effect;
       WasBlocked blocked = shot.Blocked;
@@ -525,7 +543,6 @@ namespace Game.Logic {
 
       if (shot.Type != ShotType.SIGHT) {
         AddEvent(new Buffers.ShotBufferEvent(shot.Type, exit, res));
-
       }
       return res;
     }
@@ -545,12 +562,12 @@ namespace Game.Logic {
       ent.Destroy();
     }
 
-    #endregion
+    #endregion shooting logic
 
     #region construction logic
 
     private Area FindConstructionSpot(IConstructor constructor, Entity ent) {
-      return new Area(GetExitPoint((Building) constructor), ent.Size);
+      return new Area(GetExitPoint((Building)constructor), ent.Size);
     }
 
     private Point GetExitPoint(Building constructor) {
@@ -559,27 +576,27 @@ namespace Game.Logic {
 
     public void SelectUnit(Point point, Affiliation player) {
       Entity temp = GetEntityInPoint(point);
-      if (m_selected == null) {
-        if ((temp != null) && (temp is ISelectable)) //TODO - loyalty should be player issuing the order
-        {
-          m_selected = temp;
-          m_actionsDone.Add(new Buffers.UnitSelectBufferEvent(m_selected.VisualInfo,
-            ((ISelectable) temp).Select(player),
-            new Vector(ConvertToCentralPoint(temp).X, ConvertToCentralPoint(temp).Y)));
-          FinishResolveNewPath((ConstructorBuilding) temp);
-          return;
-        }
-        //TODO - else?
+      var selectable = temp as ISelectable;
+      if (selectable == null) {
+        Console.WriteLine("nothing selected.");
+        return;
+      }
+      if (m_selected == null) { //TODO - loyalty should be player issuing the order
+        m_selected = temp;
+        var centralPoint = ConvertToCentralPoint(temp);
+        m_actionsDone.Add(new Buffers.UnitSelectBufferEvent(
+          m_selected.VisualInfo,
+          selectable.Select(player),
+          new Vector(centralPoint.X, centralPoint.Y)));
+        FinishResolveNewPath((ConstructorBuilding)temp);
       } else {
-        if ((temp != null) && (temp is ISelectable)) {
-          var selction = ((ISelectable) temp).Select(player);
-          if (selction.Controlled) {
-            point = GetExitPoint((Building) temp);
-            PoliceStation pol = ((PoliceStation) m_selected);
-            m_constructorsToPaths.Add(pol, GetComplexPath(GetExitPoint(pol), point, new Vector(1, 1), MovementType.GROUND, pol.Exit.VectorToDirection()));
-          }
-          DeselectUnit();
+        var selection = selectable.Select(player);
+        if (selection.Controlled) {
+          point = GetExitPoint(temp as Building);
+          var pol = m_selected as PoliceStation;
+          m_constructorsToPaths.Add(pol, GetComplexPath(GetExitPoint(pol), point, new Vector(1, 1), MovementType.GROUND, pol.Exit.VectorToDirection()));
         }
+        DeselectUnit();
       }
     }
 
@@ -589,8 +606,9 @@ namespace Game.Logic {
     }
 
     /*
-     * This method sets randomly all the exit points of all the buildigns on the map. 
+     * This method sets randomly all the exit points of all the buildigns on the map.
      */
+
     private void SetExitPoint(Building ent) {
       Point center = ConvertToCentralPoint(ent);
       List<Vector> options = new List<Vector>();
@@ -642,8 +660,8 @@ namespace Game.Logic {
       m_actionsDone.Add(new Buffers.SetPathActionBufferEvent(constructor.VisualInfo, constructor.Path, FindConstructionSpot(constructor, constructor.GetConstruct()).Entry.ToVector2f()));
     }
 
-    #endregion
+    #endregion construction logic
 
-    #endregion
+    #endregion private methods
   }
 }

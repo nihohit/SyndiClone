@@ -1,9 +1,7 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Game.Logic.Entities {
+
   #region ConstructorBuilding
 
   public abstract class ConstructorBuilding : Building, IConstructor {
@@ -34,5 +32,5 @@ namespace Game.Logic.Entities {
     public List<Direction> Path { get; set; }
   }
 
-  #endregion
+  #endregion ConstructorBuilding
 }

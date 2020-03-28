@@ -1,19 +1,22 @@
-using System.Collections.Generic;
 using Game.Graphic_Manager;
 using Game.Logic;
 using Game.Logic.Entities;
 using SFML.Graphics;
-using SFML.Window;
+using System.Collections.Generic;
 using Vector2f = SFML.System.Vector2f;
 
 namespace Game.Buffers {
-  public class DisplayBuffer : Game.Buffers.Buffer {
-    #region consts
-    //TODO - debug, remove
-    const int amountOfReapeatingSpritesInAnimation = 1;
-    readonly uint amountOfDecals = FileHandler.GetUintProperty("decal amount", FileAccessor.DISPLAY);
 
-    #endregion
+  public class DisplayBuffer : Game.Buffers.Buffer {
+
+    #region consts
+
+    //TODO - debug, remove
+    private const int amountOfReapeatingSpritesInAnimation = 1;
+
+    private readonly uint amountOfDecals = FileHandler.GetUintProperty("decal amount", FileAccessor.DISPLAY);
+
+    #endregion consts
 
     #region private members
 
@@ -31,7 +34,7 @@ namespace Game.Buffers {
     private bool m_deselected = false;
     private VisualEntityInformation m_selectedEntity; //For UI purposes
 
-    #endregion
+    #endregion private members
 
     #region constructors
 
@@ -39,9 +42,10 @@ namespace Game.Buffers {
       m_selection.Origin = new Vector2f(m_selection.Texture.Size.X / 2, m_selection.Texture.Size.Y / 2);
     }
 
-    #endregion
+    #endregion constructors
 
     #region public methods
+
     #region output methods
 
     public void AnalyzeData() {
@@ -76,7 +80,7 @@ namespace Game.Buffers {
       set { m_updated = value; System.Threading.Monitor.Pulse(this); }
     }
 
-    #endregion
+    #endregion output methods
 
     #region input methods
 
@@ -88,14 +92,16 @@ namespace Game.Buffers {
       m_actions.UnionWith(actions);
     }
 
-    #endregion
-    #endregion
+    #endregion input methods
+
+    #endregion public methods
 
     #region private methods
 
     /*
-     * This function is a repeat of the Berensham's line algorithm, this time painting a straight line. 
+     * This function is a repeat of the Berensham's line algorithm, this time painting a straight line.
      */
+
     private Animation CreateNewShot(ShotType shot, Point exit, Point target) {
       List<Sprite> ans = new List<Sprite>();
       int x0 = exit.X;
@@ -140,62 +146,64 @@ namespace Game.Buffers {
     private void AnalyzeActions() {
       foreach (IBufferEvent action in m_actions) {
         switch (action.Type()) {
-        case BufferType.EXTERNAL_DESTROY:
-          VisualEntityInformation visualInfo = ((ExternalDestroyBufferEvent) action).VisualInfo;
-          Sprite temp = m_finder.Remove(visualInfo);
-          m_removedSprites.Add(temp);
-          if (visualInfo.Type != EntityType.PERSON)
-            m_newAnimations.Add(m_finder.GenerateDestoryResults(((ExternalDestroyBufferEvent) action).Area, visualInfo.Type));
-          Decal decal = null;
-          switch (visualInfo.Type) {
-          case (EntityType.BUILDING):
-            decal = new Decal(DecalType.RUBBLE);
+          case BufferType.EXTERNAL_DESTROY:
+            VisualEntityInformation visualInfo = ((ExternalDestroyBufferEvent)action).VisualInfo;
+            Sprite temp = m_finder.Remove(visualInfo);
+            m_removedSprites.Add(temp);
+            if (visualInfo.Type != EntityType.PERSON)
+              m_newAnimations.Add(m_finder.GenerateDestoryResults(((ExternalDestroyBufferEvent)action).Area, visualInfo.Type));
+            Decal decal = null;
+            switch (visualInfo.Type) {
+              case (EntityType.BUILDING):
+                decal = new Decal(DecalType.RUBBLE);
+                break;
+
+              case (EntityType.VEHICLE):
+                decal = new Decal(DecalType.WRECKAGE);
+                break;
+
+              case (EntityType.PERSON):
+                decal = new Decal(DecalType.BLOOD);
+                break;
+            }
+
+            decal.SetLocation(visualInfo.Position);
+            AddDecal(decal);
             break;
-          case (EntityType.VEHICLE):
-            decal = new Decal(DecalType.WRECKAGE);
+
+          case BufferType.EXTERNAL_CREATE:
+            //TODO
             break;
-          case (EntityType.PERSON):
-            decal = new Decal(DecalType.BLOOD);
+
+          case BufferType.SHOT:
+            m_newAnimations.Add(CreateNewShot(((ShotBufferEvent)action).Shot, ((ShotBufferEvent)action).Exit, ((ShotBufferEvent)action).Target));
             break;
-          }
 
-          decal.SetLocation(visualInfo.Position);
-          AddDecal(decal);
-          break;
+          case BufferType.UNIT_SELECT:
+            m_selection.Position = ((UnitSelectBufferEvent)action).Coords.ToVector2f();
+            m_selectedEntity = ((UnitSelectBufferEvent)action).VisibleInfo;
+            m_selected = true;
+            break;
 
-        case BufferType.EXTERNAL_CREATE:
-          //TODO
-          break;
+          case BufferType.DESELECT:
+            m_selected = false;
+            m_deselected = true;
+            break;
 
-        case BufferType.SHOT:
-          m_newAnimations.Add(CreateNewShot(((ShotBufferEvent) action).Shot, ((ShotBufferEvent) action).Exit, ((ShotBufferEvent) action).Target));
-          break;
+          case BufferType.SETPATH:
+            Sprite toRemove = m_finder.RemovePath(((SetPathActionBufferEvent)action).Entity);
+            if (toRemove != null) {
+              m_removedSprites.Add(toRemove);
+            }
+            m_finder.SetPath(((SetPathActionBufferEvent)action).Entity, ((SetPathActionBufferEvent)action).Path, ((SetPathActionBufferEvent)action).Position);
+            break;
 
-        case BufferType.UNIT_SELECT:
-          m_selection.Position = ((UnitSelectBufferEvent) action).Coords.ToVector2f();
-          m_selectedEntity = ((UnitSelectBufferEvent) action).VisibleInfo;
-          m_selected = true;
-          break;
+          case BufferType.DISPLAY_IMAGE:
+            m_displaySprites.Add(((DisplayImageBufferEvent)action).Sprite);
+            break;
 
-        case BufferType.DESELECT:
-          m_selected = false;
-          m_deselected = true;
-          break;
-
-        case BufferType.SETPATH:
-          Sprite toRemove = m_finder.RemovePath(((SetPathActionBufferEvent) action).Entity);
-          if (toRemove != null) {
-            m_removedSprites.Add(toRemove);
-          }
-          m_finder.SetPath(((SetPathActionBufferEvent) action).Entity, ((SetPathActionBufferEvent) action).Path, ((SetPathActionBufferEvent) action).Position);
-          break;
-
-        case BufferType.DISPLAY_IMAGE:
-          m_displaySprites.Add(((DisplayImageBufferEvent) action).Sprite);
-          break;
-
-        default:
-          throw new System.ArgumentException("the action is not relevant to the display buffer");
+          default:
+            throw new System.ArgumentException("the action is not relevant to the display buffer");
         }
       }
       m_actions.Clear();
@@ -247,7 +255,6 @@ namespace Game.Buffers {
         m_removedSprites.Add(m_finder.GetPath(selectedEntity));
         m_displaySprites.Add(m_finder.NextPathStep(selectedEntity));
       }
-
     }
 
     private void AnalyzeEntities() {
@@ -258,6 +265,7 @@ namespace Game.Buffers {
       }
       m_visibleEntities.Clear();
     }
-    #endregion
+
+    #endregion private methods
   }
 }

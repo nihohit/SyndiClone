@@ -3,7 +3,8 @@ using Game.Logic.Entities;
 using Vector2f = SFML.System.Vector2f;
 
 namespace Game.Buffers {
-  #region enumerators 
+
+  #region enumerators
 
   /// <summary>
   /// represents the different queues in the input buffer
@@ -11,21 +12,22 @@ namespace Game.Buffers {
   public enum InputModuleAccessors { Graphics, Sounds, Logic }
 
   /// <summary>
-  /// This enumerator represents the different buffer types we use. 
+  /// This enumerator represents the different buffer types we use.
   /// TODO - different buffers will use different events - might be useful to seperate to different enumerators.
   /// </summary>
   public enum BufferType { MOVE, SHOT, EXTERNAL_DESTROY, EXTERNAL_CREATE, PAUSE, SELECT, DESELECT, UNPAUSE, ENDGAME, MOUSEMOVE, SETPATH, UNIT_SELECT, DISPLAY_IMAGE, LOGIC_INTERNAL_CREATE, LOGIC_INTERNAL_DESTROY }
 
-  #endregion
+  #endregion enumerators
 
   #region IBufferEvent
 
   //this interface represents the basic buffer event - it just identifies itself, the rest is in the specific events.
   public interface IBufferEvent {
+
     BufferType Type();
   }
 
-  #endregion
+  #endregion IBufferEvent
 
   #region buffer events
 
@@ -33,27 +35,29 @@ namespace Game.Buffers {
 
   //this event pauses the game.
   public struct PauseBufferEvent : IBufferEvent {
+
     BufferType IBufferEvent.Type() {
       return BufferType.PAUSE;
     }
   }
 
-  #endregion
+  #endregion PauseBufferEvent
 
   #region SetPathActionBufferEvent
 
   /// <summary>
   /// this event holds a point and a path from that point.
-  /// is used from logic to display buffer, to display the different paths. 
+  /// is used from logic to display buffer, to display the different paths.
   /// </summary>
   public class SetPathActionBufferEvent : IBufferEvent {
+
     #region properties
 
     public System.Collections.Generic.List<Logic.Direction> Path { get; private set; }
     public Vector2f Position { get; private set; }
     public VisualEntityInformation Entity { get; private set; }
 
-    #endregion
+    #endregion properties
 
     public SetPathActionBufferEvent(VisualEntityInformation ent, System.Collections.Generic.List<Logic.Direction> path, Vector2f pos) {
       Path = path;
@@ -66,20 +70,22 @@ namespace Game.Buffers {
     }
   }
 
-  #endregion
+  #endregion SetPathActionBufferEvent
 
   #region CancelActionBufferEvent
 
   //this event represents a cancel action - deselection of units, etc. basically right click.
   public struct CancelActionBufferEvent : IBufferEvent {
+
     BufferType IBufferEvent.Type() {
       return BufferType.DESELECT;
     }
   }
 
-  #endregion
+  #endregion CancelActionBufferEvent
 
   #region MouseSelectBufferEvent
+
   //this event represents a mouse left click on specific window coordinates.
   public struct MouseSelectBufferEvent : IBufferEvent {
     public Vector Coords { get; }
@@ -96,7 +102,7 @@ namespace Game.Buffers {
     }
   }
 
-  #endregion
+  #endregion MouseSelectBufferEvent
 
   #region UnitSelectBufferEvent
 
@@ -119,7 +125,7 @@ namespace Game.Buffers {
     }
   }
 
-  #endregion
+  #endregion UnitSelectBufferEvent
 
   #region MouseMoveBufferEvent
 
@@ -142,28 +148,30 @@ namespace Game.Buffers {
     public Vector2f Coords { get { return m_coords; } }
   }
 
-  #endregion
+  #endregion MouseMoveBufferEvent
 
   #region EndGameBufferEvent
 
-  //this event ends a game. 
+  //this event ends a game.
   public struct EndGameBufferEvent : IBufferEvent {
+
     BufferType IBufferEvent.Type() {
       return BufferType.ENDGAME;
     }
   }
 
-  #endregion
+  #endregion EndGameBufferEvent
 
   #region UnPauseBufferEvent
 
   public struct UnPauseBufferEvent : IBufferEvent {
+
     BufferType IBufferEvent.Type() {
       return BufferType.UNPAUSE;
     }
   }
 
-  #endregion
+  #endregion UnPauseBufferEvent
 
   #region ShotBufferEvent
 
@@ -184,7 +192,7 @@ namespace Game.Buffers {
     }
   }
 
-  #endregion
+  #endregion ShotBufferEvent
 
   #region InternalDestroyBufferEvent
 
@@ -211,12 +219,13 @@ namespace Game.Buffers {
     }
   }
 
-  #endregion
+  #endregion InternalDestroyBufferEvent
 
   #region ExternalDestroyBufferEvent
 
   //this event will be sent by the logic to the output buffers when an entity is destroyed.
   public struct ExternalDestroyBufferEvent : IBufferEvent {
+
     public ExternalDestroyBufferEvent(InternalDestroyBufferEvent internalDestroyed) {
       Area = internalDestroyed.Area;
       VisualInfo = internalDestroyed.DestroyedEntity.VisualInfo;
@@ -231,12 +240,13 @@ namespace Game.Buffers {
     }
   }
 
-  #endregion
+  #endregion ExternalDestroyBufferEvent
 
   #region ExternalCreateUnitBufferEvent
 
   //this event signifies the creation of a new entity.
   public class ExternalCreateUnitBufferEvent : IBufferEvent {
+
     public ExternalCreateUnitBufferEvent(InternalCreateUnitBufferEvent internalCreationEvent) {
       VisibleInfo = internalCreationEvent.CreatedEntity.VisualInfo;
       Location = internalCreationEvent.Location;
@@ -251,12 +261,13 @@ namespace Game.Buffers {
     }
   }
 
-  #endregion
+  #endregion ExternalCreateUnitBufferEvent
 
   #region InternalCreateUnitBufferEvent
 
   //this event signifies the creation of a new entity.
   public class InternalCreateUnitBufferEvent : IBufferEvent {
+
     public InternalCreateUnitBufferEvent(Entity ent, Area location) {
       CreatedEntity = ent;
       Location = location;
@@ -271,11 +282,12 @@ namespace Game.Buffers {
     }
   }
 
-  #endregion
+  #endregion InternalCreateUnitBufferEvent
 
   #region DisplayImageBufferEvent
 
   public class DisplayImageBufferEvent : IBufferEvent {
+
     public DisplayImageBufferEvent(SFML.Graphics.Sprite sprite) {
       Sprite = sprite;
     }
@@ -287,7 +299,7 @@ namespace Game.Buffers {
     }
   }
 
-  #endregion
+  #endregion DisplayImageBufferEvent
 
-  #endregion
+  #endregion buffer events
 }

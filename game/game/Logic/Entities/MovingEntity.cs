@@ -1,18 +1,21 @@
 using System.Collections.Generic;
+
 namespace Game.Logic.Entities {
+
   public abstract class MovingEntity : Entity {
+
     #region consts
 
-    const int AMOUNT_OF_MOVES_FOR_STEP = 70;
+    private const int AMOUNT_OF_MOVES_FOR_STEP = 70;
 
-    #endregion
+    #endregion consts
 
     #region fields
 
     private int m_steps = 0;
     private Direction m_headed;
 
-    #endregion
+    #endregion fields
 
     #region properties
 
@@ -22,7 +25,7 @@ namespace Game.Logic.Entities {
 
     public MovementType WayToMove { get; private set; }
 
-    #endregion
+    #endregion properties
 
     #region constructor
 
@@ -33,28 +36,30 @@ namespace Game.Logic.Entities {
       WayToMove = MovementType.GROUND;
     }
 
-    #endregion
+    #endregion constructor
 
     #region Entity overrides
 
     protected override void Upgrade(System.Collections.Generic.List<Upgrades> list) {
       foreach (Upgrades upgrade in list) {
         switch (upgrade) {
-        case (Upgrades.FLYER):
-          WayToMove = MovementType.FLYER;
-          break;
-        case (Upgrades.HOVER):
-          WayToMove = MovementType.HOVER;
-          break;
-        case (Upgrades.CRUSHER):
-          WayToMove = MovementType.CRUSHER;
-          break;
+          case (Upgrades.FLYER):
+            WayToMove = MovementType.FLYER;
+            break;
+
+          case (Upgrades.HOVER):
+            WayToMove = MovementType.HOVER;
+            break;
+
+          case (Upgrades.CRUSHER):
+            WayToMove = MovementType.CRUSHER;
+            break;
         }
       }
       base.Upgrade(list);
     }
 
-    #endregion
+    #endregion Entity overrides
 
     #region public methods
 
@@ -82,7 +87,6 @@ namespace Game.Logic.Entities {
       } else {
         m_steps -= Speed;
       }
-
     }
 
     public bool NeedFlip() {
@@ -93,6 +97,6 @@ namespace Game.Logic.Entities {
       Size = new Vector(Size.Y, Size.X);
     }
 
-    #endregion
+    #endregion public methods
   }
 }

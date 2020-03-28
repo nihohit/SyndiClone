@@ -1,21 +1,19 @@
-using Gwen;
-using Gwen.Control;
-using Gwen.ControlInternal;
-using Gwen.Input;
 using System;
 
 namespace Game.Screen_Manager {
+
   /// <summary>
   /// This screen is the main screen - the first interactive screen that the game loads.
   /// </summary>
-  class MainScreen : IScreen {
+  internal class MainScreen : IScreen {
+
     #region static members
 
-    static SFML.Graphics.RenderWindow s_window;
-    static MainScreen s_instance;
-    static Gwen.Control.Canvas s_canvas;
+    private static SFML.Graphics.RenderWindow s_window;
+    private static MainScreen s_instance;
+    private static Gwen.Control.Canvas s_canvas;
 
-    #endregion
+    #endregion static members
 
     #region constructors
 
@@ -23,9 +21,10 @@ namespace Game.Screen_Manager {
       get { if (s_instance == null) s_instance = new MainScreen(); return MainScreen.s_instance; }
     }
 
-    private MainScreen() { }
+    private MainScreen() {
+    }
 
-    #endregion
+    #endregion constructors
 
     #region IScreen Implementation
 
@@ -46,20 +45,20 @@ namespace Game.Screen_Manager {
       s_window.Display();
     }
 
-    #endregion
+    #endregion IScreen Implementation
 
     #region private methods
 
     private void InitialiseUI() {
       var newGameButton = new Gwen.Control.Button(s_canvas);
       newGameButton.Text = "New Game";
-      newGameButton.SetBounds((int) s_window.Size.X / 2, (int) s_window.Size.Y / 2 - 100, 200, 200);
+      newGameButton.SetBounds((int)s_window.Size.X / 2, (int)s_window.Size.Y / 2 - 100, 200, 200);
       newGameButton.AutoSizeToContents = true;
       newGameButton.Pressed += GenerateNewGameScreen;
 
       var quitGameButton = new Gwen.Control.Button(s_canvas);
       quitGameButton.Text = "Quit Game";
-      quitGameButton.SetBounds((int) s_window.Size.X / 2, (int) s_window.Size.Y / 2 + 100, 400, 200);
+      quitGameButton.SetBounds((int)s_window.Size.X / 2, (int)s_window.Size.Y / 2 + 100, 400, 200);
       quitGameButton.AutoSizeToContents = true;
       quitGameButton.Pressed += QuitGame;
     }
@@ -84,6 +83,6 @@ namespace Game.Screen_Manager {
       s_window.Clear();
     }
 
-    #endregion
+    #endregion private methods
   }
 }

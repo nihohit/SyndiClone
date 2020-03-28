@@ -1,13 +1,12 @@
 using System.Collections.Generic;
-using Game.Logic;
 
 namespace Game.Logic.Entities {
+
   public class CivilianBuilding : ConstructorBuilding, IConstructor {
 
     public CivilianBuilding(Game.Vector realSize, int sizeModifier, Vector exit) : base(sizeModifier, Entity.ReactionPlaceHolder, realSize, Affiliation.CIVILIAN) {
-
       base.Exit = exit;
-      reactionFunction react = delegate(List<Entity> ent) {
+      reactionFunction react = delegate (List<Entity> ent) {
         Civilian temp = new Civilian(exit.VectorToDirection());
         m_readyToBuild = true;
         return new ConstructReaction(temp);
@@ -20,6 +19,7 @@ namespace Game.Logic.Entities {
     /*
      * This function is just the basic reaction function for the basic civic buildings.
      */
+
     public Reaction civBuildReact(List<Entity> ent) {
       Civilian temp = new Civilian(base.Exit.VectorToDirection());
       m_readyToBuild = true;
@@ -27,7 +27,7 @@ namespace Game.Logic.Entities {
     }
 
     public override MovingEntity GetConstruct() {
-      return ((ConstructReaction) Reaction).Focus;
+      return ((ConstructReaction)Reaction).Focus;
     }
 
     public override bool ReadyToConstruct() {
@@ -38,7 +38,6 @@ namespace Game.Logic.Entities {
       return "Civilian Building, " + base.ToString();
     }
 
-    #endregion
+    #endregion public methods
   }
-
 }

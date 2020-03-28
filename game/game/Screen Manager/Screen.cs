@@ -1,8 +1,10 @@
 namespace Game.Screen_Manager {
+
   /// <summary>
   /// the interface for every screen run by the screen manager
   /// </summary>
   public interface IScreen {
+
     /// <summary>
     /// This method is called when a screen is loaded as the main screen.
     /// </summary>

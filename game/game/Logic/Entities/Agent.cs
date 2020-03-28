@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace Game.Logic.Entities {
   /*class Agent :  Person, Shooter
   {
@@ -36,7 +34,6 @@ namespace Game.Logic.Entities {
       {
           throw new NotImplementedException();
       }
-
   }
   */
 }

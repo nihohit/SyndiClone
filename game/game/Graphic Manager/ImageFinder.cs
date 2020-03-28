@@ -1,20 +1,23 @@
-using System;
-using System.Collections.Generic;
 using Game.Logic;
 using Game.Logic.Entities;
 using SFML.Graphics;
+using System;
+using System.Collections.Generic;
 using Vector2f = SFML.System.Vector2f;
 
 namespace Game.Graphic_Manager {
-  class SpriteFinder {
-    private enum ImageType { PATH } //this enumerator is used for miscelenae. 
 
- #region fields
- private readonly uint m_distanceBetweenPathObjects = FileHandler.GetUintProperty("path sprite distance", FileAccessor.DISPLAY);
- private readonly Dictionary<VisualEntityInformation, SpriteLoop> m_spriteLoopFinder = new Dictionary<VisualEntityInformation, SpriteLoop>();
- private readonly Dictionary<VisualEntityInformation, SpriteLoop> m_pathFinder = new Dictionary<VisualEntityInformation, SpriteLoop>();
+  internal class SpriteFinder {
 
- private readonly Dictionary<Logic.Affiliation, Texture> m_personFinder = new Dictionary<Logic.Affiliation, Texture> { { Logic.Affiliation.INDEPENDENT, new Texture("images/Persons/personblue.png") },
+    private enum ImageType { PATH } //this enumerator is used for miscelenae.
+
+    #region fields
+
+    private readonly uint m_distanceBetweenPathObjects = FileHandler.GetUintProperty("path sprite distance", FileAccessor.DISPLAY);
+    private readonly Dictionary<VisualEntityInformation, SpriteLoop> m_spriteLoopFinder = new Dictionary<VisualEntityInformation, SpriteLoop>();
+    private readonly Dictionary<VisualEntityInformation, SpriteLoop> m_pathFinder = new Dictionary<VisualEntityInformation, SpriteLoop>();
+
+    private readonly Dictionary<Logic.Affiliation, Texture> m_personFinder = new Dictionary<Logic.Affiliation, Texture> { { Logic.Affiliation.INDEPENDENT, new Texture("images/Persons/personblue.png") },
  { Logic.Affiliation.CORP1, new Texture("images/Persons/personpurple.png") },
  { Logic.Affiliation.CORP2, new Texture("images/Persons/persongreen.png") },
  { Logic.Affiliation.CORP4, new Texture("images/Persons/personblack.png") },
@@ -23,7 +26,6 @@ namespace Game.Graphic_Manager {
     };
 
     private readonly Dictionary<ShotType, Texture> m_shots = new Dictionary<ShotType, Texture> { { ShotType.PISTOL_BULLET, new Texture("images/shots/bulletshotstraight.png") }
-
     };
 
     private readonly Dictionary<ImageType, Texture> m_miscellaneous = new Dictionary<ImageType, Texture> { { ImageType.PATH, new Texture("images/UI/path.png") }
@@ -31,13 +33,14 @@ namespace Game.Graphic_Manager {
 
     private readonly List<VisualEntityInformation> m_removed = new List<VisualEntityInformation>();
 
-    #endregion
+    #endregion fields
 
     #region constructor
 
-    public SpriteFinder() { }
+    public SpriteFinder() {
+    }
 
-    #endregion
+    #endregion constructor
 
     #region public methods
 
@@ -93,35 +96,35 @@ namespace Game.Graphic_Manager {
       return m_pathFinder.ContainsKey(ent);
     }
 
-    #endregion
+    #endregion public methods
 
     #region private methods
 
     private SpriteLoop GenerateNewSpriteLoop(VisualEntityInformation ent) {
       List<Sprite> list = new List<Sprite>();
       switch (ent.Type) {
-      case (Game.Logic.EntityType.BUILDING):
-        list.Add(new Sprite(BuildingImageGenerator.GetBuildingSFMLTexture(ent)));
-        break;
+        case (Game.Logic.EntityType.BUILDING):
+          list.Add(new Sprite(BuildingImageGenerator.GetBuildingSFMLTexture(ent)));
+          break;
 
-      case (Logic.EntityType.PERSON):
-        list.Add(new Sprite(m_personFinder[ent.VisibleLoyalty]));
-        break;
+        case (Logic.EntityType.PERSON):
+          list.Add(new Sprite(m_personFinder[ent.VisibleLoyalty]));
+          break;
 
-      case (Logic.EntityType.VEHICLE):
-        //TODO - missing function
-        break;
-
+        case (Logic.EntityType.VEHICLE):
+          //TODO - missing function
+          break;
       }
       return new SpriteLoop(list);
     }
 
     #region paths
 
-    /*This function receives the parameters for a path, generates its bounding box, and then creates a series of RenderTextures sized as the bounding box, and places the 
-     * relevant sprites in RenderTextures. 
-     * DistanceBetweenPathObjects basically says how many sprites will be in the resulting loop. 
+    /*This function receives the parameters for a path, generates its bounding box, and then creates a series of RenderTextures sized as the bounding box, and places the
+     * relevant sprites in RenderTextures.
+     * DistanceBetweenPathObjects basically says how many sprites will be in the resulting loop.
      */
+
     private SpriteLoop GenerateNewComplexPath(List<Direction> path, Vector2f position) {
       Area area = GetPathSize(path);
       List<Sprite> list = new List<Sprite>();
@@ -131,11 +134,11 @@ namespace Game.Graphic_Manager {
       Sprite temp;
       int count;
       RenderTexture texture;
-      //In each recursion of this loop a new RenderTexture is created and each sprite that is relevant to that texture is embedded in it. 
+      //In each recursion of this loop a new RenderTexture is created and each sprite that is relevant to that texture is embedded in it.
       for (uint i = 0; i < m_distanceBetweenPathObjects; i++) {
-        texture = new RenderTexture((uint) area.Size.X, (uint) area.Size.Y);
+        texture = new RenderTexture((uint)area.Size.X, (uint)area.Size.Y);
         for (uint j = 0; j < path.Count / m_distanceBetweenPathObjects; j++) {
-          count = (int) (j * m_distanceBetweenPathObjects + i);
+          count = (int)(j * m_distanceBetweenPathObjects + i);
           if (count < newSprite.Count) {
             texture.Draw(newSprite[count]);
           }
@@ -158,34 +161,41 @@ namespace Game.Graphic_Manager {
       uint xSize = maxSize, xPos = halfSize, ySize = maxSize, yPos = halfSize, x = halfSize, y = halfSize;
       foreach (Direction dir in path) {
         switch (dir) {
-        case (Game.Logic.Direction.DOWN):
-          y++;
-          break;
-        case (Game.Logic.Direction.DOWNLEFT):
-          y++;
-          x--;
-          break;
-        case (Game.Logic.Direction.DOWNRIGHT):
-          y++;
-          x++;
-          break;
-        case (Game.Logic.Direction.LEFT):
-          x--;
-          break;
-        case (Game.Logic.Direction.RIGHT):
-          x++;
-          break;
-        case (Game.Logic.Direction.UP):
-          y--;
-          break;
-        case (Game.Logic.Direction.UPLEFT):
-          y--;
-          x--;
-          break;
-        case (Game.Logic.Direction.UPRIGHT):
-          x++;
-          y--;
-          break;
+          case (Game.Logic.Direction.DOWN):
+            y++;
+            break;
+
+          case (Game.Logic.Direction.DOWNLEFT):
+            y++;
+            x--;
+            break;
+
+          case (Game.Logic.Direction.DOWNRIGHT):
+            y++;
+            x++;
+            break;
+
+          case (Game.Logic.Direction.LEFT):
+            x--;
+            break;
+
+          case (Game.Logic.Direction.RIGHT):
+            x++;
+            break;
+
+          case (Game.Logic.Direction.UP):
+            y--;
+            break;
+
+          case (Game.Logic.Direction.UPLEFT):
+            y--;
+            x--;
+            break;
+
+          case (Game.Logic.Direction.UPRIGHT):
+            x++;
+            y--;
+            break;
         }
         if (x < halfSize) { xPos++; xSize++; x = halfSize; }
         if (y < halfSize) { yPos++; ySize++; y = halfSize; }
@@ -193,10 +203,10 @@ namespace Game.Graphic_Manager {
         if (y >= ySize - halfSize) { ySize++; }
       }
 
-      return new Area(new Point((int) xPos, (int) yPos), new Vector((int) xSize, (int) ySize));
+      return new Area(new Point((int)xPos, (int)yPos), new Vector((int)xSize, (int)ySize));
     }
 
-    //This function returns a new path sprite, rotated to the correct way. 
+    //This function returns a new path sprite, rotated to the correct way.
     private List<Sprite> GenerateNewPathSprite(List<Direction> path, Point entry) {
       List<Sprite> newList = new List<Sprite>();
       Vector initial = new Vector(entry.X, entry.Y);
@@ -207,29 +217,36 @@ namespace Game.Graphic_Manager {
         temp = new Sprite(m_miscellaneous[ImageType.PATH]);
         temp.Origin = new Vector2f(xSize, ySize);
         switch (dir) {
-        case (Direction.UP):
-          break;
-        case (Direction.DOWN):
-          temp.Rotation = 180F;
-          break;
-        case (Direction.LEFT):
-          temp.Rotation = 270;
-          break;
-        case (Direction.RIGHT):
-          temp.Rotation = 90F;
-          break;
-        case (Direction.UPRIGHT):
-          temp.Rotation = 45F;
-          break;
-        case (Direction.UPLEFT):
-          temp.Rotation = 315F;
-          break;
-        case (Direction.DOWNRIGHT):
-          temp.Rotation = 135F;
-          break;
-        case (Direction.DOWNLEFT):
-          temp.Rotation = 225F;
-          break;
+          case (Direction.UP):
+            break;
+
+          case (Direction.DOWN):
+            temp.Rotation = 180F;
+            break;
+
+          case (Direction.LEFT):
+            temp.Rotation = 270;
+            break;
+
+          case (Direction.RIGHT):
+            temp.Rotation = 90F;
+            break;
+
+          case (Direction.UPRIGHT):
+            temp.Rotation = 45F;
+            break;
+
+          case (Direction.UPLEFT):
+            temp.Rotation = 315F;
+            break;
+
+          case (Direction.DOWNRIGHT):
+            temp.Rotation = 135F;
+            break;
+
+          case (Direction.DOWNLEFT):
+            temp.Rotation = 225F;
+            break;
         }
         initial = initial.AddVector(Vector.DirectionToVector(dir));
         temp.Position = initial.ToVector2f();
@@ -239,12 +256,12 @@ namespace Game.Graphic_Manager {
       return newList;
     }
 
-    #endregion
-    #endregion
+    #endregion paths
 
+    #endregion private methods
   }
 
-  class VisualInformationEqualityComparer : IEqualityComparer<VisualEntityInformation> {
+  internal class VisualInformationEqualityComparer : IEqualityComparer<VisualEntityInformation> {
 
     public bool Equals(VisualEntityInformation first, VisualEntityInformation second) {
       return (first.EntityId.Equals(second.EntityId));
@@ -254,6 +271,5 @@ namespace Game.Graphic_Manager {
       int hCode = item.EntityId.GetHashCode();
       return hCode.GetHashCode();
     }
-
   }
 }

@@ -1,27 +1,28 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using SFML.Graphics;
+using System.Collections.Generic;
 
 namespace Game.Logic.Pathfinding {
-  enum VisibleColors { YELLOW, WHITE, RED }
+
+  internal enum VisibleColors { YELLOW, WHITE, RED }
 
   #region VisibleAStar
 
   public class VisibleAStar : AStar {
+
     #region fields
 
-    Texture m_texture = new Texture("images/debug/yellow_pixel.png");
+    private Texture m_texture = new Texture("images/debug/yellow_pixel.png");
 
-    static Game.Buffers.DisplayBuffer s_buffer;
+    private static Game.Buffers.DisplayBuffer s_buffer;
 
-    #endregion
+    #endregion fields
 
     #region constructor
 
-    public VisibleAStar(TerrainGrid gridHolder) : base(gridHolder) { }
+    public VisibleAStar(TerrainGrid gridHolder) : base(gridHolder) {
+    }
 
-    #endregion
+    #endregion constructor
 
     #region public methods
 
@@ -43,22 +44,24 @@ namespace Game.Logic.Pathfinding {
       s_buffer = buffer;
     }
 
-    #endregion
+    #endregion public methods
   }
 
-  #endregion
+  #endregion VisibleAStar
 
   #region AdvancedVisibleAStar
 
   public class AdvancedVisibleAStar : AdvancedAStar {
+
     #region fields
 
-    Texture m_texture = new Texture("images/debug/red_blot.png");
-    static Game.Buffers.DisplayBuffer s_buffer;
+    private Texture m_texture = new Texture("images/debug/red_blot.png");
+    private static Game.Buffers.DisplayBuffer s_buffer;
 
-    #endregion
+    #endregion fields
 
-    public AdvancedVisibleAStar(TerrainGrid gridHolder) : base(gridHolder, new VisibleAStar(gridHolder), new VisibleAStar(AdvancedAStar.MinimiseGrid(gridHolder))) { }
+    public AdvancedVisibleAStar(TerrainGrid gridHolder) : base(gridHolder, new VisibleAStar(gridHolder), new VisibleAStar(AdvancedAStar.MinimiseGrid(gridHolder))) {
+    }
 
     public static void Setup(Game.Buffers.DisplayBuffer buffer) {
       s_buffer = buffer;
@@ -74,7 +77,7 @@ namespace Game.Logic.Pathfinding {
         list.Add(new Buffers.DisplayImageBufferEvent(sprite));
         midPoint = midPoint.Parent;
       }
-      lock(s_buffer) {
+      lock (s_buffer) {
         s_buffer.ReceiveActions(list);
         s_buffer.Updated = true;
       }
@@ -82,5 +85,5 @@ namespace Game.Logic.Pathfinding {
     }
   }
 
-  #endregion
+  #endregion AdvancedVisibleAStar
 }

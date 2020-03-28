@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 /**
  * It's a city. a pre-processing phase city, but a city nonetheless.
- * here we make most of the processing needed to create a city. 
+ * here we make most of the processing needed to create a city.
  * the phases of creating a city are done by this order:
  * 1) Create a city object.
  * 2) Add roads to the city.
@@ -11,8 +11,11 @@ using System.Collections.Generic;
  * 4) Add Buildings.
  * 5) Divide building into corporates.
  */
+
 namespace Game.City_Generator {
-  class City : GameBoard {
+
+  internal class City : GameBoard {
+
     #region constants
 
     private const int GAP_RATIO = 6;
@@ -22,16 +25,16 @@ namespace Game.City_Generator {
     private const char ROAD_GENERIC = '*'; // a generic char for a road, not knowing direction or it's adjacent squares.
     private const int MIN_BLOCK_SIZE = 0; // the smaller block that will have sub-roads is of size 7X6
     private const int CORP_DIM = 20; //see "add corporates()" for use, signifies the size of each initial corporate
-    static readonly Random s_random = new Random();
+    private static readonly Random s_random = new Random();
 
-    #endregion
+    #endregion constants
 
     #region fields
 
     private char[,] m_grid;
     private BuildingPlacer m_buildPlacer;
 
-    #endregion
+    #endregion fields
 
     #region constructors
 
@@ -56,13 +59,14 @@ namespace Game.City_Generator {
       Buildings = new List<Building>();
     }
 
-    #endregion
+    #endregion constructors
 
     #region adding roads
 
     /**
      * This method adds roads to a city by calling to "add main roads" recursively, first time with the whole grid, and after that it adds roads block by block.
      * */
+
     public void AddRoads() {
       List<Block> blocks = new List<Block>();
       AddMainRoads(0, 0, Length, Depth, ref blocks);
@@ -82,8 +86,8 @@ namespace Game.City_Generator {
     /**
      * this method adds a few roads that cross an entire "block" (whose dimensions are given as parameters)
      * */
-    private void AddMainRoads(int startX, int startY, int Lengthgth, int Depthth, ref List<Block> blocks) {
 
+    private void AddMainRoads(int startX, int startY, int Lengthgth, int Depthth, ref List<Block> blocks) {
       int LengthRoadsNum = 0, DepthRoadsNum = 0;
 
       //this gives us the max possible road Depthth for both vertical(Lengthgth) and horizontal(Depthth) roads
@@ -173,6 +177,7 @@ namespace Game.City_Generator {
     /**
      * this method adds some info to the road tiles to determine thier type and their rotate attribute.
      * */
+
     public void TranslateRoads() {
       RoadTile current;
       for (int j = 0; j < Depth; ++j) {
@@ -206,13 +211,14 @@ namespace Game.City_Generator {
       }
     }
 
-    #endregion
+    #endregion adding roads
 
     #region adding Buildings
 
     /**
      * Adds building to a city using the "add building" method.
      * */
+
     public void AddBuildings() {
       int id = 0;
       for (int i = 0; i < Length; ++i)
@@ -229,6 +235,7 @@ namespace Game.City_Generator {
     /*
      * creates a building, adds it to the Buildings list
      * */
+
     private void AddBuilding(int y, int x, int id) {
       Block buildingSize;
       Building b;
@@ -312,6 +319,7 @@ namespace Game.City_Generator {
     /**
      * if there's a building that is one row remote from a road - enlarge this building so that it reaches a road.
      * */
+
     private void ConnectBuildings2Roads() {
       bool cond = true;
       bool connected;
@@ -374,6 +382,7 @@ namespace Game.City_Generator {
     /**
      * this method connects a building to all roads within 1 step of it.
      * */
+
     private bool ExpandToRoad(Building b) {
       bool retVal = false;
 
@@ -436,7 +445,7 @@ namespace Game.City_Generator {
       return retVal;
     }
 
-    #endregion
+    #endregion adding Buildings
 
     #region adding corporations
 
@@ -444,6 +453,7 @@ namespace Game.City_Generator {
      * divides the Buildings between corporates according to geographical location
      * TODO: not tested (waiting for graphical interface)
      * */
+
     public void AddCorporates() {
       Building b;
       foreach (Tile t in Grid)
@@ -460,8 +470,8 @@ namespace Game.City_Generator {
     /**
      * it's a way to make some corporates bigger then the others.
      * */
-    private void Takeover(int iLoc, int jLoc) {
 
+    private void Takeover(int iLoc, int jLoc) {
       for (int i = iLoc - 1; i <= iLoc + 1; ++i) {
         if (i < 0) continue;
         if (i >= CorpList.GetLength(0)) break;
@@ -476,30 +486,34 @@ namespace Game.City_Generator {
       }
     }
 
-    #endregion
+    #endregion adding corporations
 
     #region BuildingPlacer
+
     /*
      * this class is a tool that helps me create new Buildings.
      * By theory, it was meant to keep a changing probability to decide the Lengthgth and Depthth of the building considering the past, so the more Buildings there are of a certain
-     * Lengthgth, the less likely this Lengthgth to appear. 
-     * However, after testing it a little, I found that in the end the probabilities to get a big building reaches 100% (due to place constraints). 
+     * Lengthgth, the less likely this Lengthgth to appear.
+     * However, after testing it a little, I found that in the end the probabilities to get a big building reaches 100% (due to place constraints).
      * Maybe I will think of a different strategy later.
      * */
+
     public class BuildingPlacer {
+
       #region constants
 
       private const double DECREASE_FACTOR = 0.01,
         LOWER_HALF_PROB = 0.25;
+
       private const int ARR_SIZE = 12;
 
-      #endregion
+      #endregion constants
 
       #region fields
 
       private double[] hPlaces, vPlaces;
 
-      #endregion
+      #endregion fields
 
       #region constructor
 
@@ -523,7 +537,7 @@ namespace Game.City_Generator {
         // print();
       }
 
-      #endregion
+      #endregion constructor
 
       #region public methods
 
@@ -537,7 +551,7 @@ namespace Game.City_Generator {
         }
         Console.Out.Write("\nVPlaces:\n  ");
         for (int i = 1; i < ARR_SIZE; ++i) {
-          Console.Out.Write(i + ":" + String.Format("{0:F2}", vPlaces[i] - vPlaces[i - 1]) + "\\ "); //chances              
+          Console.Out.Write(i + ":" + String.Format("{0:F2}", vPlaces[i] - vPlaces[i - 1]) + "\\ "); //chances
           Console.Out.Write(i + ":" + String.Format("{0:F2}", vPlaces[i]) + ", "); //actual values
           Console.Out.WriteLine();
         }
@@ -567,7 +581,6 @@ namespace Game.City_Generator {
              total += step;
              vPlaces[y] += total;
              if (vPlaces[y] < 0) vPlaces[y] = 0;
-            
          }*/
         //TODO: decide if the code above is useful or not.
         return retVal;
@@ -600,9 +613,9 @@ namespace Game.City_Generator {
         return retVal;
       }
 
-      #endregion
+      #endregion public methods
     }
 
-    #endregion
+    #endregion BuildingPlacer
   }
 }

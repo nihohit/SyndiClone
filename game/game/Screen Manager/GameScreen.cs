@@ -1,17 +1,18 @@
-using System;
-using System.Threading;
 using Game.Buffers;
-using Gwen.Renderer;
 using SFML.Graphics;
 using SFML.Window;
+using System;
+using System.Threading;
 using Vector2f = SFML.System.Vector2f;
 
 namespace Game.Screen_Manager {
+
   /// <summary>
-  /// This screen is meant to represent a new game, including creating the game. 
+  /// This screen is meant to represent a new game, including creating the game.
   /// </summary>
   //TODO - add a loading screen
-  class GameScreen : IScreen {
+  internal class GameScreen : IScreen {
+
     #region fields
 
     private float m_backgroundX, m_backgroundY;
@@ -26,9 +27,10 @@ namespace Game.Screen_Manager {
     private int m_mapX, m_mapY, m_civAmount;
     private float m_minY, m_topY, m_topX;
 
-    #endregion
+    #endregion fields
 
     #region file read values
+
     //currently, at least.
 
     private readonly float AMOUNT_OF_PIXEL_ALLOWED_OFFSCREEN = FileHandler.GetFloatProperty("pixels allowed off background", FileAccessor.SCREEN);
@@ -37,7 +39,7 @@ namespace Game.Screen_Manager {
     private readonly uint FRAME_RATES = FileHandler.GetUintProperty("frame rates", FileAccessor.SCREEN);
     private readonly float MIN_X = FileHandler.GetFloatProperty("minimal view size", FileAccessor.SCREEN); //these represent the bounds on the size of the view
 
-    #endregion
+    #endregion file read values
 
     #region IScreen Implementation
 
@@ -56,7 +58,7 @@ namespace Game.Screen_Manager {
       }
     }
 
-    #endregion
+    #endregion IScreen Implementation
 
     #region initialisation
 
@@ -86,7 +88,7 @@ namespace Game.Screen_Manager {
       Gwen.Control.Canvas canvas = new Gwen.Control.Canvas(skin);*/
     }
 
-    #endregion
+    #endregion initialisation
 
     #region constructors
 
@@ -96,7 +98,7 @@ namespace Game.Screen_Manager {
       m_civAmount = civAmount;
     }
 
-    #endregion
+    #endregion constructors
 
     #region starting new game
 
@@ -136,7 +138,7 @@ namespace Game.Screen_Manager {
       return logic;
     }
 
-    #endregion
+    #endregion starting new game
 
     #region control
 
@@ -183,7 +185,7 @@ namespace Game.Screen_Manager {
     /// <summary>
     /// Function called when the window is closed
     /// </summary>
-    void OnClosed(object sender, EventArgs e) {
+    private void OnClosed(object sender, EventArgs e) {
       Window window = (Window)sender;
       window.Close();
       m_input.EnterEvent(new EndGameBufferEvent());
@@ -192,21 +194,21 @@ namespace Game.Screen_Manager {
     }
 
     //TODO - why can't we return from alt-tabbing?
-    void OnGainingFocus(object sender, EventArgs e) {
+    private void OnGainingFocus(object sender, EventArgs e) {
       if (m_input != null) {
         m_input.EnterEvent(new UnPauseBufferEvent());
         m_activeGame = true;
       }
     }
 
-    void OnLosingFocus(object sender, EventArgs e) {
+    private void OnLosingFocus(object sender, EventArgs e) {
       if (m_input != null) {
         m_input.EnterEvent(new PauseBufferEvent());
         m_activeGame = false;
       }
     }
 
-    void MouseClick(object sender, MouseButtonEventArgs e) {
+    private void MouseClick(object sender, MouseButtonEventArgs e) {
       if (e.Button == Mouse.Button.Left) {
         Vector2f temp = m_mainWindow.MapPixelToCoords(new SFML.System.Vector2i(e.X, e.Y));
         Vector result = new Vector(Convert.ToInt16(temp.X), Convert.ToInt16(temp.Y));
@@ -217,7 +219,7 @@ namespace Game.Screen_Manager {
       if (e.Button == Mouse.Button.Right) { m_input.EnterEvent(new CancelActionBufferEvent()); }
     }
 
-    #endregion
+    #endregion control
 
     #region view
 
@@ -239,7 +241,7 @@ namespace Game.Screen_Manager {
       }
     }
 
-    void Zooming(object sender, MouseWheelScrollEventArgs e) {
+    private void Zooming(object sender, MouseWheelScrollEventArgs e) {
       float scale = 1 - (e.Delta / 10F);
       if (scale != 1) {
         View currentView = ((RenderWindow)sender).GetView();
@@ -247,7 +249,6 @@ namespace Game.Screen_Manager {
         if (((scale > 1) && (newX < m_topX && newY < m_topY)) ||
           ((scale < 1) && (newX > MIN_X || newY > m_minY)))
           currentView.Zoom(scale);
-
         else if (scale > 1) currentView.Size = new Vector2f(m_topX, m_topY);
         else currentView.Size = new Vector2f(MIN_X, m_minY);
         float left = currentView.Center.X - currentView.Size.X / 2;
@@ -272,7 +273,7 @@ namespace Game.Screen_Manager {
     }
 
     //TODO - known bug, after mouse exits screen, scrolling gets stuck in one direction.
-    void MouseMoved(object sender, MouseMoveEventArgs e) {
+    private void MouseMoved(object sender, MouseMoveEventArgs e) {
       m_mouseX = e.X;
       m_mouseY = e.Y;
       var viewSize = m_mainWindow.GetView().Size;
@@ -300,7 +301,7 @@ namespace Game.Screen_Manager {
       }
     }
 
-    void CenterNew(float x, float y) {
+    private void CenterNew(float x, float y) {
       View currentView = m_mainWindow.GetView();
       float halfX = (currentView.Size.X / 2);
       float halfY = (currentView.Size.Y / 2);
@@ -312,6 +313,6 @@ namespace Game.Screen_Manager {
       m_mainWindow.SetView(currentView);
     }
 
-    #endregion
+    #endregion view
   }
 }

@@ -1,19 +1,20 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Game.Buffers;
 using SFML.Graphics;
 using SFML.Window;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using Vector2f = SFML.System.Vector2f;
 
 namespace Game.Graphic_Manager {
-  //This class is in charge of displaying an actual game instance. 
-  class GameDisplay {
-    /*TODO - right now there's a central problem, that some UI elements are handled by the manager 
-     * and some by the buffer (basically, what depends on whether they demand knowledge of logic events is handled by the buffer and what 
-     * demands knowledge of screen events is handled by the manager). 
-     * This should be remedied - maybe move everything to the buffer. 
+
+  //This class is in charge of displaying an actual game instance.
+  internal class GameDisplay {
+    /*TODO - right now there's a central problem, that some UI elements are handled by the manager
+     * and some by the buffer (basically, what depends on whether they demand knowledge of logic events is handled by the buffer and what
+     * demands knowledge of screen events is handled by the manager).
+     * This should be remedied - maybe move everything to the buffer.
      */
 
     #region fields
@@ -32,13 +33,14 @@ namespace Game.Graphic_Manager {
     //DEBUG & PERFORMANCE TOOLS
     //TODO - remove.
     private readonly Stopwatch remove = new Stopwatch();
+
     private readonly Stopwatch DisplayWatch = new Stopwatch();
     private readonly Stopwatch synch = new Stopwatch();
     private readonly Stopwatch update = new Stopwatch();
     private readonly Stopwatch other = new Stopwatch();
-    int runs = 0;
+    private int runs = 0;
 
-    #endregion
+    #endregion fields
 
     #region constructor
 
@@ -57,7 +59,7 @@ namespace Game.Graphic_Manager {
              */
     }
 
-    #endregion
+    #endregion constructor
 
     #region public methods
 
@@ -84,13 +86,13 @@ namespace Game.Graphic_Manager {
       Console.Out.WriteLine("amount of graphic loops: " + runs + " average milliseconds per frame: " + DisplayWatch.ElapsedMilliseconds / runs);
     }
 
-    #endregion
+    #endregion public methods
 
     #region private methods
 
     #region communication
 
-    //This is the central 
+    //This is the central
     private void UpdateInfo() {
       HandleInputBuffer();
       HandleDisplayBuffer();
@@ -149,7 +151,7 @@ namespace Game.Graphic_Manager {
       m_animations.UnionWith(m_buffer.GetAnimations());
     }
 
-    #endregion
+    #endregion communication
 
     #region info handling
 
@@ -160,7 +162,6 @@ namespace Game.Graphic_Manager {
     }
 
     private void EnterAnimations() {
-
       foreach (Animation animation in m_animations.ToList()) {
         m_removedSprites.Add(animation.Current());
         if (animation.IsDone()) {
@@ -178,8 +179,8 @@ namespace Game.Graphic_Manager {
       m_removedSprites.Clear();
     }
 
-    #endregion
+    #endregion info handling
 
-    #endregion
+    #endregion private methods
   }
 }

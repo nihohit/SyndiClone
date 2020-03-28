@@ -1,15 +1,12 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using SFML.Graphics;
-
 /**
  * this class holds a bulding object - it has place on the initial grid (represented by a "block").
  * it can also preform basic operations (such as join a corporation).
  * */
+
 namespace Game.City_Generator {
+
   public class Building {
+
     #region properties
 
     public int Id { get; set; }
@@ -23,7 +20,7 @@ namespace Game.City_Generator {
     //TODO - known bug - sometimes the exit spot isn't on a road. Currently overridden elsewhere.
     public int ExitDirection { get; set; }
 
-    #endregion
+    #endregion properties
 
     #region constructor
 
@@ -35,11 +32,13 @@ namespace Game.City_Generator {
       Id = id;
     }
 
-    #endregion
+    #endregion constructor
 
     #region public methods
 
-    public bool HasCorp() { return Corp != null; }
+    public bool HasCorp() {
+      return Corp != null;
+    }
 
     public void JoinCorp(Corporate c) {
       if (Corp != null)
@@ -49,6 +48,6 @@ namespace Game.City_Generator {
         Corp.AddBuilding(this);
     }
 
-    #endregion
+    #endregion public methods
   }
 }

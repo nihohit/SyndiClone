@@ -1,31 +1,35 @@
-using System;
-using System.Collections.Generic;
 using SFML.Graphics;
-using SFML.Window;
+using System.Collections.Generic;
 
 namespace Game.Graphic_Manager {
+
   #region enumerators
+
   public enum DisplayCommand { MOVE_VIEW, ZOOM_VIEW, ADD_ENTITY, MOVE_ENTITY, ADD_SHOT, DESTROY_ENTITY }
+
   public enum DecalType { WRECKAGE, BLOOD, RUBBLE } //TODO - different vehicles wreckages for different vehicles?
- #endregion
 
- #region Decal
+  #endregion enumerators
 
- //this struct represents decals - temporary static pictures.
- public class Decal {
- #region fields
+  #region Decal
 
- static readonly uint DECAL_STAY_TIME = FileHandler.GetUintProperty("decal stay time", FileAccessor.DISPLAY);
- static readonly Dictionary<DecalType, Texture> s_decals = new Dictionary<DecalType, Texture> {
- //{DecalType.EXPLOSION, 
+  //this struct represents decals - temporary static pictures.
+  public class Decal {
+
+    #region fields
+
+    private static readonly uint DECAL_STAY_TIME = FileHandler.GetUintProperty("decal stay time", FileAccessor.DISPLAY);
+
+    private static readonly Dictionary<DecalType, Texture> s_decals = new Dictionary<DecalType, Texture> {
+ //{DecalType.EXPLOSION,
  { DecalType.BLOOD, new Texture("images/Decals/bloodsplatter.png") }
- //{DecalType.RUBBLE, 
+ //{DecalType.RUBBLE,
     };
 
     private readonly Sprite m_sprite;
     private uint m_stayTime;
 
-    #endregion
+    #endregion fields
 
     #region public methods
 
@@ -47,15 +51,15 @@ namespace Game.Graphic_Manager {
       m_sprite.Position = vector;
     }
 
-    #endregion
+    #endregion public methods
   }
 
-  #endregion
+  #endregion Decal
 
   #region Animation
 
-  //this struct is in charge of changing Sprites with a limited amount of appearances. Also, supposed not to be connected to an ExternalEntity, but held in a different list. 
-  //TODO - replace with a spriteloop and a timer? 
+  //this struct is in charge of changing Sprites with a limited amount of appearances. Also, supposed not to be connected to an ExternalEntity, but held in a different list.
+  //TODO - replace with a spriteloop and a timer?
   public struct Animation {
     private readonly List<Sprite> m_order;
 
@@ -84,11 +88,11 @@ namespace Game.Graphic_Manager {
     }
   }
 
-  #endregion
+  #endregion Animation
 
   #region SpriteLoop
 
-  //this represents a series of Sprites that are repeated one after the other. 
+  //this represents a series of Sprites that are repeated one after the other.
   public struct SpriteLoop {
     private readonly LoopedList<SFML.Graphics.Sprite> m_list;
 
@@ -104,10 +108,9 @@ namespace Game.Graphic_Manager {
     public SFML.Graphics.Sprite CurrentSprite() {
       return m_list.GetValue();
     }
-
   }
 
-  #endregion
+  #endregion SpriteLoop
 
   #region LoopedList
 
@@ -131,5 +134,5 @@ namespace Game.Graphic_Manager {
     }
   }
 
-  #endregion
+  #endregion LoopedList
 }

@@ -1,15 +1,15 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Game.Logic.Pathfinding {
+
   #region delegates
 
-  delegate List<Direction> pathfindFunction(Point entry, Point goal, Vector size, TerrainGrid grid, Logic.MovementType traversalMethod, Heuristic heuristic, Direction dir);
+  internal delegate List<Direction> pathfindFunction(Point entry, Point goal, Vector size, TerrainGrid grid, Logic.MovementType traversalMethod, Heuristic heuristic, Direction dir);
+
   public delegate double Heuristic(Point check);
 
-  #endregion
+  #endregion delegates
 
   #region AstarNode
 
@@ -43,7 +43,7 @@ namespace Game.Logic.Pathfinding {
       Open = true;
     }
 
-    #endregion
+    #endregion constructors
 
     #region properties
 
@@ -67,7 +67,7 @@ namespace Game.Logic.Pathfinding {
 
     public double FValue { get; private set; }
 
-    #endregion
+    #endregion properties
 
     #region comparers
 
@@ -79,7 +79,7 @@ namespace Game.Logic.Pathfinding {
       return 0;
     }
 
-    static int NodeComparer(AstarNode a, AstarNode b) {
+    private static int NodeComparer(AstarNode a, AstarNode b) {
       if (a.FValue > b.FValue) return 1;
       if (a.FValue < b.FValue) return -1;
       if (a.HValue > b.HValue) return 1;
@@ -87,16 +87,17 @@ namespace Game.Logic.Pathfinding {
       return 0;
     }
 
-    #endregion
+    #endregion comparers
   }
 
-  #endregion
+  #endregion AstarNode
 
   #region Heuristics
 
   public class Heuristics {
+
     public static Heuristic DiagonalTo(Point goal) {
-      return delegate(Point entry) {
+      return delegate (Point entry) {
         int diagonal = Math.Max(Math.Abs(entry.X - goal.X), Math.Abs(entry.Y - goal.Y));
         int straight = Math.Abs(entry.X - goal.X) + Math.Abs(entry.Y - goal.Y);
         return Math.Sqrt(2) * diagonal + straight - (2 * diagonal);
@@ -104,12 +105,11 @@ namespace Game.Logic.Pathfinding {
     }
 
     public static Heuristic ManhattanMovement(Point goal) {
-      return delegate(Point entry) {
+      return delegate (Point entry) {
         return Math.Abs(goal.X - entry.X) + Math.Abs(goal.Y - entry.Y);
       };
     }
-
   }
 
-  #endregion
+  #endregion Heuristics
 }

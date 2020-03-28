@@ -1,26 +1,25 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
 /**
- * Currently, city factory knows to give just one type of city. 
+ * Currently, city factory knows to give just one type of city.
  * later it might be able to give other types (mazes?)
  * */
+
 namespace Game.City_Generator {
-  static class CityFactory {
+
+  internal static class CityFactory {
+
     #region constants
 
     private const int DEF_LEN = 100;
     private const int DEF_WID = 100; //default city length and depth
 
-    #endregion
+    #endregion constants
 
     #region public methods
 
     /**
      * a city factory method.
      * */
+
     public static GameBoard CreateCity(int length = DEF_LEN, int depth = DEF_WID) {
       City retVal = new City(length, depth);
       retVal.AddRoads();
@@ -44,23 +43,23 @@ namespace Game.City_Generator {
       //((RoadTile)retVal.Grid[1, 2]).HDepth = 2;
 
       retVal.Grid[1, 1] = new RoadTile();
-      ((RoadTile) retVal.Grid[1, 1]).VOffset = 0;
-      ((RoadTile) retVal.Grid[1, 1]).VDepth = 2;
+      ((RoadTile)retVal.Grid[1, 1]).VOffset = 0;
+      ((RoadTile)retVal.Grid[1, 1]).VDepth = 2;
       retVal.Grid[1, 2] = new RoadTile();
-      ((RoadTile) retVal.Grid[1, 2]).VOffset = 0;
-      ((RoadTile) retVal.Grid[1, 2]).VDepth = 2;
+      ((RoadTile)retVal.Grid[1, 2]).VOffset = 0;
+      ((RoadTile)retVal.Grid[1, 2]).VDepth = 2;
       retVal.Grid[1, 3] = new RoadTile();
-      ((RoadTile) retVal.Grid[1, 3]).VOffset = 0;
-      ((RoadTile) retVal.Grid[1, 3]).VDepth = 2;
+      ((RoadTile)retVal.Grid[1, 3]).VOffset = 0;
+      ((RoadTile)retVal.Grid[1, 3]).VDepth = 2;
       retVal.Grid[2, 1] = new RoadTile();
-      ((RoadTile) retVal.Grid[2, 1]).VOffset = 1;
-      ((RoadTile) retVal.Grid[2, 1]).VDepth = 2;
+      ((RoadTile)retVal.Grid[2, 1]).VOffset = 1;
+      ((RoadTile)retVal.Grid[2, 1]).VDepth = 2;
       retVal.Grid[2, 2] = new RoadTile();
-      ((RoadTile) retVal.Grid[2, 2]).VOffset = 1;
-      ((RoadTile) retVal.Grid[2, 2]).VDepth = 2;
+      ((RoadTile)retVal.Grid[2, 2]).VOffset = 1;
+      ((RoadTile)retVal.Grid[2, 2]).VDepth = 2;
       retVal.Grid[2, 3] = new RoadTile();
-      ((RoadTile) retVal.Grid[2, 3]).VOffset = 1;
-      ((RoadTile) retVal.Grid[2, 3]).VDepth = 2;
+      ((RoadTile)retVal.Grid[2, 3]).VOffset = 1;
+      ((RoadTile)retVal.Grid[2, 3]).VDepth = 2;
       //retVal.Grid[3, 1] = new RoadTile();
       //((RoadTile)retVal.Grid[3, 1]).VOffset = 2;
       //((RoadTile)retVal.Grid[3, 1]).VDepth = 3;
@@ -88,6 +87,6 @@ namespace Game.City_Generator {
       return retVal;
     }
 
-    #endregion
+    #endregion public methods
   }
 }

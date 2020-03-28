@@ -1,13 +1,11 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Game.Logic.Pathfinding {
 
   //TODO - support using the same board several times.
   public class AdvancedAStar {
+
     #region fields
 
     private const int MIN_DISTANCE = 5;
@@ -17,7 +15,7 @@ namespace Game.Logic.Pathfinding {
     private readonly AStar m_internalAStar;
     private readonly AStar m_internalMinimisedAStar;
 
-    #endregion
+    #endregion fields
 
     #region constructors
 
@@ -33,7 +31,7 @@ namespace Game.Logic.Pathfinding {
       m_internalMinimisedAStar = minimisedGrid;
     }
 
-    #endregion
+    #endregion constructors
 
     #region public methods
 
@@ -41,7 +39,7 @@ namespace Game.Logic.Pathfinding {
       return Task<List<Direction>>.Factory.StartNew(() => FindPath(entry, goal, originalDirection, configuration));
     }
 
-    #endregion
+    #endregion public methods
 
     protected List<Direction> FindPath(Point entry, Point goal, Direction originalDirection, AStarConfiguration configuration) {
       //if it's a short route, don't bother with the two tiers.
@@ -116,6 +114,5 @@ namespace Game.Logic.Pathfinding {
 
       return newGrid;
     }
-
   }
 }

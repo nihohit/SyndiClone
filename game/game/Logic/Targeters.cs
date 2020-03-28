@@ -1,11 +1,13 @@
-using System.Collections.Generic;
 using Game.Logic.Entities;
+using System.Collections.Generic;
 
 namespace Game.Logic {
   /*
-   * This class is in charge of choosing targets to a given shooter out of the list of enemies in range of him. 
+   * This class is in charge of choosing targets to a given shooter out of the list of enemies in range of him.
    */
+
   public static class Targeters {
+
     public static Entity ThreatTargeterHigh(List<Entity> entities, Affiliation loyalty) {
       Entity target = null;
       int seenThreat = 0;
@@ -22,8 +24,8 @@ namespace Game.Logic {
       Entity target = null;
       int speed = 0;
       foreach (Entity ent in entities) {
-        if ((ent is MovingEntity && ((MovingEntity) ent).Speed > speed) || (ent.Type == EntityType.BUILDING && target == null) && (ent.Loyalty != loyalty)) {
-          speed = ((MovingEntity) ent).Speed;
+        if ((ent is MovingEntity && ((MovingEntity)ent).Speed > speed) || (ent.Type == EntityType.BUILDING && target == null) && (ent.Loyalty != loyalty)) {
+          speed = ((MovingEntity)ent).Speed;
           target = ent;
         }
       }
@@ -48,7 +50,6 @@ namespace Game.Logic {
       Entity target = null;
       int seenThreat = 10000;
       foreach (Entity ent in entities) {
-
         if ((ent.Threat < seenThreat) && (ent.Loyalty != loyalty)) {
           seenThreat = ent.Threat;
           target = ent;
@@ -62,8 +63,8 @@ namespace Game.Logic {
       Entity target = null;
       int speed = 10000;
       foreach (Entity ent in entities) {
-        if ((ent is MovingEntity && ((MovingEntity) ent).Speed < speed) || (ent.Type == EntityType.BUILDING && target == null) && (ent.Loyalty != loyalty)) {
-          speed = ((MovingEntity) ent).Speed;
+        if ((ent is MovingEntity && ((MovingEntity)ent).Speed < speed) || (ent.Type == EntityType.BUILDING && target == null) && (ent.Loyalty != loyalty)) {
+          speed = ((MovingEntity)ent).Speed;
           target = ent;
         }
       }

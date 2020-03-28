@@ -1,24 +1,26 @@
 using System;
 
 namespace Game.Logic.Entities {
+
   public abstract class Entity {
+
     #region static members
 
     private static int s_Id = 0;
 
-    #endregion
+    #endregion static members
 
     #region consts
 
-    const int TIME_TO_REACT = 1000;
+    private const int TIME_TO_REACT = 1000;
 
-    #endregion
+    #endregion consts
 
     #region fields
 
     private int m_timeAcc = 0;
 
-    #endregion
+    #endregion fields
 
     #region properties
 
@@ -48,7 +50,7 @@ namespace Game.Logic.Entities {
 
     public VisualEntityInformation VisualInfo { get; protected set; }
 
-    #endregion
+    #endregion properties
 
     #region constructor
 
@@ -68,7 +70,7 @@ namespace Game.Logic.Entities {
       VisualInfo = new VisualEntityInformation(Type, Loyalty, size, Id);
     }
 
-    #endregion
+    #endregion constructor
 
     #region public methods
 
@@ -104,25 +106,28 @@ namespace Game.Logic.Entities {
       return ans;
     }
 
-    public virtual void Destroy() { }
+    public virtual void Destroy() {
+    }
 
     protected virtual void Upgrade(System.Collections.Generic.List<Upgrades> list) {
       foreach (Upgrades upgrade in list) {
         switch (upgrade) {
-        case (Upgrades.BULLETPROOF_VEST):
-          Health += 7;
-          break;
-        case (Upgrades.VISIBILITY_SOLID):
-          VisibleStatus = Visibility.SOLID;
-          break;
-        case (Upgrades.BUILDING_BLIND):
-          SightSystem = Sight.instance(SightType.BLIND);
-          break;
+          case (Upgrades.BULLETPROOF_VEST):
+            Health += 7;
+            break;
+
+          case (Upgrades.VISIBILITY_SOLID):
+            VisibleStatus = Visibility.SOLID;
+            break;
+
+          case (Upgrades.BUILDING_BLIND):
+            SightSystem = Sight.instance(SightType.BLIND);
+            break;
         }
       }
     }
 
-    #endregion
+    #endregion virtual methods
 
     #region static methods
 
@@ -130,8 +135,8 @@ namespace Game.Logic.Entities {
       return new IgnoreReaction();
     }
 
-    #endregion
+    #endregion static methods
 
-    #endregion
+    #endregion public methods
   }
 }

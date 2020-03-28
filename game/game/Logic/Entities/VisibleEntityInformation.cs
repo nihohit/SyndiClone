@@ -1,11 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Vector2f = SFML.System.Vector2f;
 
 namespace Game.Logic.Entities {
+
   public class VisualEntityInformation {
+
     #region properties
 
     public EntityType Type { get; private set; }
@@ -18,7 +16,7 @@ namespace Game.Logic.Entities {
 
     public int EntityId { get; private set; }
 
-    #endregion
+    #endregion properties
 
     #region constructors
 
@@ -30,15 +28,16 @@ namespace Game.Logic.Entities {
       EntityId = entityId;
     }
 
-    public VisualEntityInformation(EntityType type, Affiliation visibleLoyalty, Vector size, int entityId) : this(type, visibleLoyalty, size, entityId, new Vector2f(-1, -1)) { }
+    public VisualEntityInformation(EntityType type, Affiliation visibleLoyalty, Vector size, int entityId) : this(type, visibleLoyalty, size, entityId, new Vector2f(-1, -1)) {
+    }
 
-    #endregion
+    #endregion constructors
 
     #region comparison methods
 
     public override bool Equals(object obj) {
       if (obj is VisualEntityInformation) {
-        return EntityId == ((VisualEntityInformation) obj).EntityId;
+        return EntityId == ((VisualEntityInformation)obj).EntityId;
       } else return false;
     }
 
@@ -46,6 +45,6 @@ namespace Game.Logic.Entities {
       return base.GetHashCode();
     }
 
-    #endregion
+    #endregion comparison methods
   }
 }

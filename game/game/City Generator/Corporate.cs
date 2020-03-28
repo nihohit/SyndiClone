@@ -1,38 +1,40 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 /**
  * a Corporate is a collection of buildings.
  * */
+
 namespace Game.City_Generator {
-  enum CorporateNames { ZOMBIE_LTD, BRAINS, UPGRADES, MINING, ARMORY, RND, DEFENCE, DIGGING } //TODO: figure out what kinds of corporates do we want.
 
- public class Corporate {
- #region static fields
+  internal enum CorporateNames { ZOMBIE_LTD, BRAINS, UPGRADES, MINING, ARMORY, RND, DEFENCE, DIGGING } //TODO: figure out what kinds of corporates do we want.
 
- static int s_counter = 0;
- static Random s_random = new Random();
+  public class Corporate {
 
- #endregion
+    #region static fields
 
- #region fields
+    private static int s_counter = 0;
+    private static Random s_random = new Random();
 
- private CorporateNames m_type;
+    #endregion static fields
 
- #endregion
+    #region fields
 
- #region constructor
+    private CorporateNames m_type;
 
- public Corporate() {
- m_type = (CorporateNames) s_random.Next(Enum.GetValues(typeof(CorporateNames)).Length);
- Id = s_counter;
- s_counter++;
- Buildings = new List<Building>();
+    #endregion fields
+
+    #region constructor
+
+    public Corporate() {
+      m_type = (CorporateNames)s_random.Next(Enum.GetValues(typeof(CorporateNames)).Length);
+      Id = s_counter;
+      s_counter++;
+      Buildings = new List<Building>();
     }
 
-    #endregion
+    #endregion constructor
 
     #region properties
 
@@ -40,7 +42,7 @@ namespace Game.City_Generator {
 
     public int Id { get; private set; }
 
-    #endregion
+    #endregion properties
 
     #region public methods
 
@@ -64,6 +66,7 @@ namespace Game.City_Generator {
      * This method merges the "other" corporate into the current one.
      * after this method is done, other corporate will still exist, but will be empty (so it's better to remove him)
      * */
+
     public void Takeover(Corporate other) {
       if (other == this)
         return;
@@ -73,6 +76,6 @@ namespace Game.City_Generator {
         other.Buildings.First().JoinCorp(this);
     }
 
-    #endregion
+    #endregion public methods
   }
 }

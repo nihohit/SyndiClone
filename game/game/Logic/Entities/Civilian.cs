@@ -1,29 +1,30 @@
 using System.Collections.Generic;
-using Game.Logic;
 
 namespace Game.Logic.Entities {
-  class Civilian : Person {
+
+  internal class Civilian : Person {
+
     #region consts
 
-    const int CIV_RUNNING_TIME = 100;
+    private const int CIV_RUNNING_TIME = 100;
 
-    #endregion
+    #endregion consts
 
     #region fields
 
     private bool m_fleeing;
     private int m_timeRunning = 0;
 
-    #endregion
+    #endregion fields
 
     #region constructors
 
-    public Civilian(Direction headed):
+    public Civilian(Direction headed) :
       base(CivReact, Affiliation.CIVILIAN, new List<Direction>(), headed) {
-        m_fleeing = false;
-      }
+      m_fleeing = false;
+    }
 
-    #endregion
+    #endregion constructors
 
     #region public methods
 
@@ -62,6 +63,6 @@ namespace Game.Logic.Entities {
       return "Civilian, " + base.ToString();
     }
 
-    #endregion
+    #endregion public methods
   }
 }

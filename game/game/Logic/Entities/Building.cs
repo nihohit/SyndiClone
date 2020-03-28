@@ -1,16 +1,15 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Game.Logic.Entities {
+
   public abstract class Building : Entity {
+
     #region consts
 
     protected const int BASE_BUILD_REACTION_TIME = 10;
     protected const int BASE_BUILD_HEALTH = 10;
 
-    #endregion
+    #endregion consts
 
     protected readonly int m_sizeModifier;
 

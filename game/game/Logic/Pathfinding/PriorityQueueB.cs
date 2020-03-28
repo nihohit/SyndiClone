@@ -1,28 +1,37 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 
 namespace Game.Logic.Pathfinding {
+
   #region Interfaces
 
   public interface IPriorityQueue<T> {
+
     #region Methods
+
     int Push(T item);
+
     T Pop();
+
     T Peek();
+
     void Update(int i);
-    #endregion
+
+    #endregion Methods
   }
-  #endregion
+
+  #endregion Interfaces
 
   public class PriorityQueueB<T> : IPriorityQueue<T> {
+
     #region Variables Declaration
+
     protected List<T> InnerList = new List<T>();
     protected IComparer<T> mComparer;
-    #endregion
+
+    #endregion Variables Declaration
 
     #region Contructors
+
     public PriorityQueueB() {
       mComparer = Comparer<T>.Default;
     }
@@ -35,9 +44,11 @@ namespace Game.Logic.Pathfinding {
       mComparer = comparer;
       InnerList.Capacity = capacity;
     }
-    #endregion
+
+    #endregion Contructors
 
     #region Methods
+
     protected void SwitchElements(int i, int j) {
       T h = InnerList[i];
       InnerList[i] = InnerList[j];
@@ -156,7 +167,6 @@ namespace Game.Logic.Pathfinding {
     public void RemoveLocation(T item) {
       int index = -1;
       for (int i = 0; i < InnerList.Count; i++) {
-
         if (mComparer.Compare(InnerList[i], item) == 0)
           index = i;
       }
@@ -172,6 +182,7 @@ namespace Game.Logic.Pathfinding {
         Update(index);
       }
     }
-    #endregion
+
+    #endregion Methods
   }
 }

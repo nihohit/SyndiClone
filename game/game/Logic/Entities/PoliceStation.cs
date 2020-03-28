@@ -1,14 +1,14 @@
 using System.Collections.Generic;
-using Game.Logic;
 
 namespace Game.Logic.Entities {
-  class PoliceStation : ConstructorBuilding //TODO - should be ConstructorBuilding
-  {
+
+  internal class PoliceStation : ConstructorBuilding {
+
     #region consts
 
-    const int POLICE_SIZE_MODIFIER = 3;
+    private const int POLICE_SIZE_MODIFIER = 3;
 
-    #endregion
+    #endregion consts
 
     #region fields
 
@@ -16,13 +16,13 @@ namespace Game.Logic.Entities {
     private int m_amountOfPolicemen;
     private Cop m_toConstruct;
 
-    #endregion
+    #endregion fields
 
     #region properties
 
     public bool Alert { get; set; }
 
-    #endregion
+    #endregion properties
 
     //TODO - set the whole alert operation. another idea - after alert wanes, begin "destroying" cops?
 
@@ -34,7 +34,7 @@ namespace Game.Logic.Entities {
       m_policemenCap = sizeModifier / POLICE_SIZE_MODIFIER;
       m_amountOfPolicemen = 0;
       Alert = false;
-      reactionFunction react = delegate(List<Entity> ent) {
+      reactionFunction react = delegate (List<Entity> ent) {
         if (m_toConstruct == null) m_toConstruct = new Cop(this, Path);
         m_readyToBuild = true;
         return new ConstructReaction(m_toConstruct);
@@ -42,7 +42,7 @@ namespace Game.Logic.Entities {
       ReactionFunction = react;
     }
 
-    #endregion
+    #endregion cosntructor
 
     #region public methods
 
@@ -75,6 +75,7 @@ namespace Game.Logic.Entities {
     public override string ToString() {
       return "Police station, " + base.ToString();
     }
-    #endregion
+
+    #endregion public methods
   }
 }

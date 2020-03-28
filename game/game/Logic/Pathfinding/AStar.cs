@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 
 namespace Game.Logic.Pathfinding {
+
   #region AStar
 
   public class AStar {
@@ -15,7 +16,7 @@ namespace Game.Logic.Pathfinding {
       m_gridHolder = gridHolder;
     }
 
-    #endregion
+    #endregion constructor
 
     #region public methods
 
@@ -45,7 +46,7 @@ namespace Game.Logic.Pathfinding {
       throw new Exception("open set empty, route impossible");
     }
 
-    #endregion
+    #endregion public methods
 
     #region private methods
 
@@ -184,7 +185,7 @@ namespace Game.Logic.Pathfinding {
         if (costToMove < newNode.GValue) {
           newNode.Parent = current;
           newNode.GValue = costToMove;
-          //TODO - find a more elegant way to do 
+          //TODO - find a more elegant way to do
           state.OpenSet.RemoveLocation(newNode);
           state.OpenSet.Push(newNode);
         }
@@ -245,16 +246,16 @@ namespace Game.Logic.Pathfinding {
     private int CostOfMovement(Point temp, AStarInternalState state) {
       if (state.Configuration.TraversalMethod == MovementType.FLYER) return 1;
       switch (m_gridHolder.Grid[temp.X, temp.Y]) {
-      case TerrainType.ROAD:
-        return 1;
-      case TerrainType.BUILDING:
-        if (state.Configuration.TraversalMethod == MovementType.CRUSHER) return 1;
-        return -1;
-      case TerrainType.WATER:
-        if (state.Configuration.TraversalMethod == MovementType.HOVER) return 1;
-        return -1;
-      default:
-        return -1;
+        case TerrainType.ROAD:
+          return 1;
+        case TerrainType.BUILDING:
+          if (state.Configuration.TraversalMethod == MovementType.CRUSHER) return 1;
+          return -1;
+        case TerrainType.WATER:
+          if (state.Configuration.TraversalMethod == MovementType.HOVER) return 1;
+          return -1;
+        default:
+          return -1;
       }
     }
 
@@ -269,14 +270,15 @@ namespace Game.Logic.Pathfinding {
       return ans;
     }
 
-    #endregion
+    #endregion private methods
   }
 
-  #endregion
+  #endregion AStar
 
   #region AStarConfiguration
 
   public class AStarConfiguration {
+
     public AStarConfiguration(Vector size, Logic.MovementType traversalMethod, Heuristic heuristic, bool directionChangeMatters, bool diagonalMovement) {
       Size = size;
       TraversalMethod = traversalMethod;
@@ -292,11 +294,12 @@ namespace Game.Logic.Pathfinding {
     public bool DiagonalMovement { get; private set; }
   }
 
-  #endregion
+  #endregion AStarConfiguration
 
   #region AStarInternalState
 
   public class AStarInternalState {
+
     public AStarInternalState(AStarConfiguration configuration) {
       Configuration = configuration;
       AmountOfNodesChecked = 0;
@@ -310,5 +313,5 @@ namespace Game.Logic.Pathfinding {
     public int AmountOfNodesChecked { get; set; }
   }
 
-  #endregion
+  #endregion AStarInternalState
 }

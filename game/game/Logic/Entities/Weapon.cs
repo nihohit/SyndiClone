@@ -1,15 +1,18 @@
 using System.Collections.Generic;
 
 namespace Game.Logic.Entities {
+
   public class Weapons {
+
     #region consts
+
     private static readonly Dictionary<WeaponType, Weapons> s_weapons = new Dictionary<WeaponType, Weapons>();
     private const int PISTOL_ROF = 20;
     private const int PISTOL_RANGE = 12;
     private const int PISTOL_THREAT = 1;
     private const double PISTOL_ACC = 8;
 
-    #endregion
+    #endregion consts
 
     #region constructor
 
@@ -28,13 +31,12 @@ namespace Game.Logic.Entities {
             s_weapons.Add(type, new Weapons(PISTOL_RANGE, PISTOL_ROF, PISTOL_ACC, Shot.instance(ShotType.PISTOL_BULLET), PISTOL_THREAT));
             break;
             //TODO - missing types
-
         }
       }
       return s_weapons[type];
     }
 
-    #endregion
+    #endregion constructor
 
     #region properties
 
@@ -44,8 +46,8 @@ namespace Game.Logic.Entities {
       this.Shot = shot;
       this.RateOfFire = rateOfFire;
       this.Accuracy = accuracy;
-
     }
+
     public int Threat { get; set; }
 
     public int Range { get; set; }
@@ -56,6 +58,6 @@ namespace Game.Logic.Entities {
 
     public double Accuracy { get; set; }
 
-    #endregion
+    #endregion properties
   }
 }

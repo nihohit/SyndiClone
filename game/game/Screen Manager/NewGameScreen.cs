@@ -1,19 +1,21 @@
 using System;
 
 namespace Game.Screen_Manager {
+
   /// <summary>
   /// In this screen, you define the parameters for a new game and call its creation.
   /// </summary>
-  class NewGameScreen : IScreen {
+  internal class NewGameScreen : IScreen {
+
     #region static members
 
-    static SFML.Graphics.RenderWindow s_window;
-    static Gwen.Control.Canvas s_canvas;
-    static Gwen.Skin.Base s_skin;
-    static NewGameScreen s_instance;
-    static Gwen.Control.NumericUpDown s_xValue, s_yValue, s_civAmount;
+    private static SFML.Graphics.RenderWindow s_window;
+    private static Gwen.Control.Canvas s_canvas;
+    private static Gwen.Skin.Base s_skin;
+    private static NewGameScreen s_instance;
+    private static Gwen.Control.NumericUpDown s_xValue, s_yValue, s_civAmount;
 
-    #endregion
+    #endregion static members
 
     #region constructors
 
@@ -21,9 +23,10 @@ namespace Game.Screen_Manager {
       get { if (s_instance == null) s_instance = new NewGameScreen(); return NewGameScreen.s_instance; }
     }
 
-    private NewGameScreen() { }
+    private NewGameScreen() {
+    }
 
-    #endregion
+    #endregion constructors
 
     #region IScreen
 
@@ -43,7 +46,7 @@ namespace Game.Screen_Manager {
       s_window.Display();
     }
 
-    #endregion
+    #endregion IScreen
 
     #region private methods
 
@@ -106,6 +109,6 @@ namespace Game.Screen_Manager {
       s_window.Clear();
     }
 
-    #endregion
+    #endregion private methods
   }
 }

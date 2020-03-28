@@ -1,6 +1,5 @@
-using System.Collections.Generic;
-
 namespace Game.Logic.Entities {
+
   public interface IShooter {
 
     Weapons Weapon();
@@ -10,6 +9,5 @@ namespace Game.Logic.Entities {
     Entity Target();
 
     targetChooser Targeter();
-
   }
 }

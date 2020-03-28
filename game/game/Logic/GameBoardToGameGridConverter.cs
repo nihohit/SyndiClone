@@ -1,18 +1,18 @@
-using System;
-using System.Collections.Generic;
 using Game.City_Generator;
-using Game.Logic.Entities;
+using System;
 
 namespace Game.Logic {
+
   internal static class GameBoardToGameGridConverter {
     private static readonly int TILE_SIZE_CONVERSION = FileHandler.GetIntProperty("tile size", FileAccessor.GENERAL);
 
     #region public methods
 
     /*
-     * This function converts a gameBaord to a grid. It creates a new grid, and populates it according to the 
-     * building list in the original board. 
+     * This function converts a gameBaord to a grid. It creates a new grid, and populates it according to the
+     * building list in the original board.
      */
+
     public static Grid ConvertBoard(GameBoard board) {
       int y = board.Length * TILE_SIZE_CONVERSION;
       int x = board.Depth * TILE_SIZE_CONVERSION;
@@ -45,6 +45,7 @@ namespace Game.Logic {
     /*
      * converts a generation-building to a game-building
      */
+
     public static Game.Logic.Entities.Building ConvertToCivilianBuilding(Game.City_Generator.Building build) {
       Vector realSize = new Vector(build.Dimensions.Length * TILE_SIZE_CONVERSION, build.Dimensions.Depth * TILE_SIZE_CONVERSION);
       int sizeModifier = build.Dimensions.Depth * build.Dimensions.Length;
@@ -63,12 +64,15 @@ namespace Game.Logic {
         case (0):
           y = -1;
           break;
+
         case (1):
           y = 1;
           break;
+
         case (2):
           x = -1;
           break;
+
         case (3):
           x = 1;
           break;
@@ -80,19 +84,20 @@ namespace Game.Logic {
         (short)(y * build.Dimensions.Depth * TILE_SIZE_CONVERSION / 2));
     }
 
-    #endregion
+    #endregion public methods
 
     #region private methods
 
     /*
      * Finds the area of a generation bulding.
      */
+
     private static Area ConvertToArea(Game.City_Generator.Building build) {
       return new Area(
         new Point((short)(build.Dimensions.StartY * TILE_SIZE_CONVERSION), (short)(build.Dimensions.StartX * TILE_SIZE_CONVERSION)),
         new Vector((short)(build.Dimensions.Length * TILE_SIZE_CONVERSION), (short)(build.Dimensions.Depth * TILE_SIZE_CONVERSION)));
     }
 
-    #endregion
+    #endregion private methods
   }
 }

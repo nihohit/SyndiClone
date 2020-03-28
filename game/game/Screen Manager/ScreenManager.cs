@@ -1,27 +1,25 @@
-using System;
-using System.Threading;
-using Game.Buffers;
-using Gwen;
 using SFML.Graphics;
 using SFML.Window;
 
 namespace Game.Screen_Manager {
+
   /// <summary>
   /// This is the manager of the screens - it checks which screen is currently loaded, and loops through it.
   /// </summary>
-  static class ScreenManager {
+  internal static class ScreenManager {
+
     #region static members
 
     private static Gwen.Input.SFML s_Input;
     private static RenderWindow s_window;
 
-    #endregion
+    #endregion static members
 
     #region properties
 
     public static IScreen CurrentScreen { get; set; }
 
-    #endregion
+    #endregion properties
 
     #region public methods
 
@@ -30,7 +28,7 @@ namespace Game.Screen_Manager {
       Gwen.Renderer.SFML UIrenderer = new Gwen.Renderer.SFML(s_window);
       Gwen.Skin.TexturedBase skin = new Gwen.Skin.TexturedBase(UIrenderer, "DefaultSkin.png");
       Gwen.Control.Canvas canvas = new Gwen.Control.Canvas(skin);
-      canvas.SetSize((int) s_window.Size.X, (int) s_window.Size.Y);
+      canvas.SetSize((int)s_window.Size.X, (int)s_window.Size.Y);
       canvas.MouseInputEnabled = true;
       s_Input = new Gwen.Input.SFML();
       s_Input.Initialize(canvas, s_window);
@@ -49,27 +47,28 @@ namespace Game.Screen_Manager {
       }
     }
 
-    #endregion
+    #endregion public methods
 
     #region input handlers
+
     // input handlers - just pass mouse data to Gwen
 
     private static void WindowClosed(object sender, System.EventArgs e) {
       s_window.Close();
     }
 
-    static void WindowMouseMoved(object sender, MouseMoveEventArgs e) {
+    private static void WindowMouseMoved(object sender, MouseMoveEventArgs e) {
       s_Input.ProcessMessage(e);
     }
 
-    static void WindowMouseButtonPressed(object sender, MouseButtonEventArgs e) {
+    private static void WindowMouseButtonPressed(object sender, MouseButtonEventArgs e) {
       s_Input.ProcessMessage(new Gwen.Input.SFMLMouseButtonEventArgs(e, true));
     }
 
-    static void WindowMouseButtonReleased(object sender, MouseButtonEventArgs e) {
+    private static void WindowMouseButtonReleased(object sender, MouseButtonEventArgs e) {
       s_Input.ProcessMessage(new Gwen.Input.SFMLMouseButtonEventArgs(e, false));
     }
 
-    #endregion
+    #endregion input handlers
   }
 }

@@ -2,30 +2,36 @@ using System;
 using System.Collections.Generic;
 
 namespace Game.Buffers {
+
   /// <summary>
   /// the buffer for the input from the game screen to the game logic and display manager.
   /// </summary>
   public class InputBuffer : Buffer {
     private static readonly List<IBufferEvent> list = new List<IBufferEvent>();
+
     #region fields
+
     private readonly List<IBufferEvent> m_soundEvents = list;
     private readonly List<IBufferEvent> m_logicEvents = new List<IBufferEvent>();
     private readonly List<IBufferEvent> m_graphicEvents = new List<IBufferEvent>();
-    #endregion
+
+    #endregion fields
 
     #region properties
+
     public bool SoundInput { get; private set; }
 
     public bool LogicInput { get; private set; }
 
     public bool GraphicInput { get; private set; }
-    #endregion
+
+    #endregion properties
 
     #region public method
 
     //TODO - do we bother with different events?
     public void EnterEvent(IBufferEvent input) {
-      lock(this) {
+      lock (this) {
         m_graphicEvents.Add(input);
         m_logicEvents.Add(input);
         m_soundEvents.Add(input);
@@ -52,30 +58,29 @@ namespace Game.Buffers {
                 setAllFlags();
                 break;
         }*/
-
       }
     }
 
     public List<IBufferEvent> GetEvents(InputModuleAccessors accessor) {
       switch (accessor) {
-      case InputModuleAccessors.Graphics:
-        GraphicInput = false;
-        return GetEventsFromList(m_graphicEvents);
+        case InputModuleAccessors.Graphics:
+          GraphicInput = false;
+          return GetEventsFromList(m_graphicEvents);
 
-      case InputModuleAccessors.Logic:
-        LogicInput = false;
-        return GetEventsFromList(m_logicEvents);
+        case InputModuleAccessors.Logic:
+          LogicInput = false;
+          return GetEventsFromList(m_logicEvents);
 
-      case InputModuleAccessors.Sounds:
-        SoundInput = false;
-        return GetEventsFromList(m_soundEvents);
+        case InputModuleAccessors.Sounds:
+          SoundInput = false;
+          return GetEventsFromList(m_soundEvents);
 
-      default:
-        throw new Exception("invalid InputModuleAccessor " + accessor);
+        default:
+          throw new Exception("invalid InputModuleAccessor " + accessor);
       }
     }
 
-    #endregion
+    #endregion public method
 
     #region private methods
 
@@ -91,6 +96,6 @@ namespace Game.Buffers {
       GraphicInput = true;
     }
 
-    #endregion
+    #endregion private methods
   }
 }

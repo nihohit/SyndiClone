@@ -1,63 +1,80 @@
-using System;
-using System.Collections.Generic;
 using Game.Logic.Entities;
+using System.Collections.Generic;
 
 namespace Game.Logic {
+
   #region delegates
 
   public delegate bool EntityChecker(Entity ent); //These functions check basic questions about entities and return a bool
+
   public delegate void ShotEffect(Entity ent); //These functions simulate effects on entities. mostly will be damage
+
   public delegate bool WasBlocked(Entity ent); //These functions check whether an entitiy blocks a certain effect
+
   public delegate Entity targetChooser(List<Entity> targets); //These functions choose which entity, out of the list of possible entities, to target
+
   public delegate Reaction reactionFunction(List<Entity> ent); //These functions set the reaction of entities
 
-  #endregion
+  #endregion delegates
 
   #region enumerators
 
   public enum ActionType { FIRE_AT, IGNORE, RUN_AWAY_FROM, MOVE_TOWARDS, MOVE_WHILE_SHOOT, CONSTRUCT_ENTITY, PURSUE } //This enum checks the possible actions entities can take
- public enum EntityType { PERSON, VEHICLE, BUILDING } //the different types of entities
- public enum Visibility { CLOAKED, MASKED, REVEALED, SOLID } //the visibility of an entity
- public enum Affiliation { INDEPENDENT, CORP1, CORP2, CORP3, CORP4, CIVILIAN } //to which player each entity belongs
- public enum SightType { DEFAULT_SIGHT, BLIND } //different sights
- public enum WeaponType { PISTOL, ASSAULT, BAZOOKA, SNIPER, RAILGUN } //different weapons
+
+  public enum EntityType { PERSON, VEHICLE, BUILDING } //the different types of entities
+
+  public enum Visibility { CLOAKED, MASKED, REVEALED, SOLID } //the visibility of an entity
+
+  public enum Affiliation { INDEPENDENT, CORP1, CORP2, CORP3, CORP4, CIVILIAN } //to which player each entity belongs
+
+  public enum SightType { DEFAULT_SIGHT, BLIND } //different sights
+
+  public enum WeaponType { PISTOL, ASSAULT, BAZOOKA, SNIPER, RAILGUN } //different weapons
+
   public enum MovementType { GROUND, HOVER, FLYER, CRUSHER }
+
   public enum TerrainType { ROAD, WATER, BUILDING }
+
   public enum BlastType { } //different blast effect
+
   public enum ShotType { SIGHT, PISTOL_BULLET }
+
   public enum Direction { LEFT, RIGHT, UP, DOWN, UPLEFT, UPRIGHT, DOWNLEFT, DOWNRIGHT }
+
   public enum Corporations { BIOTECH, STEALTH, ARMS, VEHICLES, VISION }
+
   public enum Upgrades { BULLETPROOF_VEST, VISIBILITY_SOLID, BUILDING_BLIND, FLYER, HOVER, CRUSHER }
 
-  #endregion
+  #endregion enumerators
 
   #region TerrainGrid
 
-  //This class is a holder for an array - used so the array won't be transferred by value over functions. 
+  //This class is a holder for an array - used so the array won't be transferred by value over functions.
   public class TerrainGrid {
-    private readonly TerrainType[, ] grid;
+    private readonly TerrainType[,] grid;
 
     public TerrainGrid(int x, int y) {
       grid = new TerrainType[x, y];
     }
 
-    public Logic.TerrainType[, ] Grid {
+    public Logic.TerrainType[,] Grid {
       get { return grid; }
     }
   }
 
-  #endregion
+  #endregion TerrainGrid
 
   #region reactions
 
   #region Reaction
 
-  //This interface describes the reaction of an entity to the enemies it sees. 
+  //This interface describes the reaction of an entity to the enemies it sees.
   public interface Reaction {
+
     ActionType Action();
   }
 
-  #endregion
+  #endregion Reaction
 
   #region ShootReaction
 
@@ -77,7 +94,7 @@ namespace Game.Logic {
     }
   }
 
-  #endregion
+  #endregion ShootReaction
 
   #region PursueReaction
 
@@ -97,7 +114,7 @@ namespace Game.Logic {
     }
   }
 
-  #endregion
+  #endregion PursueReaction
 
   #region ShootAndMoveReaction
 
@@ -112,12 +129,12 @@ namespace Game.Logic {
       return ActionType.MOVE_WHILE_SHOOT;
     }
 
-    ShootAndMoveReaction(Entity focus) {
+    private ShootAndMoveReaction(Entity focus) {
       m_focus = focus;
     }
   }
 
-  #endregion
+  #endregion ShootAndMoveReaction
 
   #region ConstructReaction
 
@@ -137,7 +154,7 @@ namespace Game.Logic {
     }
   }
 
-  #endregion
+  #endregion ConstructReaction
 
   #region RunAwayReaction
 
@@ -157,27 +174,31 @@ namespace Game.Logic {
     }
   }
 
-  #endregion
+  #endregion RunAwayReaction
 
   #region IgnoreReaction
 
   public struct IgnoreReaction : Reaction {
+
     ActionType Reaction.Action() {
       return ActionType.IGNORE;
     }
   }
 
-  #endregion
+  #endregion IgnoreReaction
 
-  #endregion
+  #endregion reactions
 
   #region UniqueList
 
-  //This class represents a list that verifies that entities entered into it only once. 
+  //This class represents a list that verifies that entities entered into it only once.
   public class UniqueList<T> : List<T> {
-    public UniqueList() : base() { }
 
-    public UniqueList(List<T> old) : base(old) { }
+    public UniqueList() : base() {
+    }
+
+    public UniqueList(List<T> old) : base(old) {
+    }
 
     public void uniqueAdd(T obj) {
       if (!base.Contains(obj)) base.Add(obj);
@@ -190,21 +211,25 @@ namespace Game.Logic {
     }
   }
 
-  #endregion
+  #endregion UniqueList
 
   #region LocationFullException
 
   public class LocationFullException : System.ApplicationException {
-    public LocationFullException() { }
-    public LocationFullException(string message) { }
 
-    // Constructor needed for serialization 
+    public LocationFullException() {
+    }
+
+    public LocationFullException(string message) {
+    }
+
+    // Constructor needed for serialization
     // when exception propagates from a remoting server to the client.
     protected LocationFullException(System.Runtime.Serialization.SerializationInfo info,
       System.Runtime.Serialization.StreamingContext context) { }
   }
 
-  #endregion
+  #endregion LocationFullException
 
   #region EntityInformation
 
@@ -214,5 +239,5 @@ namespace Game.Logic {
     //TODO - determine what needs to be here.
   }
 
-  #endregion
+  #endregion EntityInformation
 }
