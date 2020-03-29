@@ -7,6 +7,20 @@ using Vector2f = SFML.System.Vector2f;
 
 namespace Game.Screen_Manager {
 
+  static internal class ViewExtensions {
+    public static FloatRect pixelRect(this View view) {
+      return new FloatRect(view.Center - (view.Size / 2), view.Size);
+    }
+
+    public static float Right(this FloatRect rect) {
+      return rect.Left + rect.Width;
+    }
+
+    public static float Bottom(this FloatRect rect) {
+      return rect.Top + rect.Height;
+    }
+  }
+
   /// <summary>
   /// This screen is meant to represent a new game, including creating the game.
   /// </summary>
@@ -254,16 +268,20 @@ namespace Game.Screen_Manager {
     private void bindViewportToBoard(View currentView) {
       float newX = 0;
       float newY = 0;
-      var right = currentView.Viewport.Left + currentView.Viewport.Width;
-      var bottom = currentView.Viewport.Top + currentView.Viewport.Height;
+      var pixelRect = currentView.pixelRect();
+      var right = pixelRect.Right();
+      var bottom = pixelRect.Bottom();
+      Console.WriteLine(pixelRect);
+      Console.WriteLine(currentView.Size);
+      Console.WriteLine(currentView.Center);
 
       if (right > m_topX) {
         newX = right - m_topX;
-      } else if (currentView.Viewport.Left < 0) {
-        newX = currentView.Viewport.Left;
+      } else if (pixelRect.Left < 0) {
+        newX = pixelRect.Left;
       }
-      if (currentView.Viewport.Top < 0) {
-        newY = currentView.Viewport.Top;
+      if (pixelRect.Top < 0) {
+        newY = pixelRect.Top;
       } else if (bottom > m_topY) {
         newY = bottom - m_topY;
       }
@@ -284,28 +302,26 @@ namespace Game.Screen_Manager {
     private void MouseMoved(object sender, MouseMoveEventArgs e) {
       m_mouseX = e.X;
       m_mouseY = e.Y;
-      var viewSize = m_mainWindow.GetView().Size;
-      var viewCenter = m_mainWindow.GetView().Center;
-      var scrollZoneSize = new Vector2f(viewSize.X * SCREEN_EDGE_PERCENT_FOR_MOUSE_SCROLLING / 100, viewSize.Y * SCREEN_EDGE_PERCENT_FOR_MOUSE_SCROLLING / 100);
-      float maxX = viewCenter.X + viewSize.X / 2;
-      float maxY = viewCenter.Y + viewSize.Y / 2;
-      float minX = viewCenter.X - viewSize.X / 2;
-      float minY = viewCenter.Y - viewSize.Y / 2;
+      View currentView = ((RenderWindow)sender).GetView();
+      var pixelRect = currentView.pixelRect();
+      var right = pixelRect.Right();
+      var bottom = pixelRect.Bottom();
+      var scrollZoneSize = new Vector2f(pixelRect.Width * SCREEN_EDGE_PERCENT_FOR_MOUSE_SCROLLING / 100, pixelRect.Height * SCREEN_EDGE_PERCENT_FOR_MOUSE_SCROLLING / 100);
       m_xMove = 0;
       m_yMove = 0;
 
       //Console.Out.WriteLine(" mouse location: {0} , {1} , max: {2} , {3}, min: {4} , {5}", m_mouseX, m_mouseY, maxX, maxY, minX, minY);
-      if (m_mouseX - minX < scrollZoneSize.X) {
-        m_xMove = -(scrollZoneSize.X - m_mouseX) / scrollZoneSize.X;
+      if (m_mouseX - pixelRect.Left < scrollZoneSize.X) {
+        m_xMove = -(scrollZoneSize.X - m_mouseX + pixelRect.Left) / scrollZoneSize.X;
       }
-      if (maxX - m_mouseX < scrollZoneSize.X) {
-        m_xMove = (scrollZoneSize.X - (maxX - m_mouseX)) / scrollZoneSize.X;
+      if (right - m_mouseX < scrollZoneSize.X) {
+        m_xMove = (scrollZoneSize.X - (right - m_mouseX)) / scrollZoneSize.X;
       }
-      if (m_mouseY - minY < scrollZoneSize.Y) {
-        m_yMove = -(scrollZoneSize.Y - m_mouseY) / scrollZoneSize.Y;
+      if (m_mouseY - pixelRect.Top < scrollZoneSize.Y) {
+        m_yMove = -(scrollZoneSize.Y - m_mouseY + pixelRect.Top) / scrollZoneSize.Y;
       }
-      if (maxY - m_mouseY < scrollZoneSize.Y) {
-        m_yMove = (scrollZoneSize.Y - (maxY - m_mouseY)) / scrollZoneSize.Y;
+      if (bottom - m_mouseY < scrollZoneSize.Y) {
+        m_yMove = (scrollZoneSize.Y - (bottom - m_mouseY)) / scrollZoneSize.Y;
       }
     }
 
