@@ -241,35 +241,43 @@ namespace Game.Screen_Manager {
       }
     }
 
+    private void adjustZoom(float scale, View currentView) {
+      var newX = currentView.Size.X * scale;
+      var newY = currentView.Size.Y * scale;
+      scale = Math.Min(scale, m_topX / newX);
+      scale = Math.Min(scale, m_topY / newY);
+      scale = Math.Max(scale, MIN_X / newX);
+      scale = Math.Max(scale, m_minY / newY);
+      currentView.Zoom(scale);
+    }
+
+    private void bindViewportToBoard(View currentView) {
+      float newX = 0;
+      float newY = 0;
+      var right = currentView.Viewport.Left + currentView.Viewport.Width;
+      var bottom = currentView.Viewport.Top + currentView.Viewport.Height;
+
+      if (right > m_topX) {
+        newX = right - m_topX;
+      } else if (currentView.Viewport.Left < 0) {
+        newX = currentView.Viewport.Left;
+      }
+      if (currentView.Viewport.Top < 0) {
+        newY = currentView.Viewport.Top;
+      } else if (bottom > m_topY) {
+        newY = bottom - m_topY;
+      }
+      currentView.Center = new Vector2f(currentView.Center.X - newX, currentView.Center.Y - newY);
+    }
+
     private void Zooming(object sender, MouseWheelScrollEventArgs e) {
       float scale = 1 - (e.Delta / 10F);
-      if (scale != 1) {
-        View currentView = ((RenderWindow)sender).GetView();
-        float newX = currentView.Size.X * scale, newY = currentView.Size.Y * scale;
-        if (((scale > 1) && (newX < m_topX && newY < m_topY)) ||
-          ((scale < 1) && (newX > MIN_X || newY > m_minY)))
-          currentView.Zoom(scale);
-        else if (scale > 1) currentView.Size = new Vector2f(m_topX, m_topY);
-        else currentView.Size = new Vector2f(MIN_X, m_minY);
-        float left = currentView.Center.X - currentView.Size.X / 2;
-        float right = currentView.Center.X + currentView.Size.X / 2;
-        float up = currentView.Center.Y - currentView.Size.Y / 2;
-        float down = currentView.Center.Y + currentView.Size.Y / 2;
-        newX = 0;
-        newY = 0;
-
-        if (right > m_topX)
-          newX = right - m_topX;
-        else
-        if (left < 0)
-          newX = left;
-        if (up < 0)
-          newY = up;
-        else
-        if (down > m_topY)
-          newY = down - m_topY;
-        currentView.Center = new Vector2f(currentView.Center.X - newX, currentView.Center.Y - newY);
+      if (scale == 1) {
+        return;
       }
+      View currentView = ((RenderWindow)sender).GetView();
+      adjustZoom(scale, currentView);
+      bindViewportToBoard(currentView);
     }
 
     //TODO - known bug, after mouse exits screen, scrolling gets stuck in one direction.
