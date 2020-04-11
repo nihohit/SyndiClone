@@ -1,11 +1,13 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Base {
+namespace Game {
+
   /// <summary>
   /// These are all the code sanity checks we use in order to assert the internal state of the code
   /// </summary>
   public static class Assert {
+
     public static void NotEqual(object first, object second, string additionalMessage = "", int stackTraceDepth = 1) {
       AssertConditionMet(!first.Equals(second), "{0} equals {1}. {2}".FormatWith(first, second, additionalMessage), ++stackTraceDepth);
     }

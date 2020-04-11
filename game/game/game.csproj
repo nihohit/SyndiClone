@@ -74,7 +74,7 @@
     <Compile Include="Buffers\SoundBuffer.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="FileHandler.cs" />
+    <Compile Include="Base\FileHandler.cs" />
     <Compile Include="Graphic Manager\BuildingImageGenerator.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -171,7 +171,7 @@
     <Compile Include="Logic\Targeters.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Point.cs">
+    <Compile Include="Base\Point.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Screen Manager\MainScreen.cs" />
@@ -194,8 +194,10 @@
     <Compile Include="City Generator\GameBoard.cs" />
     <Compile Include="City Generator\RoadTile.cs" />
     <Compile Include="City Generator\Tile.cs" />
-    <Compile Include="TestLogicScreenCivilians.cs" />
-    <Compile Include="Vector.cs" />
+    <Compile Include="main.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Base\Vector.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />

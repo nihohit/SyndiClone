@@ -28,7 +28,7 @@ namespace Game.Logic.Entities {
 
     #region cosntructor
 
-    public PoliceStation(Game.Vector realSize, int sizeModifier, Vector exit) : base(sizeModifier, Entity.ReactionPlaceHolder, realSize, Affiliation.INDEPENDENT) {
+    public PoliceStation(Vector realSize, int sizeModifier, Vector exit) : base(sizeModifier, Entity.ReactionPlaceHolder, realSize, Affiliation.INDEPENDENT) {
       Path = new List<Direction>();
       base.Exit = exit;
       m_policemenCap = sizeModifier / POLICE_SIZE_MODIFIER;

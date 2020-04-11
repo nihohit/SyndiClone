@@ -1,8 +1,8 @@
-using Base;
 using System;
 using Vector2f = SFML.System.Vector2f;
 
 namespace Game {
+
   public struct Point {
     private readonly int m_xLoc, m_yLoc;
 
@@ -10,9 +10,11 @@ namespace Game {
     public int X { get { return m_xLoc; } }
 
     #region constructors
-    /** 
+
+    /**
      * This constructor creates a point with x,y parameters
      */
+
     public Point(int x, int y) {
       m_xLoc = x;
       m_yLoc = y;
@@ -23,14 +25,16 @@ namespace Game {
       m_yLoc = origin.Y + transfer.Y;
     }
 
-    /** 
+    /**
      * this constructor gives the point a random value in the range minX-maxX and minY-maxY
      */
+
     public Point(int minX, int maxX, int minY, int maxY) {
       m_xLoc = Randomizer.Next(minX, maxX);
       m_yLoc = Randomizer.Next(minY, maxY);
     }
-    #endregion
+
+    #endregion constructors
 
     #region public methods
 
@@ -43,7 +47,7 @@ namespace Game {
     }
 
     public override bool Equals(object obj) {
-      return ((obj is Point) && ((Point) obj == this));
+      return ((obj is Point) && ((Point)obj == this));
     }
 
     public Vector2f ToVector2f() {
@@ -58,7 +62,7 @@ namespace Game {
       return Convert.ToInt32(Math.Sqrt(Math.Pow(X - target.X, 2) + Math.Pow(Y - target.Y, 2)));
     }
 
-    #endregion
+    #endregion public methods
 
     #region operators
 
@@ -70,6 +74,6 @@ namespace Game {
       return (a.X != b.X || (a.Y != b.Y));
     }
 
-    #endregion
+    #endregion operators
   }
 }

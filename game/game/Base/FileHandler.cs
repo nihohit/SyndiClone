@@ -2,24 +2,26 @@ using System;
 using System.Collections.Generic;
 
 namespace Game {
-  enum FileAccessor { GENERAL, DISPLAY, SCREEN, LOGIC }
+
+  public enum FileAccessor { GENERAL, DISPLAY, SCREEN, LOGIC }
 
   //TODO - replace all of this complexity with GraphicConfiguration, LogicConfiguration etc. classes which will be loaded from files and written back to them.
 
-  static class FileHandler {
+  public static class FileHandler {
+
     #region static dictionaries
 
     private static Dictionary<string, string> s_general = new Dictionary<string, string>();
     private static Dictionary<string, string> s_display = new Dictionary<string, string>();
     private static Dictionary<string, string> s_screen = new Dictionary<string, string>();
     private static Dictionary<string, string> s_logic = new Dictionary<string, string>();
-    static Dictionary<FileAccessor, Dictionary<string, string>> s_navigator = new Dictionary<FileAccessor, Dictionary<string, string>> { { FileAccessor.SCREEN, s_screen },
+    private static Dictionary<FileAccessor, Dictionary<string, string>> s_navigator = new Dictionary<FileAccessor, Dictionary<string, string>> { { FileAccessor.SCREEN, s_screen },
       { FileAccessor.DISPLAY, s_display },
       { FileAccessor.GENERAL, s_general },
       { FileAccessor.LOGIC, s_logic }
     };
 
-    #endregion
+    #endregion static dictionaries
 
     #region public methods
 
@@ -42,7 +44,7 @@ namespace Game {
       return Convert.ToSingle(s_navigator[access][str]);
     }
 
-    #endregion
+    #endregion public methods
 
     #region private methods
 
@@ -71,6 +73,6 @@ namespace Game {
       ReadFromFile("config", FileAccessor.GENERAL);
     }
 
-    #endregion
+    #endregion private methods
   }
 }

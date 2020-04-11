@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Base {
+namespace Game {
+
   /// <summary>
   /// Initializes a single Random object for the whole program, in order to overcome flaws in Random implementation.
   /// </summary>
@@ -105,6 +106,7 @@ namespace Base {
     /// and adapted to a generic case.
     /// <typeparam name="T"></typeparam>
     private class WeightedValuesChooser<T> {
+
       private List<Node> GenerateHeap(IEnumerable<KeyValuePair<T, double>> dictionary) {
         var nodes = new List<Node> { null };
 

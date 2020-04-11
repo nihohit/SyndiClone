@@ -8,6 +8,7 @@ using Vector2f = SFML.System.Vector2f;
 namespace Game.Screen_Manager {
 
   static internal class ViewExtensions {
+
     public static FloatRect pixelRect(this View view) {
       return new FloatRect(view.Center - (view.Size / 2), view.Size);
     }

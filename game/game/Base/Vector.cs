@@ -1,8 +1,8 @@
-using Base;
 using System;
 using Vector2f = SFML.System.Vector2f;
 
 namespace Game {
+
   #region Vector
 
   public struct Vector {
@@ -25,7 +25,7 @@ namespace Game {
       m_y = a.Y;
     }
 
-    #endregion
+    #endregion constructors
 
     #region properties
 
@@ -33,7 +33,7 @@ namespace Game {
 
     public int Y { get { return m_y; } }
 
-    #endregion
+    #endregion properties
 
     #region conversion to other datatypes
 
@@ -82,36 +82,36 @@ namespace Game {
 
     static public Vector DirectionToVector(Game.Logic.Direction direction) {
       switch (direction) {
-      case (Game.Logic.Direction.UP):
-        return new Vector(0, -1);
+        case (Game.Logic.Direction.UP):
+          return new Vector(0, -1);
 
-      case (Game.Logic.Direction.DOWN):
-        return new Vector(0, 1);
+        case (Game.Logic.Direction.DOWN):
+          return new Vector(0, 1);
 
-      case (Game.Logic.Direction.LEFT):
-        return new Vector(-1, 0);
+        case (Game.Logic.Direction.LEFT):
+          return new Vector(-1, 0);
 
-      case (Game.Logic.Direction.RIGHT):
-        return new Vector(1, 0);
+        case (Game.Logic.Direction.RIGHT):
+          return new Vector(1, 0);
 
-      case (Game.Logic.Direction.UPRIGHT):
-        return new Vector(1, -1);
+        case (Game.Logic.Direction.UPRIGHT):
+          return new Vector(1, -1);
 
-      case (Game.Logic.Direction.DOWNRIGHT):
-        return new Vector(1, 1);
+        case (Game.Logic.Direction.DOWNRIGHT):
+          return new Vector(1, 1);
 
-      case (Game.Logic.Direction.UPLEFT):
-        return new Vector(-1, -1);
+        case (Game.Logic.Direction.UPLEFT):
+          return new Vector(-1, -1);
 
-      case (Game.Logic.Direction.DOWNLEFT):
-        return new Vector(-1, 1);
+        case (Game.Logic.Direction.DOWNLEFT):
+          return new Vector(-1, 1);
 
-      default:
-        throw new Exception("not valid direction found");
+        default:
+          throw new Exception("not valid direction found");
       }
     }
 
-    #endregion
+    #endregion conversion to other datatypes
 
     #region calculations
 
@@ -162,12 +162,12 @@ namespace Game {
       return new Vector(m_x * size, m_y * size);
     }
 
-    #endregion
+    #endregion calculations
 
     #region standard public methods
 
     public override bool Equals(object obj) {
-      if (!(obj is Vector)) { return false; } else { return ((m_x == ((Vector) obj).X) && (m_y == ((Vector) obj).Y)); }
+      if (!(obj is Vector)) { return false; } else { return ((m_x == ((Vector)obj).X) && (m_y == ((Vector)obj).Y)); }
     }
 
     public override int GetHashCode() {
@@ -178,10 +178,10 @@ namespace Game {
       return "Vector " + X + " , " + Y;
     }
 
-    #endregion
+    #endregion standard public methods
   }
 
-  #endregion
+  #endregion Vector
 
   #region Area
 
@@ -201,15 +201,15 @@ namespace Game {
       m_size = location.Size;
     }
 
-    #endregion
+    #endregion constructors
 
-    #region properties 
+    #region properties
 
     public Vector Size { get { return m_size; } }
 
     public Point Entry { get { return m_entry; } }
 
-    #endregion
+    #endregion properties
 
     #region public methods
 
@@ -217,8 +217,8 @@ namespace Game {
       return new Area(m_entry, m_size.Flip());
     }
 
-    public Point[, ] GetPointArea() {
-      Point[, ] area = new Point[m_size.X, m_size.Y];
+    public Point[,] GetPointArea() {
+      Point[,] area = new Point[m_size.X, m_size.Y];
 
       for (int i = 0; i < m_size.X; i++) {
         for (int j = 0; j < m_size.Y; j++) {
@@ -233,8 +233,8 @@ namespace Game {
       return "Area: entry - " + m_entry + " size - " + m_size;
     }
 
-    #endregion
+    #endregion public methods
   }
 
-  #endregion
+  #endregion Area
 }

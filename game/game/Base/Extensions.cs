@@ -3,7 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Base {
+namespace Game {
+
   public interface IIdentifiable<out T> {
     T Name { get; }
   }
@@ -12,6 +13,7 @@ namespace Base {
   /// extensions of basic C# objects
   /// </summary>
   public static class MyExtensions {
+
     public static T SafeCast<T>(this object obj, string name) where T : class {
       Assert.NotNull(obj, name, "Tried to cast null to {0}".FormatWith(typeof(T)));
       var result = obj as T;
