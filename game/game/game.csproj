@@ -81,7 +81,7 @@
     <Compile Include="Graphic Manager\DisplayBuffer.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Graphic Manager\DisplayManager.cs">
+    <Compile Include="Graphic Manager\GameDisplay.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Graphic Manager\GraphicInfo.cs">
@@ -194,9 +194,7 @@
     <Compile Include="City Generator\GameBoard.cs" />
     <Compile Include="City Generator\RoadTile.cs" />
     <Compile Include="City Generator\Tile.cs" />
-    <Compile Include="testInput.cs">
-      <SubType>Code</SubType>
-    </Compile>
+    <Compile Include="TestLogicScreenCivilians.cs" />
     <Compile Include="Vector.cs" />
   </ItemGroup>
   <ItemGroup>
