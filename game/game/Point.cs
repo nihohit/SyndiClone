@@ -1,9 +1,9 @@
+using Base;
 using System;
 using Vector2f = SFML.System.Vector2f;
 
 namespace Game {
   public struct Point {
-    private static Random s_staticRandom = new Random();
     private readonly int m_xLoc, m_yLoc;
 
     public int Y { get { return m_yLoc; } }
@@ -27,8 +27,8 @@ namespace Game {
      * this constructor gives the point a random value in the range minX-maxX and minY-maxY
      */
     public Point(int minX, int maxX, int minY, int maxY) {
-      m_xLoc = s_staticRandom.Next(minX, maxX);
-      m_yLoc = s_staticRandom.Next(minY, maxY);
+      m_xLoc = Randomizer.Next(minX, maxX);
+      m_yLoc = Randomizer.Next(minY, maxY);
     }
     #endregion
 

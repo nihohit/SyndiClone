@@ -61,6 +61,10 @@
     <Folder Include="Audio Manager\" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Base\Assert.cs" />
+    <Compile Include="Base\Exceptions.cs" />
+    <Compile Include="Base\Extensions.cs" />
+    <Compile Include="Base\Randomizer.cs" />
     <Compile Include="Buffers\Buffer.cs">
       <SubType>Code</SubType>
     </Compile>

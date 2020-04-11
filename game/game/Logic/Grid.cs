@@ -1,3 +1,4 @@
+using Base;
 using Game.Logic.Entities;
 using System;
 using System.Collections.Generic;
@@ -41,7 +42,6 @@ namespace Game.Logic {
     private Pathfinding.AdvancedAStar m_pathfinder;
     private readonly Dictionary<ConstructorBuilding, Task<List<Direction>>> m_constructorsToPaths = new Dictionary<ConstructorBuilding, Task<List<Direction>>>();
     //TODO - add corporations
-    private static Random s_random = new Random();
 
     #endregion fields
 
@@ -627,7 +627,7 @@ namespace Game.Logic {
         options.Add(new Vector(0, -i));
       //i = randomGenerator.Next(0, options.Count);
       if (options.Count > 0) {
-        ent.Exit = options[s_random.Next(0, options.Count)];
+        ent.Exit = options[Randomizer.Next(0, options.Count)];
       } else {
         i = (ent.Size.X / 2) + 1;
         if (x + i < m_gameGrid.GetLength(0) && (m_gameGrid[x + i, y] == null))
@@ -640,7 +640,7 @@ namespace Game.Logic {
         if (y - i >= 0 && (m_gameGrid[x, y - i] == null))
           options.Add(new Vector(0, -i));
         if (options.Count > 0)
-          ent.Exit = options[s_random.Next(0, options.Count)];
+          ent.Exit = options[Randomizer.Next(0, options.Count)];
         else throw new Exception("can't find exit point");
       }
     }

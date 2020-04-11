@@ -1,3 +1,4 @@
+using Base;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,7 +16,6 @@ namespace Game.City_Generator {
     #region static fields
 
     private static int s_counter = 0;
-    private static Random s_random = new Random();
 
     #endregion static fields
 
@@ -28,7 +28,7 @@ namespace Game.City_Generator {
     #region constructor
 
     public Corporate() {
-      m_type = (CorporateNames)s_random.Next(Enum.GetValues(typeof(CorporateNames)).Length);
+      m_type = (CorporateNames)Randomizer.Next(Enum.GetValues(typeof(CorporateNames)).Length);
       Id = s_counter;
       s_counter++;
       Buildings = new List<Building>();

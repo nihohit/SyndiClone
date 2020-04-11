@@ -1,3 +1,4 @@
+using Base;
 using System;
 using Vector2f = SFML.System.Vector2f;
 
@@ -5,7 +6,6 @@ namespace Game {
   #region Vector
 
   public struct Vector {
-    private static Random s_staticRandom = new Random();
     private readonly int m_x, m_y;
 
     #region constructors
@@ -126,21 +126,13 @@ namespace Game {
     }
 
     public Vector normalProbability(double deviation) {
-      int x = ComputeNormalProbablity(m_x, deviation);
-      int y = ComputeNormalProbablity(m_y, deviation);
+      int x = Convert.ToInt32(Randomizer.NormalDistribution(m_x, deviation));
+      int y = Convert.ToInt32(Randomizer.NormalDistribution(m_y, deviation));
       return new Vector(x, y);
     }
 
     public double Length() {
       return Math.Sqrt(Math.Pow(m_x, 2) + Math.Pow(m_y, 2));
-    }
-
-    private int ComputeNormalProbablity(double mean, double deviation) {
-      double u1 = s_staticRandom.NextDouble(); //these are uniform(0,1) random doubles
-      double u2 = s_staticRandom.NextDouble();
-      double randStdNormal = Math.Sqrt(-2.0 * Math.Log(u1)) * Math.Sin(2.0 * Math.PI * u2); //random normal(0,1)
-      double randNormal = mean + deviation * randStdNormal; //random normal(mean,stdDev^2)
-      return Convert.ToInt16(randNormal);
     }
 
     public Vector CompleteToDistance(int dist) {

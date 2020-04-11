@@ -1,3 +1,4 @@
+using Base;
 using System;
 using System.Collections.Generic;
 
@@ -25,7 +26,6 @@ namespace Game.City_Generator {
     private const char ROAD_GENERIC = '*'; // a generic char for a road, not knowing direction or it's adjacent squares.
     private const int MIN_BLOCK_SIZE = 0; // the smaller block that will have sub-roads is of size 7X6
     private const int CORP_DIM = 20; //see "add corporates()" for use, signifies the size of each initial corporate
-    private static readonly Random s_random = new Random();
 
     #endregion constants
 
@@ -102,12 +102,12 @@ namespace Game.City_Generator {
 
       gap = maxDepRoad * GAP_RATIO;
       for (int i = 0; i < DepthRoadsNum; ++i) {
-        LengthRoads.Add(s_random.Next(maxDepRoad, gap - maxDepRoad) + (i * gap));
+        LengthRoads.Add(Randomizer.Next(maxDepRoad, gap - maxDepRoad) + (i * gap));
       }
 
       gap = maxLenRoad * GAP_RATIO;
       for (int i = 0; i < LengthRoadsNum; ++i) {
-        DepthRoads.Add(s_random.Next(maxLenRoad, gap - maxLenRoad) + (i * gap));
+        DepthRoads.Add(Randomizer.Next(maxLenRoad, gap - maxLenRoad) + (i * gap));
       }
 
       List<int> LengthBlockEdge = new List<int>();
@@ -118,7 +118,7 @@ namespace Game.City_Generator {
       if (maxDepRoad >= 1) //this way the "rand.next()" function will not blow up
       {
         foreach (int i in LengthRoads) {
-          m = s_random.Next(1, maxDepRoad);
+          m = Randomizer.Next(1, maxDepRoad);
           LengthBlockEdge.Add(i);
           LengthBlockEdge.Add(i + m);
           for (int j = 0; j < m; ++j)
@@ -137,7 +137,7 @@ namespace Game.City_Generator {
       if (maxLenRoad >= 1) //this way the "rand.next()" function will not blow up
       {
         foreach (int i in DepthRoads) {
-          m = s_random.Next(1, maxLenRoad);
+          m = Randomizer.Next(1, maxLenRoad);
           DepthBlockEdge.Add(i);
           DepthBlockEdge.Add(i + m);
           for (int j = 0; j < m; ++j)
@@ -464,7 +464,7 @@ namespace Game.City_Generator {
           }
         }
       for (int i = 0; i < BIG_CORPS; ++i)
-        Takeover(s_random.Next(Length / CORP_DIM), s_random.Next(Depth / CORP_DIM));
+        Takeover(Randomizer.Next(Length / CORP_DIM), Randomizer.Next(Depth / CORP_DIM));
     }
 
     /**
@@ -478,7 +478,7 @@ namespace Game.City_Generator {
         for (int j = jLoc - 1; j <= jLoc + 1; ++j) {
           if (j < 0) continue;
           if (j >= CorpList.GetLength(1)) break;
-          if (s_random.NextDouble() < TAKEOVER_CHANCE) {
+          if (Randomizer.NextDouble() < TAKEOVER_CHANCE) {
             CorpList[iLoc, jLoc].Takeover(CorpList[i, j]);
             CorpList[i, j] = CorpList[iLoc, jLoc];
           }
@@ -568,7 +568,7 @@ namespace Game.City_Generator {
 
         //double step = DECREASE_FACTOR / (ARR_SIZE - 3);//"-3" is meant to represent the fact that I'm not increasing the size of places 0,1 and x;
         //double total = 0;
-        double rand = s_random.NextDouble() * vPlaces[Math.Min(max, ARR_SIZE - 1)];
+        double rand = Randomizer.NextDouble() * vPlaces[Math.Min(max, ARR_SIZE - 1)];
         for (retVal = 2;
           ((rand > vPlaces[retVal]) && (retVal <= max)); ++retVal) ; //make sure that retVal is not higher than max (in case of non-positive probabilities)
         /* for (int y = 2; y < ARR_SIZE; ++y)
@@ -595,7 +595,7 @@ namespace Game.City_Generator {
         //double step = DECREASE_FACTOR / (ARR_SIZE - 3);//"-3" is meant to represent the fact that I'm not increasing the size of places 0,1 and x;
         //double total = 0;
         max = Math.Min(max, ARR_SIZE - 1);
-        double rand = s_random.NextDouble() * hPlaces[max];
+        double rand = Randomizer.NextDouble() * hPlaces[max];
         for (retVal = 2;
           (rand > hPlaces[retVal]) && (retVal <= max); ++retVal) ;
         /*for (int y = 2; y < ARR_SIZE; ++y)
