@@ -189,30 +189,6 @@ namespace Game.Logic {
 
   #endregion reactions
 
-  #region UniqueList
-
-  //This class represents a list that verifies that entities entered into it only once.
-  public class UniqueList<T> : List<T> {
-
-    public UniqueList() : base() {
-    }
-
-    public UniqueList(List<T> old) : base(old) {
-    }
-
-    public void uniqueAdd(T obj) {
-      if (!base.Contains(obj)) base.Add(obj);
-    }
-
-    public void listAdd(UniqueList<T> list) {
-      foreach (T t in list) {
-        uniqueAdd(t);
-      }
-    }
-  }
-
-  #endregion UniqueList
-
   #region LocationFullException
 
   public class LocationFullException : System.ApplicationException {

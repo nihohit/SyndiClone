@@ -13,12 +13,12 @@ namespace Game.Logic {
     static private readonly uint FRAMES_PER_SECOND = FileHandler.GetUintProperty("logic frames per second", FileAccessor.LOGIC); //determines the amount of repeats the system can have in a second
     private readonly uint MIN_MILLISECONDS_PER_FRAME = 1000 / FRAMES_PER_SECOND;
 
-    private List<Entity> m_activeEntities = new List<Entity>(); //TODO - readonly uniquelist?
-    private readonly UniqueList<MovingEntity> m_movingEntities = new UniqueList<MovingEntity>();
-    private readonly UniqueList<Entity> m_playerUnits = new UniqueList<Entity>();
-    private readonly UniqueList<IShooter> m_shootingEntities = new UniqueList<IShooter>();
-    private readonly UniqueList<IConstructor> m_constructingEntities = new UniqueList<IConstructor>();
-    private readonly UniqueList<Entity> m_alwaysActiveEntities; //TODO - we can skip this, if we decide that civilians work even when not in view. all depends on calculations' weight
+    private List<Entity> m_activeEntities = new List<Entity>(); //TODO - readonly HashSet?
+    private readonly HashSet<MovingEntity> m_movingEntities = new HashSet<MovingEntity>();
+    private readonly HashSet<Entity> m_playerUnits = new HashSet<Entity>();
+    private readonly HashSet<IShooter> m_shootingEntities = new HashSet<IShooter>();
+    private readonly HashSet<IConstructor> m_constructingEntities = new HashSet<IConstructor>();
+    private readonly HashSet<Entity> m_alwaysActiveEntities; //TODO - we can skip this, if we decide that civilians work even when not in view. all depends on calculations' weight
     private readonly Dictionary<int, Affiliation> m_playerIdToAffiliation = new Dictionary<int, Affiliation>();
 
     private readonly int m_maximumAmountOfCivilians;
@@ -54,7 +54,7 @@ namespace Game.Logic {
       m_maximumAmountOfCivilians = civAmount;
       civAmount = 0;
       m_grid = GameBoardToGameGridConverter.ConvertBoard(city);
-      m_alwaysActiveEntities = new UniqueList<Entity>(m_grid.GetAllEntities());
+      m_alwaysActiveEntities = new HashSet<Entity>(m_grid.GetAllEntities());
       m_unpaused = true;
       m_gameRunning = true;
       totalWatch.Start();

@@ -18,7 +18,7 @@ namespace Game.Logic {
 
     #region delegates
 
-    private delegate ShotEffect CurriedEntityListAdd(UniqueList<Entity> list); //These functions curry a list to an effect which will enter entities into the list
+    private delegate ShotEffect CurriedEntityListAdd(HashSet<Entity> list); //These functions curry a list to an effect which will enter entities into the list
 
     private delegate ShotEffect CurriedDirectionListAdd(List<Direction> list); //These functions curry directions to an effect which will put them in lists
 
@@ -30,11 +30,11 @@ namespace Game.Logic {
 
     #region fields
 
-    private readonly UniqueList<Entity> m_entities = new UniqueList<Entity>();
+    private readonly HashSet<Entity> m_entities = new HashSet<Entity>();
     private readonly Dictionary<Entity, Area> m_entitiesToLocations = new Dictionary<Entity, Area>();
     private readonly List<Buffers.IBufferEvent> m_actionsDone = new List<Buffers.IBufferEvent>();
-    private readonly UniqueList<VisualEntityInformation> m_visibleEntities = new UniqueList<VisualEntityInformation>();
-    private readonly UniqueList<Entity> m_destroyedEntities = new UniqueList<Entity>();
+    private readonly HashSet<VisualEntityInformation> m_visibleEntities = new HashSet<VisualEntityInformation>();
+    private readonly HashSet<Entity> m_destroyedEntities = new HashSet<Entity>();
     private readonly Entity[,] m_gameGrid;
     private readonly TerrainGrid m_pathFindingGrid;
     private Entity m_selected;
@@ -74,7 +74,7 @@ namespace Game.Logic {
     #region public methods
 
     /// TODO - make this player specific.
-    public List<VisualEntityInformation> GetVisibleEntities() {
+    public IEnumerable<VisualEntityInformation> GetVisibleEntities() {
       return m_visibleEntities;
     }
 
@@ -117,9 +117,9 @@ namespace Game.Logic {
       int radius = sight.Range;
       WasBlocked blocked = sight.Blocked;
       //curries the list of entities to an effect
-      CurriedEntityListAdd listAdd = delegate (UniqueList<Entity> list) {
-        return delegate (Entity entity) {
-          if (entity != null) { list.uniqueAdd(entity); }
+      CurriedEntityListAdd listAdd = (HashSet<Entity> list) => {
+        return (Entity entity) => {
+          if (entity != null) { list.Add(entity); }
         };
       };
 

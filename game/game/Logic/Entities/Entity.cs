@@ -35,7 +35,7 @@ namespace Game.Logic.Entities {
 
     public reactionFunction ReactionFunction { get; set; }
 
-    public UniqueList<Entity> WhatSees { get; set; }
+    public HashSet<Entity> WhatSees { get; set; }
 
     public Affiliation Loyalty { get; set; }
 
@@ -65,7 +65,7 @@ namespace Game.Logic.Entities {
       VisibleStatus = Visibility.REVEALED;
       ReactionFunction = reaction;
       ReactionTime = reactionTime;
-      WhatSees = new UniqueList<Entity>();
+      WhatSees = new HashSet<Entity>();
       s_Id++;
       Id = s_Id;
       VisualInfo = new VisualEntityInformation(Type, Loyalty, size, Id);
