@@ -1,9 +1,9 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Game.Logic.Entities {
 
   public class BlastEffect : Shot {
-    private static Dictionary<BlastType, BlastEffect> s_blasts = new Dictionary<BlastType, BlastEffect>();
+    private static readonly Dictionary<BlastType, BlastEffect> s_blasts = new Dictionary<BlastType, BlastEffect>();
 
     public static BlastEffect Instance(BlastType type) {
       if (!s_blasts.ContainsKey(type)) {

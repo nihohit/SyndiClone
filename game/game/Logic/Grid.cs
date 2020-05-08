@@ -449,7 +449,7 @@ namespace Game.Logic {
         newY = Math.Min(y + radius - i, m_gameGrid.GetLength(1) - 1);
         ProcessPath(location, new Point(newX, newY), blast);
 
-        newY = newY = Math.Max(y - radius + i, 0);
+        newY = Math.Max(y - radius + i, 0);
         ProcessPath(location, new Point(newX, newY), blast);
 
         newX = Math.Max(x - i, 0);
