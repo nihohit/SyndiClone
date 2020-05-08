@@ -1,4 +1,4 @@
-using Game.Logic.Entities;
+﻿using Game.Logic.Entities;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -100,7 +100,6 @@ namespace Game.Logic {
     /*
      * This function returns the list of actions performed in the current round.
      */
-
     public List<Buffers.IBufferEvent> ReturnCommitedActions() {
       foreach (Entity ent in m_destroyedEntities)
         Destroy(ent);
@@ -138,7 +137,6 @@ namespace Game.Logic {
     /*
      * this function resolves a move command from the game logic, based on the reaction set by the entity
      */
-
     public void ResolveMove(MovingEntity ent) {
       ActionType action = ent.Reaction.Action();
       Point currentLocation = ConvertToCentralPoint(ent);
@@ -174,7 +172,6 @@ namespace Game.Logic {
      * This function adds an entity to a certain area
      * TODO - can this become private?
      */
-
     public void AddEntity(Entity ent, Area area) {
       //TODO - if (gameGrid[loc.getX, loc.Y] != null) throw new LocationFullException(loc.ToString() + " " + gameGrid[loc.getX, loc.getY].ToString());
       //else
@@ -206,7 +203,6 @@ namespace Game.Logic {
      * This function finds the central point of an entity - and entity is a grid, and the central point is that which the
      * shots/sights are coming from, and where other units will aim at.
      */
-
     private Point ConvertToCentralPoint(Entity ent) {
       Area area = m_entitiesToLocations[ent];
       int x = area.Entry.X + area.Size.X / 2, y = area.Entry.Y + area.Size.Y / 2;
@@ -216,7 +212,6 @@ namespace Game.Logic {
     /*
      * This function adds events to be reported to future buffers
      */
-
     private void AddEvent(Buffers.IBufferEvent action) {
       m_actionsDone.Add(action);
     }
@@ -228,10 +223,8 @@ namespace Game.Logic {
     /*
      * This is the basic moving function
      */
-
     private void Move(MovingEntity ent) {
-      int tries = 0;
-      while (ent.Path.Count == 0) {
+      for (int tries = 0; ent.Path.Count == 0; tries++) {
         if (tries == 5) //just a precaution
         {
           m_destroyedEntities.Add(ent);
@@ -239,7 +232,6 @@ namespace Game.Logic {
         }
         Point temp = ConvertToCentralPoint(ent);
         ent.Path = GetSimplePath(temp, GenerateRandomPoint(temp, randomPathLength), ent);
-        tries++;
       }
       Direction dir = ent.GetDirection();
       bool result = CanMove(ent, dir);
@@ -265,7 +257,6 @@ namespace Game.Logic {
      * This function is used mainly to generate the simple walking path for civilians.
      * Will probably need to make it better in future, it'll probably serve other functions.
      */
-
     private List<Direction> GetSimplePath(Point entry, Point target, MovingEntity ent) {
       List<Direction> ans = ProcessWalkingPath(entry, target);
       if (ans.Count != entry.GetDiffVector(target).Length()) {
@@ -277,7 +268,6 @@ namespace Game.Logic {
     /*
      * This function will be used for player units, taht need complex routes.
      */
-
     private Task<List<Direction>> GetComplexPath(Point entry, Point target, Vector size, MovementType movement, Direction direction) {
       return m_pathfinder.FindPathAsync(entry, target, direction, new Pathfinding.AStarConfiguration(size, movement, Pathfinding.Heuristics.DiagonalTo(target), true, true));
     }
@@ -285,7 +275,6 @@ namespace Game.Logic {
     /*
      * a case of Bresenham's line algorithm that returns a list of directions to go in.
      */
-
     private List<Direction> ProcessWalkingPath(Point exit, Point target) {
       List<Direction> ans = new List<Direction>();
       int x0 = exit.X;
@@ -350,7 +339,6 @@ namespace Game.Logic {
     /*
      * Checks if a ceratin entity can mone, and whether it needs to flip its axis in order to move in the given direction
      */
-
     private bool CanMove(MovingEntity ent, Direction direction) {
       Area location = m_entitiesToLocations[ent];
       if (ent.NeedFlip()) {
@@ -365,7 +353,6 @@ namespace Game.Logic {
     /*
      * Checks if an entity can enter a given area - whether each point is free
      */
-
     private bool CanMove(Entity ent, Area area) {
       //This delegate is a function that checks if the entity in the point is either null (point empty) or the same entity
       CurriedPointOperator checkEntityInArea = (Entity entity) => {
@@ -381,7 +368,6 @@ namespace Game.Logic {
     /**
      * This function serves for running away from a certain point - it finds where does the civilian run to.
      */
-
     private Point GetOppositePoint(Point from, Point center, int distance) {
       Vector dist = center.GetDiffVector(from);
       dist.CompleteToDistance(distance);
@@ -397,7 +383,6 @@ namespace Game.Logic {
     /*
      *
      */
-
     private void MoveToNewLocation(MovingEntity ent, Direction dir) {
       Area location = m_entitiesToLocations[ent];
       if (ent.NeedFlip()) {
@@ -430,7 +415,6 @@ namespace Game.Logic {
     /*
      * This function iterates an operator on every point in an area.
      */
-
     private bool IterateOverArea(Area area, boolPointOperator op) {
       bool ans = true;
       Point entry = area.Entry;
@@ -453,7 +437,6 @@ namespace Game.Logic {
     /*
      * this function sends a shot effect in every direction - lines to every point in the radius circumference
      */
-
     private void AreaEffect(Point location, BlastEffect blast) {
       int radius = blast.Radius;
       int x = location.X;
@@ -501,7 +484,6 @@ namespace Game.Logic {
     /*
      * A simple version of Berensham's line algorithm, that calculates the way of a bullet, and affects every entity in the way
      */
-
     private Point ProcessPath(Point exit, Point target, Shot shot) {
       ShotEffect effect = shot.Effect;
       WasBlocked blocked = shot.Blocked;
@@ -607,7 +589,6 @@ namespace Game.Logic {
     /*
      * This method sets randomly all the exit points of all the buildigns on the map.
      */
-
     private void SetExitPoint(Building ent) {
       Point center = ConvertToCentralPoint(ent);
       List<Vector> options = new List<Vector>();
