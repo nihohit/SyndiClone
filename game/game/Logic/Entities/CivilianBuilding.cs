@@ -6,12 +6,11 @@ namespace Game.Logic.Entities {
 
     public CivilianBuilding(Game.Vector realSize, int sizeModifier, Vector exit) : base(sizeModifier, Entity.ReactionPlaceHolder, realSize, Affiliation.CIVILIAN) {
       base.Exit = exit;
-      reactionFunction react = delegate (List<Entity> ent) {
+      ReactionFunction = (IEnumerable<Entity> ent) => {
         Civilian temp = new Civilian(exit.VectorToDirection());
         m_readyToBuild = true;
         return new ConstructReaction(temp);
-      };
-      ReactionFunction = react;
+      }; 
     }
 
     #region public methods

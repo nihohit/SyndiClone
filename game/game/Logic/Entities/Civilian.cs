@@ -32,7 +32,7 @@ namespace Game.Logic.Entities {
       m_fleeing = true;
     }
 
-    public static Reaction CivReact(List<Entity> entities) {
+    public static Reaction CivReact(IEnumerable<Entity> entities) {
       Entity threat = Targeters.ThreatTargeterHigh(entities, Affiliation.CIVILIAN);
       Reaction react;
 

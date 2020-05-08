@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace Game.Logic.Entities {
 
@@ -131,7 +132,7 @@ namespace Game.Logic.Entities {
 
     #region static methods
 
-    protected static Reaction ReactionPlaceHolder(System.Collections.Generic.List<Entity> list) {
+    protected static Reaction ReactionPlaceHolder(IEnumerable<Entity> list) {
       return new IgnoreReaction();
     }
 

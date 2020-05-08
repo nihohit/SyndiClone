@@ -11,9 +11,9 @@ namespace Game.Logic {
 
   public delegate bool WasBlocked(Entity ent); //These functions check whether an entitiy blocks a certain effect
 
-  public delegate Entity targetChooser(List<Entity> targets); //These functions choose which entity, out of the list of possible entities, to target
+  public delegate Entity targetChooser(IEnumerable<Entity> targets); //These functions choose which entity, out of the list of possible entities, to target
 
-  public delegate Reaction reactionFunction(List<Entity> ent); //These functions set the reaction of entities
+  public delegate Reaction reactionFunction(IEnumerable<Entity> ent); //These functions set the reaction of entities
 
   #endregion delegates
 

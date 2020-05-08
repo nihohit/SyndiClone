@@ -8,7 +8,7 @@ namespace Game.Logic {
 
   public static class Targeters {
 
-    public static Entity ThreatTargeterHigh(List<Entity> entities, Affiliation loyalty) {
+    public static Entity ThreatTargeterHigh(IEnumerable<Entity> entities, Affiliation loyalty) {
       Entity target = null;
       int seenThreat = 0;
       foreach (Entity ent in entities) {
@@ -20,7 +20,7 @@ namespace Game.Logic {
       return target;
     }
 
-    public static Entity SpeedTargeterHigh(List<Entity> entities, Affiliation loyalty) {
+    public static Entity SpeedTargeterHigh(IEnumerable<Entity> entities, Affiliation loyalty) {
       Entity target = null;
       int speed = 0;
       foreach (Entity ent in entities) {
@@ -33,7 +33,7 @@ namespace Game.Logic {
       return target;
     }
 
-    public static Entity HealthTargeterHigh(List<Entity> entities, Affiliation loyalty) {
+    public static Entity HealthTargeterHigh(IEnumerable<Entity> entities, Affiliation loyalty) {
       Entity target = null;
       int health = 0;
       foreach (Entity ent in entities) {
@@ -46,7 +46,7 @@ namespace Game.Logic {
       return target;
     }
 
-    public static Entity ThreatTargeterLow(List<Entity> entities, Affiliation loyalty) {
+    public static Entity ThreatTargeterLow(IEnumerable<Entity> entities, Affiliation loyalty) {
       Entity target = null;
       int seenThreat = 10000;
       foreach (Entity ent in entities) {
@@ -59,7 +59,7 @@ namespace Game.Logic {
       return target;
     }
 
-    public static Entity SpeedTargeterLow(List<Entity> entities, Affiliation loyalty) {
+    public static Entity SpeedTargeterLow(IEnumerable<Entity> entities, Affiliation loyalty) {
       Entity target = null;
       int speed = 10000;
       foreach (Entity ent in entities) {
@@ -72,7 +72,7 @@ namespace Game.Logic {
       return target;
     }
 
-    public static Entity HealthTargeterLow(List<Entity> entities, Affiliation loyalty) {
+    public static Entity HealthTargeterLow(IEnumerable<Entity> entities, Affiliation loyalty) {
       Entity target = null;
       int health = 10000;
       foreach (Entity ent in entities) {
@@ -85,7 +85,7 @@ namespace Game.Logic {
       return target;
     }
 
-    public static Entity SimpleTestTargeter(List<Entity> list, Affiliation affiliation) {
+    public static Entity SimpleTestTargeter(IEnumerable<Entity> list, Affiliation affiliation) {
       Entity target = null;
       int seenThreat = 10000;
       foreach (Entity ent in list) {

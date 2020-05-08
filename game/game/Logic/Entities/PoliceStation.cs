@@ -34,12 +34,11 @@ namespace Game.Logic.Entities {
       m_policemenCap = sizeModifier / POLICE_SIZE_MODIFIER;
       m_amountOfPolicemen = 0;
       Alert = false;
-      reactionFunction react = delegate (List<Entity> ent) {
+      ReactionFunction = (IEnumerable<Entity> ent) => {
         if (m_toConstruct == null) m_toConstruct = new Cop(this, Path);
         m_readyToBuild = true;
         return new ConstructReaction(m_toConstruct);
       };
-      ReactionFunction = react;
     }
 
     #endregion cosntructor

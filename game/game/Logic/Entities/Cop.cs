@@ -6,7 +6,7 @@ namespace Game.Logic.Entities {
 
     #region static members
 
-    static private Reaction copReact(List<Entity> list) {
+    static private Reaction copReact(IEnumerable<Entity> list) {
       Entity temp = Targeters.ThreatTargeterHigh(list, Affiliation.INDEPENDENT);
       if (temp == null) {
         return new IgnoreReaction();
@@ -14,7 +14,7 @@ namespace Game.Logic.Entities {
       return new PursueReaction(temp);
     }
 
-    private static Entity copTargeter(List<Entity> list) {
+    private static Entity copTargeter(IEnumerable<Entity> list) {
       return Targeters.ThreatTargeterHigh(list, Affiliation.INDEPENDENT);
     }
 
