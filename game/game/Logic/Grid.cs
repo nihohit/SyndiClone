@@ -562,6 +562,11 @@ namespace Game.Logic {
         Console.WriteLine("nothing selected.");
         return;
       }
+
+      if (temp.Loyalty == Affiliation.CIVILIAN && !m_entities.Any(Entities => ent.Loyalty == player)) {
+        temp.Loyalty = player;
+      }
+
       if (m_selected == null) { //TODO - loyalty should be player issuing the order
         m_selected = temp;
         var centralPoint = ConvertToCentralPoint(temp);
@@ -569,12 +574,12 @@ namespace Game.Logic {
           m_selected.VisualInfo,
           selectable.Select(player),
           new Vector(centralPoint.X, centralPoint.Y)));
-        FinishResolveNewPath((ConstructorBuilding) temp);
+        FinishResolveNewPath(temp as ConstructorBuilding);
       } else {
         var selection = selectable.Select(player);
         if (selection.Controlled) {
           point = GetExitPoint(temp as Building);
-          var pol = m_selected as PoliceStation;
+          var pol = m_selected as ConstructorBuilding;
           m_constructorsToPaths.Add(pol, GetComplexPath(GetExitPoint(pol), point, new Vector(1, 1), MovementType.GROUND, pol.Exit.VectorToDirection()));
         }
         DeselectUnit();
