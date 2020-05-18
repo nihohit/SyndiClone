@@ -53,19 +53,10 @@ namespace Game.City_Generator {
       Buildings.Remove(b);
     }
 
-    public bool CanBuild(Building b) {
-      if (b.Corp != this) return false;
-      foreach (Building other in Buildings)
-        if (b.Owner != other.Owner)
-          return false;
-      return true;
-    }
-
     /**
      * This method merges the "other" corporate into the current one.
      * after this method is done, other corporate will still exist, but will be empty (so it's better to remove him)
      * */
-
     public void Takeover(Corporate other) {
       if (other == this)
         return;

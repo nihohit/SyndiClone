@@ -76,7 +76,6 @@ namespace Game.Logic {
     /*
      * This is the main loop of the logic
      */
-
     public void Loop() {
       synch.Start();
       HandleInput();
@@ -136,7 +135,6 @@ namespace Game.Logic {
     /*
      * This method limits the amount of logic frames per second.
      */
-
     private void FrameLimit() {
       while (m_frameTimer.ElapsedMilliseconds < MIN_MILLISECONDS_PER_FRAME) { }
       m_frameTimer.Restart();
@@ -241,7 +239,6 @@ namespace Game.Logic {
     /*
      * This function iterates over every active entity, checks if they need to act, and if they do, finds their new reaction.
      */
-
     private void ResolveOrders() {
       foreach (Entity ent in m_activeEntities) {
         orders.Start();
@@ -301,7 +298,6 @@ namespace Game.Logic {
     /*
      * This function populates the active entities for this round, by the logic of - all player units, and every entity they see
      */
-
     private void PopulateActionLists() {
       /*
       activeEntities.listAdd(alwaysActive);

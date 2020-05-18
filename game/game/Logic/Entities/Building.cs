@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace Game.Logic.Entities {
 
-  public abstract class Building : Entity {
+  public abstract class Building : Entity, ISelectable {
 
     #region consts
 
@@ -25,6 +25,12 @@ namespace Game.Logic.Entities {
 
     public override void Destroy() {
       base.Destroy();
+    }
+
+    public SelectedEntityInformation Select(Affiliation playersLoyalty) {
+      return new SelectedEntityInformation {
+        Controlled = playersLoyalty == Loyalty
+      };
     }
   }
 }

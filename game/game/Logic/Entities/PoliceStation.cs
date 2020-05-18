@@ -26,7 +26,7 @@ namespace Game.Logic.Entities {
 
     //TODO - set the whole alert operation. another idea - after alert wanes, begin "destroying" cops?
 
-    #region cosntructor
+    #region constructor
 
     public PoliceStation(Vector realSize, int sizeModifier, Vector exit) : base(sizeModifier, Entity.ReactionPlaceHolder, realSize, Affiliation.INDEPENDENT) {
       Path = new List<Direction>();

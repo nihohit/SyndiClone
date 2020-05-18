@@ -210,7 +210,7 @@ namespace Game.Logic {
   #region EntityInformation
 
   public class SelectedEntityInformation {
-    public bool Controlled { get; private set; }
+    public bool Controlled { get;  set; }
 
     //TODO - determine what needs to be here.
   }

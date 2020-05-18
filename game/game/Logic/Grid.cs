@@ -93,8 +93,8 @@ namespace Game.Logic {
       }
     }
 
-    public List<VisualEntityInformation> GetAllVisualEntitiesInformation() {
-      return new List<VisualEntityInformation>(m_entities.Select(ent => ent.VisualInfo));
+    public IEnumerable<VisualEntityInformation> GetAllVisualEntitiesInformation() {
+      return m_entities.Select(ent => ent.VisualInfo);
     }
 
     /*
