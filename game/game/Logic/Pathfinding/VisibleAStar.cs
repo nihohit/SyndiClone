@@ -1,5 +1,5 @@
-using SFML.Graphics;
 using System.Collections.Generic;
+using SFML.Graphics;
 
 namespace Game.Logic.Pathfinding {
 
@@ -19,8 +19,7 @@ namespace Game.Logic.Pathfinding {
 
     #region constructor
 
-    public VisibleAStar(TerrainGrid gridHolder) : base(gridHolder) {
-    }
+    public VisibleAStar(TerrainGrid gridHolder) : base(gridHolder) { }
 
     #endregion constructor
 
@@ -60,8 +59,7 @@ namespace Game.Logic.Pathfinding {
 
     #endregion fields
 
-    public AdvancedVisibleAStar(TerrainGrid gridHolder) : base(gridHolder, new VisibleAStar(gridHolder), new VisibleAStar(AdvancedAStar.MinimiseGrid(gridHolder))) {
-    }
+    public AdvancedVisibleAStar(TerrainGrid gridHolder) : base(gridHolder, new VisibleAStar(gridHolder), new VisibleAStar(AdvancedAStar.MinimiseGrid(gridHolder))) { }
 
     public static void Setup(Game.Buffers.DisplayBuffer buffer) {
       s_buffer = buffer;
@@ -77,7 +75,7 @@ namespace Game.Logic.Pathfinding {
         list.Add(new Buffers.DisplayImageBufferEvent(sprite));
         midPoint = midPoint.Parent;
       }
-      lock (s_buffer) {
+      lock(s_buffer) {
         s_buffer.ReceiveActions(list);
         s_buffer.Updated = true;
       }

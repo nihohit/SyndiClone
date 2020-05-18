@@ -1,5 +1,5 @@
-using Game.Logic.Entities;
 using System.Collections.Generic;
+using Game.Logic.Entities;
 
 namespace Game.Logic {
 
@@ -21,15 +21,15 @@ namespace Game.Logic {
 
   public enum ActionType { FIRE_AT, IGNORE, RUN_AWAY_FROM, MOVE_TOWARDS, MOVE_WHILE_SHOOT, CONSTRUCT_ENTITY, PURSUE } //This enum checks the possible actions entities can take
 
-  public enum EntityType { PERSON, VEHICLE, BUILDING } //the different types of entities
+ public enum EntityType { PERSON, VEHICLE, BUILDING } //the different types of entities
 
-  public enum Visibility { CLOAKED, MASKED, REVEALED, SOLID } //the visibility of an entity
+ public enum Visibility { CLOAKED, MASKED, REVEALED, SOLID } //the visibility of an entity
 
-  public enum Affiliation { INDEPENDENT, CORP1, CORP2, CORP3, CORP4, CIVILIAN } //to which player each entity belongs
+ public enum Affiliation { INDEPENDENT, CORP1, CORP2, CORP3, CORP4, CIVILIAN } //to which player each entity belongs
 
-  public enum SightType { DEFAULT_SIGHT, BLIND } //different sights
+ public enum SightType { DEFAULT_SIGHT, BLIND } //different sights
 
-  public enum WeaponType { PISTOL, ASSAULT, BAZOOKA, SNIPER, RAILGUN } //different weapons
+ public enum WeaponType { PISTOL, ASSAULT, BAZOOKA, SNIPER, RAILGUN } //different weapons
 
   public enum MovementType { GROUND, HOVER, FLYER, CRUSHER }
 
@@ -51,13 +51,13 @@ namespace Game.Logic {
 
   //This class is a holder for an array - used so the array won't be transferred by value over functions.
   public class TerrainGrid {
-    private readonly TerrainType[,] grid;
+    private readonly TerrainType[, ] grid;
 
     public TerrainGrid(int x, int y) {
       grid = new TerrainType[x, y];
     }
 
-    public Logic.TerrainType[,] Grid {
+    public Logic.TerrainType[, ] Grid {
       get { return grid; }
     }
   }
@@ -193,11 +193,9 @@ namespace Game.Logic {
 
   public class LocationFullException : System.ApplicationException {
 
-    public LocationFullException() {
-    }
+    public LocationFullException() { }
 
-    public LocationFullException(string message) {
-    }
+    public LocationFullException(string message) { }
 
     // Constructor needed for serialization
     // when exception propagates from a remoting server to the client.
@@ -210,7 +208,7 @@ namespace Game.Logic {
   #region EntityInformation
 
   public class SelectedEntityInformation {
-    public bool Controlled { get;  set; }
+    public bool Controlled { get; set; }
 
     //TODO - determine what needs to be here.
   }

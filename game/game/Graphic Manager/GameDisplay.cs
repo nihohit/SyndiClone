@@ -1,10 +1,10 @@
-using Game.Buffers;
-using SFML.Graphics;
-using SFML.Window;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using Game.Buffers;
+using SFML.Graphics;
+using SFML.Window;
 using Vector2f = SFML.System.Vector2f;
 
 namespace Game.Graphic_Manager {
@@ -109,7 +109,7 @@ namespace Game.Graphic_Manager {
     private void HandleDisplayBuffer() {
       synch.Start();
 
-      lock (m_buffer) {
+      lock(m_buffer) {
         if (m_buffer.Updated) {
           //TODO - needs reviewing
           m_buffer.AnalyzeData();
@@ -123,7 +123,7 @@ namespace Game.Graphic_Manager {
     }
 
     private void HandleInputBuffer() {
-      lock (m_input) {
+      lock(m_input) {
         if (m_input.GraphicInput) {
           List<IBufferEvent> list = m_input.GetEvents(InputModuleAccessors.Graphics);
           foreach (IBufferEvent action in list) {

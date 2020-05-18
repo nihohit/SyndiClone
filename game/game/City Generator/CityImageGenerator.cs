@@ -1,6 +1,6 @@
-using SFML.Graphics;
 using System;
 using System.Collections.Generic;
+using SFML.Graphics;
 
 namespace Game.City_Generator {
 
@@ -12,7 +12,7 @@ namespace Game.City_Generator {
     public static SFML.Graphics.Texture ConvertToImage(GameBoard city) {
       //TODO - set up all the images ahead of time in a dictionary, so we won't load them all the time.
 
-      Tile[,] grid = city.Grid;
+      Tile[, ] grid = city.Grid;
       //Image img = new Image(TILE_SIZE*grid.GetLength(0),TILE_SIZE*grid.GetLength(1));
       uint x = Convert.ToUInt16(TILE_SIZE * city.Length);
       uint y = Convert.ToUInt16(TILE_SIZE * city.Depth);
@@ -21,19 +21,22 @@ namespace Game.City_Generator {
       for (int i = 0; i < city.Length; i++) {
         for (int j = 0; j < city.Depth; j++) {
           switch (grid[i, j].Type) {
-            case ContentType.ROAD: {
-              images.Add(GetRoadImage((RoadTile)grid[i, j]));
-              break;
-            }
-            case ContentType.BUILDING: {
-              images.Add(GenerateBuildingTile((BuildingTile)grid[i, j]));
-              break;
-            }
-            //TODO - other tiles?
-            default: {
-              images.Add(new Image("images/City/0_empty.jpg"));
-              break;
-            }
+            case ContentType.ROAD:
+              {
+                images.Add(GetRoadImage((RoadTile) grid[i, j]));
+                break;
+              }
+            case ContentType.BUILDING:
+              {
+                images.Add(GenerateBuildingTile((BuildingTile) grid[i, j]));
+                break;
+              }
+              //TODO - other tiles?
+            default:
+              {
+                images.Add(new Image("images/City/0_empty.jpg"));
+                break;
+              }
           }
         }
       }

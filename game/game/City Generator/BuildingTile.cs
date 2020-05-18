@@ -8,7 +8,6 @@ namespace Game.City_Generator {
   internal class BuildingTile : Tile {
     /********************************Constructor***************************************/
 
-    public BuildingTile(Building b) : base(ContentType.BUILDING, b) {
-    }
+    public BuildingTile(Building b) : base(ContentType.BUILDING, b) { }
   }
 }

@@ -31,7 +31,7 @@ namespace Game.Buffers {
 
     //TODO - do we bother with different events?
     public void EnterEvent(IBufferEvent input) {
-      lock (this) {
+      lock(this) {
         m_graphicEvents.Add(input);
         m_logicEvents.Add(input);
         m_soundEvents.Add(input);

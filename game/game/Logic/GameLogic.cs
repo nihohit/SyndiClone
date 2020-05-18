@@ -1,8 +1,8 @@
-using Game.Buffers;
-using Game.Logic.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Game.Buffers;
+using Game.Logic.Entities;
 
 namespace Game.Logic {
 
@@ -143,7 +143,7 @@ namespace Game.Logic {
     private void HandleUnitCreation() {
       int civAmountToCreate = m_maximumAmountOfCivilians - m_currentCivilianAmount;
       foreach (IConstructor constructor in m_constructingEntities) {
-        switch (((Entity)constructor).Loyalty) {
+        switch (((Entity) constructor).Loyalty) {
           case (Affiliation.CIVILIAN):
             if (civAmountToCreate > 0) {
               m_grid.ResolveConstruction(constructor, constructor.GetConstruct());
@@ -172,7 +172,7 @@ namespace Game.Logic {
       foreach (IBufferEvent action in actions.ToList()) {
         switch (action.Type()) {
           case (BufferType.LOGIC_INTERNAL_DESTROY):
-            InternalDestroyBufferEvent temp = (InternalDestroyBufferEvent)action;
+            InternalDestroyBufferEvent temp = (InternalDestroyBufferEvent) action;
             m_alwaysActiveEntities.Remove(temp.DestroyedEntity);
             m_playerUnits.Remove(temp.DestroyedEntity);
             if ((temp.DestroyedEntity.Type == EntityType.PERSON) && temp.DestroyedEntity.Loyalty == Affiliation.CIVILIAN) {
@@ -184,15 +184,15 @@ namespace Game.Logic {
 
           case (BufferType.LOGIC_INTERNAL_CREATE):
             //TODO - change this function
-            m_alwaysActiveEntities.Add(((InternalCreateUnitBufferEvent)action).CreatedEntity);
+            m_alwaysActiveEntities.Add(((InternalCreateUnitBufferEvent) action).CreatedEntity);
             actions.Remove(action);
-            actions.Add(new ExternalCreateUnitBufferEvent((InternalCreateUnitBufferEvent)action));
+            actions.Add(new ExternalCreateUnitBufferEvent((InternalCreateUnitBufferEvent) action));
             break;
             //TODO - missing cases?
         }
       }
       //TODO - try smarter threading, with waiting only a limited time on entering.
-      lock (m_displayBuffer) {
+      lock(m_displayBuffer) {
         //List<ExternalEntity> newPath = grid.getVisibleEntities();
         List<VisualEntityInformation> newList = new List<VisualEntityInformation>(m_grid.GetAllVisualEntitiesInformation());
         m_displayBuffer.ReceiveVisibleEntities(newList);
@@ -205,7 +205,7 @@ namespace Game.Logic {
     }
 
     private void HandleInput() {
-      lock (m_inputBuffer) {
+      lock(m_inputBuffer) {
         if (m_inputBuffer.LogicInput) {
           List<IBufferEvent> events = m_inputBuffer.GetEvents(InputModuleAccessors.Logic);
           foreach (IBufferEvent action in events) {
@@ -224,7 +224,7 @@ namespace Game.Logic {
                 break;
 
               case BufferType.SELECT:
-                m_grid.SelectUnit(((MouseSelectBufferEvent)action).Coords.ToPoint(), m_playerIdToAffiliation[((MouseSelectBufferEvent)action).PlayerId]);
+                m_grid.SelectUnit(((MouseSelectBufferEvent) action).Coords.ToPoint(), m_playerIdToAffiliation[((MouseSelectBufferEvent) action).PlayerId]);
                 break;
 
               case BufferType.DESELECT:
@@ -257,7 +257,7 @@ namespace Game.Logic {
         ActionType action = react.Action();
 
         if (action == ActionType.FIRE_AT || action == ActionType.MOVE_WHILE_SHOOT) {
-          IShooter temp = (IShooter)ent;
+          IShooter temp = (IShooter) ent;
           if (temp.ReadyToShoot()) {
             m_shootingEntities.Add(temp);
           }
@@ -265,14 +265,14 @@ namespace Game.Logic {
 
         if (action == ActionType.MOVE_TOWARDS || action == ActionType.MOVE_WHILE_SHOOT || action == ActionType.RUN_AWAY_FROM ||
           (action == ActionType.IGNORE && ent.Type != EntityType.BUILDING)) {
-          MovingEntity temp = (MovingEntity)ent;
+          MovingEntity temp = (MovingEntity) ent;
           if (temp.ReadyToMove(temp.Speed)) {
             m_movingEntities.Add(temp);
           }
         }
 
         if (action == ActionType.CONSTRUCT_ENTITY) {
-          IConstructor temp = (IConstructor)ent;
+          IConstructor temp = (IConstructor) ent;
           bool check = temp.ReadyToConstruct();
           if (check) //TODO - for structures, to make sure they update their building order. other solution?
           {

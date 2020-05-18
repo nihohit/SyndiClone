@@ -167,7 +167,7 @@ namespace Game {
     #region standard public methods
 
     public override bool Equals(object obj) {
-      if (!(obj is Vector)) { return false; } else { return ((m_x == ((Vector)obj).X) && (m_y == ((Vector)obj).Y)); }
+      if (!(obj is Vector)) { return false; } else { return ((m_x == ((Vector) obj).X) && (m_y == ((Vector) obj).Y)); }
     }
 
     public override int GetHashCode() {
@@ -217,8 +217,8 @@ namespace Game {
       return new Area(m_entry, m_size.Flip());
     }
 
-    public Point[,] GetPointArea() {
-      Point[,] area = new Point[m_size.X, m_size.Y];
+    public Point[, ] GetPointArea() {
+      Point[, ] area = new Point[m_size.X, m_size.Y];
 
       for (int i = 0; i < m_size.X; i++) {
         for (int j = 0; j < m_size.Y; j++) {

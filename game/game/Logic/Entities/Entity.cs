@@ -107,8 +107,7 @@ namespace Game.Logic.Entities {
       return ans;
     }
 
-    public virtual void Destroy() {
-    }
+    public virtual void Destroy() { }
 
     protected virtual void Upgrade(System.Collections.Generic.List<Upgrades> list) {
       foreach (Upgrades upgrade in list) {

@@ -1,5 +1,5 @@
-using SFML.Graphics;
 using System.Collections.Generic;
+using SFML.Graphics;
 
 namespace Game.City_Generator {
   /**
@@ -10,7 +10,7 @@ namespace Game.City_Generator {
 
     #region properties
 
-    public Tile[,] Grid { get; protected set; }
+    public Tile[, ] Grid { get; protected set; }
 
     public int Length { get; protected set; }
 
@@ -20,7 +20,7 @@ namespace Game.City_Generator {
 
     public List<Building> Buildings { get; protected set; }
 
-    public Corporate[,] CorpList { get; protected set; }
+    public Corporate[, ] CorpList { get; protected set; }
 
     #endregion properties
   }

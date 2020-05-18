@@ -1,7 +1,7 @@
-using Game.Logic.Entities;
-using SFML.Graphics;
 using System;
 using System.Collections.Generic;
+using Game.Logic.Entities;
+using SFML.Graphics;
 using Vector2f = SFML.System.Vector2f;
 
 namespace Game.Graphic_Manager {
@@ -70,7 +70,7 @@ namespace Game.Graphic_Manager {
     //checks if the image exists, if not, then if an equivalent image exist, and if not, creates a new image.
     private static Texture GetBuildingImage(VisualEntityInformation building) {
       if (s_buildings.ContainsKey(building)) return s_buildings[building];
-      var temp = Tuple.Create(new Block((uint)building.Size.X, (uint)building.Size.Y), generateStyle(building.VisibleLoyalty));
+      var temp = Tuple.Create(new Block((uint) building.Size.X, (uint) building.Size.Y), generateStyle(building.VisibleLoyalty));
       Texture image = null;
       if (s_templates.ContainsKey(temp)) {
         image = s_templates[temp];
@@ -171,8 +171,7 @@ namespace Game.Graphic_Manager {
         case (10):
           img = new Sprite(s_parts[BuildingParts.EDGE]) {
             Rotation = 270f
-          };
-          ;
+          };;
           break;
 
         case (90):
@@ -213,8 +212,8 @@ namespace Game.Graphic_Manager {
 
     private static BuildingStyle generateStyle(Logic.Affiliation aff) {
       //TODO - missing function
-      int num = (int)aff;
-      return (BuildingStyle)num;
+      int num = (int) aff;
+      return (BuildingStyle) num;
     }
 
     #endregion private methods
@@ -228,7 +227,7 @@ namespace Game.Graphic_Manager {
       }
 
       public int GetHashCode(Tuple<Block, BuildingStyle> item) {
-        int hCode = (int)(item.Item1.X * item.Item1.Y * item.Item2.GetHashCode());
+        int hCode = (int) (item.Item1.X * item.Item1.Y * item.Item2.GetHashCode());
         return hCode.GetHashCode();
       }
     }

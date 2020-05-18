@@ -1,5 +1,5 @@
-using SFML.Graphics;
 using System.Collections.Generic;
+using SFML.Graphics;
 
 namespace Game.Graphic_Manager {
 
@@ -9,18 +9,18 @@ namespace Game.Graphic_Manager {
 
   public enum DecalType { WRECKAGE, BLOOD, RUBBLE } //TODO - different vehicles wreckages for different vehicles?
 
-  #endregion enumerators
+ #endregion enumerators
 
-  #region Decal
+ #region Decal
 
-  //this struct represents decals - temporary static pictures.
-  public class Decal {
+ //this struct represents decals - temporary static pictures.
+ public class Decal {
 
-    #region fields
+ #region fields
 
-    private static readonly uint DECAL_STAY_TIME = FileHandler.GetUintProperty("decal stay time", FileAccessor.DISPLAY);
+ private static readonly uint DECAL_STAY_TIME = FileHandler.GetUintProperty("decal stay time", FileAccessor.DISPLAY);
 
-    private static readonly Dictionary<DecalType, Texture> s_decals = new Dictionary<DecalType, Texture> {
+ private static readonly Dictionary<DecalType, Texture> s_decals = new Dictionary<DecalType, Texture> {
  //{DecalType.EXPLOSION,
  { DecalType.BLOOD, new Texture("images/Decals/bloodsplatter.png") }
  //{DecalType.RUBBLE,

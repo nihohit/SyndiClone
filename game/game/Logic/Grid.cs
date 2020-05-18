@@ -1,9 +1,9 @@
-﻿using Game.Logic.Entities;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Game.Logic.Entities;
 
 namespace Game.Logic {
 
@@ -35,7 +35,7 @@ namespace Game.Logic {
     private readonly List<Buffers.IBufferEvent> m_actionsDone = new List<Buffers.IBufferEvent>();
     private readonly HashSet<VisualEntityInformation> m_visibleEntities = new HashSet<VisualEntityInformation>();
     private readonly HashSet<Entity> m_destroyedEntities = new HashSet<Entity>();
-    private readonly Entity[,] m_gameGrid;
+    private readonly Entity[, ] m_gameGrid;
     private readonly TerrainGrid m_pathFindingGrid;
     private Entity m_selected;
     private Pathfinding.AdvancedAStar m_pathfinder;
@@ -65,7 +65,7 @@ namespace Game.Logic {
     //this function is called after all the buildings have been inserted into the grid.
     public void InitialiseExitPoints() {
       foreach (Entity ent in m_entities) {
-        SetExitPoint((Building)ent);
+        SetExitPoint((Building) ent);
       }
     }
 
@@ -145,14 +145,14 @@ namespace Game.Logic {
           break;
 
         case ActionType.RUN_AWAY_FROM:
-          Point from = ConvertToCentralPoint(((RunAwayReaction)ent.Reaction).Focus);
+          Point from = ConvertToCentralPoint(((RunAwayReaction) ent.Reaction).Focus);
           Point runTo = GetOppositePoint(from, currentLocation, CIV_FLEE_RANGE);
           ent.Path = GetSimplePath(currentLocation, runTo, ent);
-          ((Civilian)ent).RunningAway();
+          ((Civilian) ent).RunningAway();
           break;
 
         case ActionType.PURSUE:
-          Point targetLocation = ConvertToCentralPoint(((PursueReaction)ent.Reaction).Focus);
+          Point targetLocation = ConvertToCentralPoint(((PursueReaction) ent.Reaction).Focus);
           ent.Path = GetSimplePath(currentLocation, targetLocation, ent);
           break;
           //TODO - missing cases
@@ -187,7 +187,7 @@ namespace Game.Logic {
 
     public void ResolveConstruction(IConstructor constructor, MovingEntity entity) {
       if (constructor is ConstructorBuilding) {
-        FinishResolveNewPath((ConstructorBuilding)constructor);
+        FinishResolveNewPath((ConstructorBuilding) constructor);
       }
       AddEntity(entity, FindConstructionSpot(constructor, entity));
       //TODO - add the transition of the entity from the center of the building to outside. currently just pops out.
@@ -466,7 +466,7 @@ namespace Game.Logic {
       //get all relevant variables
       Weapons weapon = shooter.Weapon();
       Shot shot = weapon.Shot;
-      Point exit = ConvertToCentralPoint((Entity)shooter);
+      Point exit = ConvertToCentralPoint((Entity) shooter);
       Point currentTargetLocation = ConvertToCentralPoint(target);
       Vector direction = new Vector(currentTargetLocation, exit);
       direction = direction.normalProbability(direction.Length() / weapon.Accuracy);
@@ -548,7 +548,7 @@ namespace Game.Logic {
     #region construction logic
 
     private Area FindConstructionSpot(IConstructor constructor, Entity ent) {
-      return new Area(GetExitPoint((Building)constructor), ent.Size);
+      return new Area(GetExitPoint((Building) constructor), ent.Size);
     }
 
     private Point GetExitPoint(Building constructor) {
@@ -569,7 +569,7 @@ namespace Game.Logic {
           m_selected.VisualInfo,
           selectable.Select(player),
           new Vector(centralPoint.X, centralPoint.Y)));
-        FinishResolveNewPath((ConstructorBuilding)temp);
+        FinishResolveNewPath((ConstructorBuilding) temp);
       } else {
         var selection = selectable.Select(player);
         if (selection.Controlled) {

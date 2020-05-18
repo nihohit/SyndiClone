@@ -1,8 +1,8 @@
+using System.Collections.Generic;
 using Game.Graphic_Manager;
 using Game.Logic;
 using Game.Logic.Entities;
 using SFML.Graphics;
-using System.Collections.Generic;
 using Vector2f = SFML.System.Vector2f;
 
 namespace Game.Buffers {
@@ -147,11 +147,11 @@ namespace Game.Buffers {
       foreach (IBufferEvent action in m_actions) {
         switch (action.Type()) {
           case BufferType.EXTERNAL_DESTROY:
-            VisualEntityInformation visualInfo = ((ExternalDestroyBufferEvent)action).VisualInfo;
+            VisualEntityInformation visualInfo = ((ExternalDestroyBufferEvent) action).VisualInfo;
             Sprite temp = m_finder.Remove(visualInfo);
             m_removedSprites.Add(temp);
             if (visualInfo.Type != EntityType.PERSON)
-              m_newAnimations.Add(m_finder.GenerateDestoryResults(((ExternalDestroyBufferEvent)action).Area, visualInfo.Type));
+              m_newAnimations.Add(m_finder.GenerateDestoryResults(((ExternalDestroyBufferEvent) action).Area, visualInfo.Type));
             Decal decal = null;
             switch (visualInfo.Type) {
               case (EntityType.BUILDING):
@@ -176,12 +176,12 @@ namespace Game.Buffers {
             break;
 
           case BufferType.SHOT:
-            m_newAnimations.Add(CreateNewShot(((ShotBufferEvent)action).Shot, ((ShotBufferEvent)action).Exit, ((ShotBufferEvent)action).Target));
+            m_newAnimations.Add(CreateNewShot(((ShotBufferEvent) action).Shot, ((ShotBufferEvent) action).Exit, ((ShotBufferEvent) action).Target));
             break;
 
           case BufferType.UNIT_SELECT:
-            m_selection.Position = ((UnitSelectBufferEvent)action).Coords.ToVector2f();
-            m_selectedEntity = ((UnitSelectBufferEvent)action).VisibleInfo;
+            m_selection.Position = ((UnitSelectBufferEvent) action).Coords.ToVector2f();
+            m_selectedEntity = ((UnitSelectBufferEvent) action).VisibleInfo;
             m_selected = true;
             break;
 
@@ -191,15 +191,15 @@ namespace Game.Buffers {
             break;
 
           case BufferType.SETPATH:
-            Sprite toRemove = m_finder.RemovePath(((SetPathActionBufferEvent)action).Entity);
+            Sprite toRemove = m_finder.RemovePath(((SetPathActionBufferEvent) action).Entity);
             if (toRemove != null) {
               m_removedSprites.Add(toRemove);
             }
-            m_finder.SetPath(((SetPathActionBufferEvent)action).Entity, ((SetPathActionBufferEvent)action).Path, ((SetPathActionBufferEvent)action).Position);
+            m_finder.SetPath(((SetPathActionBufferEvent) action).Entity, ((SetPathActionBufferEvent) action).Path, ((SetPathActionBufferEvent) action).Position);
             break;
 
           case BufferType.DISPLAY_IMAGE:
-            m_displaySprites.Add(((DisplayImageBufferEvent)action).Sprite);
+            m_displaySprites.Add(((DisplayImageBufferEvent) action).Sprite);
             break;
 
           default:

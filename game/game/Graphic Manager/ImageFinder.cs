@@ -1,8 +1,8 @@
+using System;
+using System.Collections.Generic;
 using Game.Logic;
 using Game.Logic.Entities;
 using SFML.Graphics;
-using System;
-using System.Collections.Generic;
 using Vector2f = SFML.System.Vector2f;
 
 namespace Game.Graphic_Manager {
@@ -11,13 +11,13 @@ namespace Game.Graphic_Manager {
 
     private enum ImageType { PATH } //this enumerator is used for miscelenae.
 
-    #region fields
+ #region fields
 
-    private readonly uint m_distanceBetweenPathObjects = FileHandler.GetUintProperty("path sprite distance", FileAccessor.DISPLAY);
-    private readonly Dictionary<VisualEntityInformation, SpriteLoop> m_spriteLoopFinder = new Dictionary<VisualEntityInformation, SpriteLoop>();
-    private readonly Dictionary<VisualEntityInformation, SpriteLoop> m_pathFinder = new Dictionary<VisualEntityInformation, SpriteLoop>();
+ private readonly uint m_distanceBetweenPathObjects = FileHandler.GetUintProperty("path sprite distance", FileAccessor.DISPLAY);
+ private readonly Dictionary<VisualEntityInformation, SpriteLoop> m_spriteLoopFinder = new Dictionary<VisualEntityInformation, SpriteLoop>();
+ private readonly Dictionary<VisualEntityInformation, SpriteLoop> m_pathFinder = new Dictionary<VisualEntityInformation, SpriteLoop>();
 
-    private readonly Dictionary<Logic.Affiliation, Texture> m_personFinder = new Dictionary<Logic.Affiliation, Texture> { { Logic.Affiliation.INDEPENDENT, new Texture("images/Persons/personblue.png") },
+ private readonly Dictionary<Logic.Affiliation, Texture> m_personFinder = new Dictionary<Logic.Affiliation, Texture> { { Logic.Affiliation.INDEPENDENT, new Texture("images/Persons/personblue.png") },
  { Logic.Affiliation.CORP1, new Texture("images/Persons/personpurple.png") },
  { Logic.Affiliation.CORP2, new Texture("images/Persons/persongreen.png") },
  { Logic.Affiliation.CORP4, new Texture("images/Persons/personblack.png") },
@@ -37,8 +37,7 @@ namespace Game.Graphic_Manager {
 
     #region constructor
 
-    public SpriteFinder() {
-    }
+    public SpriteFinder() { }
 
     #endregion constructor
 
@@ -136,9 +135,9 @@ namespace Game.Graphic_Manager {
       RenderTexture texture;
       //In each recursion of this loop a new RenderTexture is created and each sprite that is relevant to that texture is embedded in it.
       for (uint i = 0; i < m_distanceBetweenPathObjects; i++) {
-        texture = new RenderTexture((uint)area.Size.X, (uint)area.Size.Y);
+        texture = new RenderTexture((uint) area.Size.X, (uint) area.Size.Y);
         for (uint j = 0; j < path.Count / m_distanceBetweenPathObjects; j++) {
-          count = (int)(j * m_distanceBetweenPathObjects + i);
+          count = (int) (j * m_distanceBetweenPathObjects + i);
           if (count < newSprite.Count) {
             texture.Draw(newSprite[count]);
           }
@@ -203,7 +202,7 @@ namespace Game.Graphic_Manager {
         if (y >= ySize - halfSize) { ySize++; }
       }
 
-      return new Area(new Point((int)xPos, (int)yPos), new Vector((int)xSize, (int)ySize));
+      return new Area(new Point((int) xPos, (int) yPos), new Vector((int) xSize, (int) ySize));
     }
 
     //This function returns a new path sprite, rotated to the correct way.

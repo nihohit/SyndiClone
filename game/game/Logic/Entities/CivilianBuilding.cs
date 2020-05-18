@@ -10,7 +10,7 @@ namespace Game.Logic.Entities {
         Civilian temp = new Civilian(exit.VectorToDirection());
         m_readyToBuild = true;
         return new ConstructReaction(temp);
-      }; 
+      };
     }
 
     #region public methods
@@ -26,7 +26,7 @@ namespace Game.Logic.Entities {
     }
 
     public override MovingEntity GetConstruct() {
-      return ((ConstructReaction)Reaction).Focus;
+      return ((ConstructReaction) Reaction).Focus;
     }
 
     public override bool ReadyToConstruct() {

@@ -97,7 +97,7 @@ namespace Game.Logic.Pathfinding {
   public class Heuristics {
 
     public static Heuristic DiagonalTo(Point goal) {
-      return delegate (Point entry) {
+      return delegate(Point entry) {
         int diagonal = Math.Max(Math.Abs(entry.X - goal.X), Math.Abs(entry.Y - goal.Y));
         int straight = Math.Abs(entry.X - goal.X) + Math.Abs(entry.Y - goal.Y);
         return Math.Sqrt(2) * diagonal + straight - (2 * diagonal);
@@ -105,7 +105,7 @@ namespace Game.Logic.Pathfinding {
     }
 
     public static Heuristic ManhattanMovement(Point goal) {
-      return delegate (Point entry) {
+      return delegate(Point entry) {
         return Math.Abs(goal.X - entry.X) + Math.Abs(goal.Y - entry.Y);
       };
     }

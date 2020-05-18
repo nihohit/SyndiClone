@@ -1,5 +1,4 @@
 namespace Game.Buffers {
 
-  public class SoundBuffer : Buffer {
-  }
+  public class SoundBuffer : Buffer { }
 }

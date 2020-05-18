@@ -47,7 +47,7 @@ namespace Game {
     }
 
     public override bool Equals(object obj) {
-      return ((obj is Point) && ((Point)obj == this));
+      return ((obj is Point) && ((Point) obj == this));
     }
 
     public Vector2f ToVector2f() {

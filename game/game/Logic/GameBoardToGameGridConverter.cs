@@ -1,5 +1,5 @@
-using Game.City_Generator;
 using System;
+using Game.City_Generator;
 
 namespace Game.Logic {
 
@@ -80,8 +80,8 @@ namespace Game.Logic {
 
       //TODO - something here is wrong, and the default exit locations seem rather random.
       return new Vector(
-        (short)(x * build.Dimensions.Length * TILE_SIZE_CONVERSION / 2),
-        (short)(y * build.Dimensions.Depth * TILE_SIZE_CONVERSION / 2));
+        (short) (x * build.Dimensions.Length * TILE_SIZE_CONVERSION / 2),
+        (short) (y * build.Dimensions.Depth * TILE_SIZE_CONVERSION / 2));
     }
 
     #endregion public methods
@@ -94,8 +94,8 @@ namespace Game.Logic {
 
     private static Area ConvertToArea(Game.City_Generator.Building build) {
       return new Area(
-        new Point((short)(build.Dimensions.StartY * TILE_SIZE_CONVERSION), (short)(build.Dimensions.StartX * TILE_SIZE_CONVERSION)),
-        new Vector((short)(build.Dimensions.Length * TILE_SIZE_CONVERSION), (short)(build.Dimensions.Depth * TILE_SIZE_CONVERSION)));
+        new Point((short) (build.Dimensions.StartY * TILE_SIZE_CONVERSION), (short) (build.Dimensions.StartX * TILE_SIZE_CONVERSION)),
+        new Vector((short) (build.Dimensions.Length * TILE_SIZE_CONVERSION), (short) (build.Dimensions.Depth * TILE_SIZE_CONVERSION)));
     }
 
     #endregion private methods

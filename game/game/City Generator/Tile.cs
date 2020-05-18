@@ -11,19 +11,17 @@ namespace Game.City_Generator {
 
   public enum Images { EMPTY, R_DEAD_END, R_CORNER, R_LINE, R_3WAY, R_FOURWAY, B_INNER, B_OUTER } //R means "road", B is building.
 
-  public enum Directions { NORTH, SOUTH, EAST, WEST } //just for passing directions.
+ public enum Directions { NORTH, SOUTH, EAST, WEST } //just for passing directions.
 
-  #endregion enumerators
+ #endregion enumerators
 
-  public class Tile {
+ public class Tile {
 
-    #region constructors
+ #region constructors
 
-    public Tile() : this(ContentType.EMPTY, null) {
-    }
+    public Tile() : this(ContentType.EMPTY, null) { }
 
-    public Tile(ContentType contentType) : this(contentType, null) {
-    }
+    public Tile(ContentType contentType) : this(contentType, null) { }
 
     public Tile(ContentType contentType, Building b) {
       // TODO: Complete member initialization

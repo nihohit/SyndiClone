@@ -19,10 +19,10 @@ namespace Game.Logic.Entities {
 
     #region constructors
 
-    public Civilian(Direction headed) :
+    public Civilian(Direction headed):
       base(CivReact, Affiliation.CIVILIAN, new List<Direction>(), headed) {
-      m_fleeing = false;
-    }
+        m_fleeing = false;
+      }
 
     #endregion constructors
 

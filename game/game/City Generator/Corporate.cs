@@ -10,27 +10,27 @@ namespace Game.City_Generator {
 
   internal enum CorporateNames { ZOMBIE_LTD, BRAINS, UPGRADES, MINING, ARMORY, RND, DEFENCE, DIGGING } //TODO: figure out what kinds of corporates do we want.
 
-  public class Corporate {
+ public class Corporate {
 
-    #region static fields
+ #region static fields
 
-    private static int s_counter = 0;
+ private static int s_counter = 0;
 
-    #endregion static fields
+ #endregion static fields
 
-    #region fields
+ #region fields
 
-    private CorporateNames m_type;
+ private CorporateNames m_type;
 
-    #endregion fields
+ #endregion fields
 
-    #region constructor
+ #region constructor
 
-    public Corporate() {
-      m_type = (CorporateNames)Randomizer.Next(Enum.GetValues(typeof(CorporateNames)).Length);
-      Id = s_counter;
-      s_counter++;
-      Buildings = new List<Building>();
+ public Corporate() {
+ m_type = (CorporateNames) Randomizer.Next(Enum.GetValues(typeof(CorporateNames)).Length);
+ Id = s_counter;
+ s_counter++;
+ Buildings = new List<Building>();
     }
 
     #endregion constructor

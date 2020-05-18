@@ -37,23 +37,23 @@ namespace Game.Logic.Entities {
 
     #region constructors
 
-    public Cop(PoliceStation station) :
+    public Cop(PoliceStation station):
       base(copReact, Affiliation.INDEPENDENT, new List<Direction>(), station.Exit.VectorToDirection()) {
-      m_station = station;
-      m_timeBeforeShot = 0;
-      List<Upgrades> list = new List<Upgrades>();
-      list.Add(Upgrades.BULLETPROOF_VEST);
-      base.Upgrade(list);
-    }
+        m_station = station;
+        m_timeBeforeShot = 0;
+        List<Upgrades> list = new List<Upgrades>();
+        list.Add(Upgrades.BULLETPROOF_VEST);
+        base.Upgrade(list);
+      }
 
-    public Cop(PoliceStation station, List<Direction> path) :
+    public Cop(PoliceStation station, List<Direction> path):
       base(copReact, Affiliation.INDEPENDENT, new List<Direction>(path), station.Exit.VectorToDirection()) {
-      m_station = station;
-      m_timeBeforeShot = 0;
-      List<Upgrades> list = new List<Upgrades>();
-      list.Add(Upgrades.BULLETPROOF_VEST);
-      base.Upgrade(list);
-    }
+        m_station = station;
+        m_timeBeforeShot = 0;
+        List<Upgrades> list = new List<Upgrades>();
+        list.Add(Upgrades.BULLETPROOF_VEST);
+        base.Upgrade(list);
+      }
 
     #endregion constructors
 
@@ -74,7 +74,7 @@ namespace Game.Logic.Entities {
     }
 
     public Entity Target() {
-      return ((ShootReaction)Reaction).Focus;
+      return ((ShootReaction) Reaction).Focus;
     }
 
     public targetChooser Targeter() {

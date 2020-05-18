@@ -10,7 +10,7 @@ namespace Game.Logic.Pathfinding {
 
     private const int MIN_DISTANCE = 5;
 
-    private static readonly int TILE_SIZE = (int)FileHandler.GetUintProperty("tile size", FileAccessor.GENERAL);
+    private static readonly int TILE_SIZE = (int) FileHandler.GetUintProperty("tile size", FileAccessor.GENERAL);
     private readonly Logic.TerrainGrid m_gridHolder;
     private readonly AStar m_internalAStar;
     private readonly AStar m_internalMinimisedAStar;

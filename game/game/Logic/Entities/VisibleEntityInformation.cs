@@ -28,8 +28,7 @@ namespace Game.Logic.Entities {
       EntityId = entityId;
     }
 
-    public VisualEntityInformation(EntityType type, Affiliation visibleLoyalty, Vector size, int entityId) : this(type, visibleLoyalty, size, entityId, new Vector2f(-1, -1)) {
-    }
+    public VisualEntityInformation(EntityType type, Affiliation visibleLoyalty, Vector size, int entityId) : this(type, visibleLoyalty, size, entityId, new Vector2f(-1, -1)) { }
 
     #endregion constructors
 
@@ -37,7 +36,7 @@ namespace Game.Logic.Entities {
 
     public override bool Equals(object obj) {
       if (obj is VisualEntityInformation) {
-        return EntityId == ((VisualEntityInformation)obj).EntityId;
+        return EntityId == ((VisualEntityInformation) obj).EntityId;
       } else return false;
     }
 

@@ -21,8 +21,7 @@ namespace Game.Screen_Manager {
       get { if (s_instance == null) s_instance = new MainScreen(); return MainScreen.s_instance; }
     }
 
-    private MainScreen() {
-    }
+    private MainScreen() { }
 
     #endregion constructors
 
@@ -52,13 +51,13 @@ namespace Game.Screen_Manager {
     private void InitialiseUI() {
       var newGameButton = new Gwen.Control.Button(s_canvas);
       newGameButton.Text = "New Game";
-      newGameButton.SetBounds((int)s_window.Size.X / 2, (int)s_window.Size.Y / 2 - 100, 200, 200);
+      newGameButton.SetBounds((int) s_window.Size.X / 2, (int) s_window.Size.Y / 2 - 100, 200, 200);
       newGameButton.AutoSizeToContents = true;
       newGameButton.Pressed += GenerateNewGameScreen;
 
       var quitGameButton = new Gwen.Control.Button(s_canvas);
       quitGameButton.Text = "Quit Game";
-      quitGameButton.SetBounds((int)s_window.Size.X / 2, (int)s_window.Size.Y / 2 + 100, 400, 200);
+      quitGameButton.SetBounds((int) s_window.Size.X / 2, (int) s_window.Size.Y / 2 + 100, 400, 200);
       quitGameButton.AutoSizeToContents = true;
       quitGameButton.Pressed += QuitGame;
     }

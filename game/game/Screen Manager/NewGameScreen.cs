@@ -23,8 +23,7 @@ namespace Game.Screen_Manager {
       get { if (s_instance == null) s_instance = new NewGameScreen(); return NewGameScreen.s_instance; }
     }
 
-    private NewGameScreen() {
-    }
+    private NewGameScreen() { }
 
     #endregion constructors
 
@@ -51,8 +50,8 @@ namespace Game.Screen_Manager {
     #region private methods
 
     private void InitialiseUI() {
-      var halfX = (int)s_window.Size.X / 2;
-      var halfY = (int)s_window.Size.Y / 2;
+      var halfX = (int) s_window.Size.X / 2;
+      var halfY = (int) s_window.Size.Y / 2;
       var newGameButton = new Gwen.Control.Button(s_canvas) {
         Text = "New Game",
         AutoSizeToContents = true
@@ -91,7 +90,7 @@ namespace Game.Screen_Manager {
 
     static private void GenerateNewGame(Gwen.Control.Base control, EventArgs args) {
       System.Console.Out.WriteLine("new game started");
-      IScreen newGame = new GameScreen((int)s_xValue.Value, (int)s_yValue.Value, (int)s_civAmount.Value); //HACK
+      IScreen newGame = new GameScreen((int) s_xValue.Value, (int) s_yValue.Value, (int) s_civAmount.Value); //HACK
       EraseScreen();
       newGame.GainControl(s_window, s_canvas);
     }

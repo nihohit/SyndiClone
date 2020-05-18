@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -48,7 +48,7 @@ namespace Game {
 
     // converts degrees to radians
     public static float DegreesToRadians(this float degrees) {
-      return (float)Math.PI * degrees / 180;
+      return (float) Math.PI * degrees / 180;
     }
 
     public static bool HasFlag(this Enum value, Enum flag) {
@@ -63,7 +63,7 @@ namespace Game {
 
     // returns an enumerable with all values of an enumerator
     public static IEnumerable<T> GetValues<T>() {
-      return (T[])Enum.GetValues(typeof(T));
+      return (T[]) Enum.GetValues(typeof(T));
     }
 
     public static HashSet<T> ToHashSet<T>(this IEnumerable<T> source) {
@@ -162,7 +162,7 @@ namespace Game {
           hash = values.Aggregate(
             hash,
             (current, currentObject) =>
-              (current * c_multiplier) + (currentObject != null ? currentObject.GetHashCode() : 0));
+            (current * c_multiplier) + (currentObject != null ? currentObject.GetHashCode() : 0));
         }
 
         return hash;
@@ -179,7 +179,6 @@ namespace Game {
       return false;
     }
 
-    public void Reset() {
-    }
+    public void Reset() { }
   }
 }

@@ -30,7 +30,7 @@ namespace Game.City_Generator {
 
     #region fields
 
-    private char[,] m_grid;
+    private char[, ] m_grid;
     private BuildingPlacer m_buildPlacer;
 
     #endregion fields
@@ -90,8 +90,8 @@ namespace Game.City_Generator {
       int LengthRoadsNum = 0, DepthRoadsNum = 0;
 
       //this gives us the max possible road Depthth for both vertical(Lengthgth) and horizontal(Depthth) roads
-      int maxLenRoad = (int)(Math.Log10(Lengthgth));
-      int maxDepRoad = (int)(Math.Log10(Depthth));
+      int maxLenRoad = (int) (Math.Log10(Lengthgth));
+      int maxDepRoad = (int) (Math.Log10(Depthth));
       if (maxLenRoad > 0) LengthRoadsNum = (Depthth / maxLenRoad) / GAP_RATIO;
       if (maxDepRoad > 0) DepthRoadsNum = (Lengthgth / maxDepRoad) / GAP_RATIO;
 
@@ -126,8 +126,8 @@ namespace Game.City_Generator {
                 m_grid[startY + i + j, startX + k] = ROAD_GENERIC;
                 if (Grid[startY + i + j, startX + k].Type != ContentType.ROAD)
                   Grid[startY + i + j, startX + k] = new RoadTile();
-                ((RoadTile)Grid[startY + i + j, startX + k]).HDepth = m;
-                ((RoadTile)Grid[startY + i + j, startX + k]).HOffset = j;
+                ((RoadTile) Grid[startY + i + j, startX + k]).HDepth = m;
+                ((RoadTile) Grid[startY + i + j, startX + k]).HOffset = j;
               }
         }
         LengthBlockEdge.Add(Lengthgth);
@@ -145,8 +145,8 @@ namespace Game.City_Generator {
                 m_grid[startY + k, startX + i + j] = ROAD_GENERIC;
                 if (Grid[startY + k, startX + i + j].Type != ContentType.ROAD)
                   Grid[startY + k, startX + i + j] = new RoadTile();
-                ((RoadTile)Grid[startY + k, startX + i + j]).VDepth = m;
-                ((RoadTile)Grid[startY + k, startX + i + j]).VOffset = j;
+                ((RoadTile) Grid[startY + k, startX + i + j]).VDepth = m;
+                ((RoadTile) Grid[startY + k, startX + i + j]).VOffset = j;
               }
             }
         }
@@ -185,7 +185,7 @@ namespace Game.City_Generator {
             Grid[i, j].Rotate = 0;
             //System.Console.WriteLine("new point: (" + x + "," + y + ")");
 
-            current = (RoadTile)Grid[i, j];
+            current = (RoadTile) Grid[i, j];
             //set number of exits from the tile
 
             if (IsConnected(i, j, Directions.NORTH, current.HOffset)) {
@@ -243,12 +243,12 @@ namespace Game.City_Generator {
       Lengthgth = 0;
 
       for (;
-        ((x + Depthth < Depth) && (Grid[y, x + Depthth].Type == ContentType.EMPTY)); ++Depthth) ;
+        ((x + Depthth < Depth) && (Grid[y, x + Depthth].Type == ContentType.EMPTY)); ++Depthth);
 
       Depthth--; //no matter why we've stopped, we need to go one step backwards
 
       for (;
-        ((y + Lengthgth < Length) && (Grid[y + Lengthgth, x + Depthth].Type == ContentType.EMPTY)); ++Lengthgth) ;
+        ((y + Lengthgth < Length) && (Grid[y + Lengthgth, x + Depthth].Type == ContentType.EMPTY)); ++Lengthgth);
 
       Lengthgth--;
 
@@ -457,7 +457,7 @@ namespace Game.City_Generator {
       Building b;
       foreach (Tile t in Grid)
         if (t.Type == ContentType.BUILDING) {
-          b = ((BuildingTile)t).Building;
+          b = ((BuildingTile) t).Building;
           if (!b.HasCorp()) {
             b.JoinCorp(CorpList[(b.Dimensions.StartY + (b.Dimensions.Length / 2)) / CORP_DIM, (b.Dimensions.StartX + (b.Dimensions.Depth / 2)) / CORP_DIM]);
           }
@@ -569,7 +569,7 @@ namespace Game.City_Generator {
         //double total = 0;
         double rand = Randomizer.NextDouble() * vPlaces[Math.Min(max, ARR_SIZE - 1)];
         for (retVal = 2;
-          ((rand > vPlaces[retVal]) && (retVal <= max)); ++retVal) ; //make sure that retVal is not higher than max (in case of non-positive probabilities)
+          ((rand > vPlaces[retVal]) && (retVal <= max)); ++retVal); //make sure that retVal is not higher than max (in case of non-positive probabilities)
         /* for (int y = 2; y < ARR_SIZE; ++y)
          {
              if (y == retVal)
@@ -596,7 +596,7 @@ namespace Game.City_Generator {
         max = Math.Min(max, ARR_SIZE - 1);
         double rand = Randomizer.NextDouble() * hPlaces[max];
         for (retVal = 2;
-          (rand > hPlaces[retVal]) && (retVal <= max); ++retVal) ;
+          (rand > hPlaces[retVal]) && (retVal <= max); ++retVal);
         /*for (int y = 2; y < ARR_SIZE; ++y)
         {
             if (y == retVal)

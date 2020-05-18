@@ -1,8 +1,8 @@
+using System;
+using System.Threading;
 using Game.Buffers;
 using SFML.Graphics;
 using SFML.Window;
-using System;
-using System.Threading;
 using Vector2f = SFML.System.Vector2f;
 
 namespace Game.Screen_Manager {
@@ -176,7 +176,7 @@ namespace Game.Screen_Manager {
         return;
       }
       if (e.Code == Keyboard.Key.Space && m_inGame) {
-        lock (m_input) {
+        lock(m_input) {
           if (m_activeGame)
             m_input.EnterEvent(new PauseBufferEvent());
           else
@@ -201,7 +201,7 @@ namespace Game.Screen_Manager {
     /// Function called when the window is closed
     /// </summary>
     private void OnClosed(object sender, EventArgs e) {
-      Window window = (Window)sender;
+      Window window = (Window) sender;
       window.Close();
       m_input.EnterEvent(new EndGameBufferEvent());
       m_logicThread.Join();
@@ -294,7 +294,7 @@ namespace Game.Screen_Manager {
       if (scale == 1) {
         return;
       }
-      View currentView = ((RenderWindow)sender).GetView();
+      View currentView = ((RenderWindow) sender).GetView();
       adjustZoom(scale, currentView);
       bindViewportToBoard(currentView);
     }
@@ -303,7 +303,7 @@ namespace Game.Screen_Manager {
     private void MouseMoved(object sender, MouseMoveEventArgs e) {
       m_mouseX = e.X;
       m_mouseY = e.Y;
-      View currentView = ((RenderWindow)sender).GetView();
+      View currentView = ((RenderWindow) sender).GetView();
       var pixelRect = currentView.pixelRect();
       var right = pixelRect.Right();
       var bottom = pixelRect.Bottom();

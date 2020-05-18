@@ -28,7 +28,7 @@ namespace Game.Screen_Manager {
       Gwen.Renderer.SFML UIrenderer = new Gwen.Renderer.SFML(s_window);
       Gwen.Skin.TexturedBase skin = new Gwen.Skin.TexturedBase(UIrenderer, "DefaultSkin.png");
       Gwen.Control.Canvas canvas = new Gwen.Control.Canvas(skin);
-      canvas.SetSize((int)s_window.Size.X, (int)s_window.Size.Y);
+      canvas.SetSize((int) s_window.Size.X, (int) s_window.Size.Y);
       canvas.MouseInputEnabled = true;
       s_Input = new Gwen.Input.SFML();
       s_Input.Initialize(canvas, s_window);

@@ -1,5 +1,5 @@
-using Game.Logic.Entities;
 using System.Collections.Generic;
+using Game.Logic.Entities;
 
 namespace Game.Logic {
   /*
@@ -24,8 +24,8 @@ namespace Game.Logic {
       Entity target = null;
       int speed = 0;
       foreach (Entity ent in entities) {
-        if ((ent is MovingEntity && ((MovingEntity)ent).Speed > speed) || (ent.Type == EntityType.BUILDING && target == null) && (ent.Loyalty != loyalty)) {
-          speed = ((MovingEntity)ent).Speed;
+        if ((ent is MovingEntity && ((MovingEntity) ent).Speed > speed) || (ent.Type == EntityType.BUILDING && target == null) && (ent.Loyalty != loyalty)) {
+          speed = ((MovingEntity) ent).Speed;
           target = ent;
         }
       }
@@ -63,8 +63,8 @@ namespace Game.Logic {
       Entity target = null;
       int speed = 10000;
       foreach (Entity ent in entities) {
-        if ((ent is MovingEntity && ((MovingEntity)ent).Speed < speed) || (ent.Type == EntityType.BUILDING && target == null) && (ent.Loyalty != loyalty)) {
-          speed = ((MovingEntity)ent).Speed;
+        if ((ent is MovingEntity && ((MovingEntity) ent).Speed < speed) || (ent.Type == EntityType.BUILDING && target == null) && (ent.Loyalty != loyalty)) {
+          speed = ((MovingEntity) ent).Speed;
           target = ent;
         }
       }
